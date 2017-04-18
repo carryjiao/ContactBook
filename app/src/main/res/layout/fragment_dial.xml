@@ -1,0 +1,568 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/dial_text_bar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center_vertical"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:background="@color/colorTitleBlue">
+
+
+        <TextView
+            android:id="@+id/tv_show_dial_number"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
+            android:layout_centerInParent="true"
+            android:textSize="30sp"
+            android:textColor="@color/colorBrightWhite"/>
+
+        <TextView
+            android:id="@+id/tv_dial_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:textSize="35sp"
+            android:text="+"
+            android:textColor="@color/colorAddGray"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="10dp" />
+
+        <ImageView
+            android:id="@+id/iv_dial_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_input_delete"
+            android:layout_marginRight="8dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true" />
+
+
+    </RelativeLayout>
+
+    <GridLayout
+        android:id="@+id/dial_gridLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="22dp"
+        android:columnCount="3"
+        android:rowCount="5"
+        android:layout_below="@+id/dial_text_bar"
+        android:layout_centerHorizontal="true">
+
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/dial_btn_column_space"
+            android:layout_marginBottom="@dimen/dial_btn_row_space">
+
+
+            <Button
+                android:id="@+id/btn_dial_number_1"
+                android:layout_width="@dimen/dial_btn_radius"
+                android:layout_height="@dimen/dial_btn_radius"
+                android:stateListAnimator="@null"
+                android:background="@drawable/dial_number_shape" />
+
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp">
+
+                <TextView
+                    android:id="@+id/tv_dial_number_1"
+                    android:text="1"
+                    android:textSize="30sp"
+                    android:typeface="monospace"
+                    android:textColor="@color/colorBlack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/dial_btn_column_space">
+
+
+            <Button
+                android:id="@+id/btn_dial_number_2"
+                android:layout_width="@dimen/dial_btn_radius"
+                android:layout_height="@dimen/dial_btn_radius"
+                android:stateListAnimator="@null"
+                android:background="@drawable/dial_number_shape" />
+
+
+            <LinearLayout
+
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tv_dial_number_2"
+                    android:text="2"
+                    android:textSize="30sp"
+                    android:typeface="monospace"
+                    android:textColor="@color/colorBlack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/tv_dial_char_2"
+                    android:text="A B C"
+                    android:textSize="10sp"
+                    android:textColor="@color/colorCharBGGray"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+
+            <Button
+                android:id="@+id/btn_dial_number_3"
+                android:layout_width="@dimen/dial_btn_radius"
+                android:layout_height="@dimen/dial_btn_radius"
+                android:stateListAnimator="@null"
+                android:background="@drawable/dial_number_shape" />
+
+
+            <LinearLayout
+
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tv_dial_number_3"
+                    android:text="3"
+                    android:textSize="30sp"
+                    android:typeface="monospace"
+                    android:textColor="@color/colorBlack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/tv_dial_char_3"
+                    android:text="D E F"
+                    android:textSize="10sp"
+                    android:textColor="@color/colorCharBGGray"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/dial_btn_row_space">
+
+
+            <Button
+                android:id="@+id/btn_dial_number_4"
+                android:layout_width="@dimen/dial_btn_radius"
+                android:layout_height="@dimen/dial_btn_radius"
+                android:stateListAnimator="@null"
+                android:background="@drawable/dial_number_shape" />
+
+
+            <LinearLayout
+
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tv_dial_number_4"
+                    android:text="4"
+                    android:textSize="30sp"
+                    android:typeface="monospace"
+                    android:textColor="@color/colorBlack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/tv_dial_char_4"
+                    android:text="G H I"
+                    android:textSize="10sp"
+                    android:textColor="@color/colorCharBGGray"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+
+            <Button
+                android:id="@+id/btn_dial_number_5"
+                android:layout_width="@dimen/dial_btn_radius"
+                android:layout_height="@dimen/dial_btn_radius"
+                android:stateListAnimator="@null"
+                android:background="@drawable/dial_number_shape" />
+
+
+            <LinearLayout
+
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tv_dial_number_5"
+                    android:text="5"
+                    android:textSize="30sp"
+                    android:typeface="monospace"
+                    android:textColor="@color/colorBlack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/tv_dial_char_5"
+                    android:text="J K L"
+                    android:textSize="10sp"
+                    android:textColor="@color/colorCharBGGray"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+
+            <Button
+                android:id="@+id/btn_dial_number_6"
+                android:layout_width="@dimen/dial_btn_radius"
+                android:layout_height="@dimen/dial_btn_radius"
+                android:stateListAnimator="@null"
+                android:background="@drawable/dial_number_shape" />
+
+
+            <LinearLayout
+
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tv_dial_number_6"
+                    android:text="6"
+                    android:textSize="30sp"
+                    android:typeface="monospace"
+                    android:textColor="@color/colorBlack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/tv_dial_char_6"
+                    android:text="M N O"
+                    android:textSize="10sp"
+                    android:textColor="@color/colorCharBGGray"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/dial_btn_row_space">
+
+
+            <Button
+                android:id="@+id/btn_dial_number_7"
+                android:layout_width="@dimen/dial_btn_radius"
+                android:layout_height="@dimen/dial_btn_radius"
+                android:stateListAnimator="@null"
+                android:background="@drawable/dial_number_shape" />
+
+
+            <LinearLayout
+
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tv_dial_number_7"
+                    android:text="7"
+                    android:textSize="30sp"
+                    android:typeface="monospace"
+                    android:textColor="@color/colorBlack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/tv_dial_char_7"
+                    android:text="P Q R S"
+                    android:textSize="10sp"
+                    android:textColor="@color/colorCharBGGray"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+
+            <Button
+                android:id="@+id/btn_dial_number_8"
+                android:layout_width="@dimen/dial_btn_radius"
+                android:layout_height="@dimen/dial_btn_radius"
+                android:stateListAnimator="@null"
+                android:background="@drawable/dial_number_shape" />
+
+
+            <LinearLayout
+
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tv_dial_number_8"
+                    android:text="8"
+                    android:textSize="30sp"
+                    android:typeface="monospace"
+                    android:textColor="@color/colorBlack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/tv_dial_char_8"
+                    android:text="T U V"
+                    android:textSize="10sp"
+                    android:textColor="@color/colorCharBGGray"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+
+            <Button
+                android:id="@+id/btn_dial_number_9"
+                android:layout_width="@dimen/dial_btn_radius"
+                android:layout_height="@dimen/dial_btn_radius"
+                android:stateListAnimator="@null"
+                android:background="@drawable/dial_number_shape" />
+
+
+            <LinearLayout
+
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tv_dial_number_9"
+                    android:text="9"
+                    android:textSize="30sp"
+                    android:typeface="monospace"
+                    android:textColor="@color/colorBlack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/tv_dial_char_9"
+                    android:text="W X Y Z"
+                    android:textSize="10sp"
+                    android:textColor="@color/colorCharBGGray"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+
+            <Button
+                android:id="@+id/btn_dial_number_xin"
+                android:layout_width="@dimen/dial_btn_radius"
+                android:layout_height="@dimen/dial_btn_radius"
+                android:stateListAnimator="@null"
+                android:background="@drawable/dial_number_shape" />
+
+            <TextView
+                android:id="@+id/tv_dial_number_xin"
+                android:text="*"
+                android:textSize="30sp"
+                android:typeface="monospace"
+                android:textColor="@color/colorBlack"
+                android:layout_gravity="center"
+                android:layout_marginTop="7dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/dial_btn_row_space">
+
+
+            <Button
+                android:id="@+id/btn_dial_number_0"
+                android:layout_width="@dimen/dial_btn_radius"
+                android:layout_height="@dimen/dial_btn_radius"
+                android:stateListAnimator="@null"
+                android:background="@drawable/dial_number_shape" />
+
+
+            <LinearLayout
+
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tv_dial_number_0"
+                    android:text="0"
+                    android:textSize="30sp"
+                    android:typeface="monospace"
+                    android:textColor="@color/colorBlack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/tv_dial_char_0"
+                    android:text="+"
+                    android:textSize="10sp"
+                    android:textColor="@color/colorCharBGGray"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+
+            <Button
+                android:id="@+id/btn_dial_number_jin"
+                android:layout_width="@dimen/dial_btn_radius"
+                android:layout_height="@dimen/dial_btn_radius"
+                android:stateListAnimator="@null"
+                android:background="@drawable/dial_number_shape" />
+
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tv_dial_number_jin"
+                    android:text="#"
+                    android:textSize="25sp"
+                    android:typeface="monospace"
+                    android:textColor="@color/colorBlack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_row="4">
+
+
+            <Button
+                android:id="@+id/btn_dial_number_call"
+                android:layout_width="@dimen/dial_btn_radius"
+                android:layout_height="@dimen/dial_btn_radius"
+                android:stateListAnimator="@null"
+                android:background="@drawable/call_btn_shape" />
+
+            <ImageView
+                android:id="@+id/im_call"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_menu_call" />
+
+
+        </FrameLayout>
+
+    </GridLayout>
+
+
+</RelativeLayout>

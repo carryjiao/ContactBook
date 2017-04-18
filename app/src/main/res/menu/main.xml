@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item
+        android:id="@+id/login"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:title="登录"/>
+
+    <item
+        android:id="@+id/change_password"
+        android:icon="@android:drawable/ic_menu_manage"
+        android:title="修改密码"/>
+
+
+    <item
+        android:id="@+id/data_synchronization"
+        android:icon="@android:drawable/ic_popup_sync"
+        android:title="数据同步"/>
+
+    <item
+        android:id="@+id/about"
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:title="关于"/>
+
+    <item
+        android:id="@+id/logout"
+        android:icon="@android:drawable/ic_menu_rotate"
+        android:title="注销"/>
+
+    <item
+        android:id="@+id/exit"
+        android:icon="@android:drawable/ic_lock_power_off"
+        android:title="退出"/>
+</menu>
