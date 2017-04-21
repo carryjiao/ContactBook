@@ -2,10 +2,12 @@ package com.carryj.root.contactbook.adapter;
 
 import android.content.Context;
 
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.carryj.root.contactbook.R;
@@ -19,22 +21,27 @@ import java.util.ArrayList;
 public class ContactBookAdapter extends BaseAdapter{
 
     private Context mContext;
-    private ArrayList<String> nameListData;
+    private ArrayList<String> mContactsName;
+    private ArrayList<Bitmap> mContactsPhonto;
+    private ArrayList<Long> mContactsID;
 
-    public ContactBookAdapter(Context mContext, ArrayList<String> nameListData) {
+    public ContactBookAdapter(Context mContext, ArrayList<String> mContactsName, ArrayList<Bitmap>
+            mContactsPhonto, ArrayList<Long> mContactsID) {
         this.mContext =mContext;
-        this.nameListData = nameListData;
+        this.mContactsName = mContactsName;
+        this.mContactsPhonto = mContactsPhonto;
+        this.mContactsID = mContactsID;
 
     }
 
     @Override
     public int getCount() {
-        return nameListData.size();
+        return mContactsName.size();
     }
 
     @Override
     public String getItem(int position) {
-        return nameListData.get(position);
+        return mContactsName.get(position);
     }
 
     @Override
@@ -49,6 +56,9 @@ public class ContactBookAdapter extends BaseAdapter{
             LayoutInflater mInflater = LayoutInflater.from(mContext);
             convertView = mInflater.inflate(R.layout.contact_book_list_item, null);
             viewHolder.tv_name = (TextView) convertView.findViewById(R.id.context_book_display_name);
+            viewHolder.im_contact_book_list_item_icon =
+                    (ImageView) convertView.findViewById(R.id.im_contact_book_list_item_icon);
+
             convertView.setTag(viewHolder);
         }
         else {
@@ -57,7 +67,8 @@ public class ContactBookAdapter extends BaseAdapter{
 
         String str = getItem(position);
         if (str != null) {
-            viewHolder.tv_name.setText(nameListData.get(position));
+            viewHolder.tv_name.setText(mContactsName.get(position));
+            viewHolder.im_contact_book_list_item_icon.setImageBitmap(mContactsPhonto.get(position));
         }
 
         return convertView;
@@ -66,6 +77,7 @@ public class ContactBookAdapter extends BaseAdapter{
     private static class ViewHolder {
 
         TextView tv_name;
+        ImageView im_contact_book_list_item_icon;
 
         public ViewHolder() {
 

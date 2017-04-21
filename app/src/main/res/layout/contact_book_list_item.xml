@@ -5,7 +5,7 @@
 
 
     <ImageView
-        android:id="@+id/iv_icon"
+        android:id="@+id/im_contact_book_list_item_icon"
         android:layout_width="@dimen/contactbook_lv_im_radius"
         android:layout_height="@dimen/contactbook_lv_im_radius"
         android:layout_centerVertical="true"

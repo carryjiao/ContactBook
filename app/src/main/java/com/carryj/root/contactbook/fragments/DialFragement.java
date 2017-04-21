@@ -17,7 +17,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.carryj.root.contactbook.MainActivity;
 import com.carryj.root.contactbook.R;
 
 
