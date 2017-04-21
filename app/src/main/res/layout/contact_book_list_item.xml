@@ -1,24 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="40dp" >
+    android:layout_height="wrap_content" >
 
+
+    <ImageView
+        android:id="@+id/iv_icon"
+        android:layout_width="@dimen/contactbook_lv_im_radius"
+        android:layout_height="@dimen/contactbook_lv_im_radius"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_launcher" />
 
 
     <TextView
         android:id="@+id/context_book_display_name"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
+        android:layout_height="@dimen/contactbook_lv_item_height"
+        android:layout_centerVertical="true"
+        android:gravity="center_vertical"
+        android:layout_toRightOf="@+id/iv_icon"
+        android:layout_marginLeft="10dp"
         android:textSize="20sp"
-        android:text="焦消"
-        android:layout_centerVertical="true" />
+        android:textColor="@color/colorBlack"
+        android:text="焦消" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_alignParentBottom="true"
-        android:background="@color/colorCharBGGray">
-    </View>
+
 
 </RelativeLayout>

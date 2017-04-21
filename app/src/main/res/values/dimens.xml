@@ -12,4 +12,10 @@
     <dimen name="dial_btn1_marginTop">19dp</dimen>
     <dimen name="dial_btn_row_space">10dp</dimen>
     <dimen name="dial_btn_column_space">25dp</dimen>
+
+    <!--fragment_contactbook-->
+    <dimen name="contactbook_lv_im_radius">35dp</dimen>
+    <dimen name="contactbook_lv_item_height">50dp</dimen>
+
+
 </resources>

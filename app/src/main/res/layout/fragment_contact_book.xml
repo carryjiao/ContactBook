@@ -90,13 +90,10 @@
             android:layout_toStartOf="@+id/tv_contact_book_search" />
     </RelativeLayout>
 
-    <ListView
+    <com.baoyz.swipemenulistview.SwipeMenuListView
         android:id="@+id/contact_book_listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/contact_book_search_bar">
-
-    </ListView>
-
+        android:layout_below="@id/contact_book_search_bar" />
 
 </RelativeLayout>
