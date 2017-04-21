@@ -3,7 +3,6 @@ package com.carryj.root.contactbook.fragments;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
-import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -49,7 +48,10 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_contact_book,null);
-        getPhoneContacts();
+        //getPhoneContacts();
+        nameListData.add(0,"焦消");
+        nameListData.add(1,"王舒");
+        nameListData.add(2,"周身高");
         initView(view);
         return view;
     }

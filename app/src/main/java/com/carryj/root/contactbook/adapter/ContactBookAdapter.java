@@ -2,6 +2,7 @@ package com.carryj.root.contactbook.adapter;
 
 import android.content.Context;
 
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -43,25 +44,32 @@ public class ContactBookAdapter extends BaseAdapter{
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
+        ViewHolder viewHolder = new ViewHolder();
         if (convertView == null) {
-            View.inflate(mContext, R.layout.contact_book_list_item, null);
-            new ViewHolder(convertView);
+            LayoutInflater mInflater = LayoutInflater.from(mContext);
+            convertView = mInflater.inflate(R.layout.contact_book_list_item, null);
+            viewHolder.tv_name = (TextView) convertView.findViewById(R.id.context_book_display_name);
+            convertView.setTag(viewHolder);
+        }
+        else {
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        ViewHolder holder = (ViewHolder) convertView.getTag();
-        holder.tv_name.setText(nameListData.get(position));
+        String str = getItem(position);
+        if (str != null) {
+            viewHolder.tv_name.setText(nameListData.get(position));
+        }
 
         return convertView;
     }
 
-    class ViewHolder {
+    private static class ViewHolder {
 
         TextView tv_name;
 
-        public ViewHolder(View view) {
-            tv_name = (TextView) view.findViewById(R.id.tv_user_name);
-            view.setTag(this);
+        public ViewHolder() {
+
         }
+
     }
 }
