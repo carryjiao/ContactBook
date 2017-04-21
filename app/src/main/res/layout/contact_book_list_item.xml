@@ -3,23 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content" >
 
-
-    <ImageView
-        android:id="@+id/im_contact_book_list_item_icon"
-        android:layout_width="@dimen/contactbook_lv_im_radius"
-        android:layout_height="@dimen/contactbook_lv_im_radius"
-        android:layout_centerVertical="true"
-        android:src="@drawable/ic_launcher" />
-
-
     <TextView
         android:id="@+id/context_book_display_name"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/contactbook_lv_item_height"
         android:layout_centerVertical="true"
         android:gravity="center_vertical"
-        android:layout_toRightOf="@+id/iv_icon"
-        android:layout_marginLeft="10dp"
+        android:layout_marginLeft="25dp"
         android:textSize="20sp"
         android:textColor="@color/colorBlack"
         android:text="焦消" />

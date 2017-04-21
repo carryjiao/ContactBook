@@ -2,15 +2,11 @@ package com.carryj.root.contactbook.fragments;
 
 import android.Manifest;
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
@@ -24,7 +20,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
-import android.provider.ContactsContract.CommonDataKinds.Photo;
 import android.widget.Toast;
 
 import com.baoyz.swipemenulistview.SwipeMenu;
@@ -34,7 +29,6 @@ import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.adapter.ContactBookAdapter;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 
 /**
@@ -44,6 +38,7 @@ import java.util.ArrayList;
 public class ContactBookFragement extends Fragment implements OnClickListener {
 
     private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 2;
+    private static boolean IS_LOAD = false;
 
 
     private TextView tv_contact_book_add;
@@ -53,54 +48,34 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
     /**获取库Phon表字段**/
     private static final String[] PHONES_PROJECTION = new String[] {
-            Phone.DISPLAY_NAME, Photo.PHOTO_ID,Phone.CONTACT_ID};
+            Phone.DISPLAY_NAME, Phone.CONTACT_ID};
 
     /**联系人显示名称**/
     private static final int PHONES_DISPLAY_NAME_INDEX = 0;
 
-    /**头像ID**/
-    private static final int PHONES_PHOTO_ID_INDEX = 1;
-
     /**联系人的ID**/
-    private static final int PHONES_CONTACT_ID_INDEX = 2;
+    private static final int PHONES_CONTACT_ID_INDEX = 1;
 
 
 
     /**联系人名称**/
     private ArrayList<String> mContactsName = new ArrayList<String>();
 
-    /**联系人头像**/
-    private ArrayList<Bitmap> mContactsPhonto = new ArrayList<Bitmap>();
-
     /**联系人ID**/
     private ArrayList<Long> mContactsID = new ArrayList<Long>();
 
 
     public ContactBookFragement() {
-        /*nameListData.add("焦消");
-        nameListData.add("王舒");
-        nameListData.add("周身高");
-        nameListData.add("焦消");
-        nameListData.add("王舒");
-        nameListData.add("周身高");
-        nameListData.add("焦消");
-        nameListData.add("王舒");
-        nameListData.add("周身高");
-        nameListData.add("焦消");
-        nameListData.add("王舒");
-        nameListData.add("周身高");
-        nameListData.add("焦消");
-        nameListData.add("王舒");
-        nameListData.add("周身高");*/
-
-        testReadContact();
 
 
     }
 
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_contact_book,null);
+        testReadContact();
         initView(view);
         return view;
     }
@@ -109,7 +84,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
         tv_contact_book_add = (TextView) view.findViewById(R.id.tv_contact_book_add);
         iv_contact_book_box = (ImageView) view.findViewById(R.id.iv_contact_book_box);
         listView = (SwipeMenuListView) view.findViewById(R.id.contact_book_listview);
-        adapter = new ContactBookAdapter(getContext(), mContactsName, mContactsPhonto, mContactsID);
+        adapter = new ContactBookAdapter(getContext(), mContactsName, mContactsID);
         listView.setAdapter(adapter);
 
         SwipeMenuCreator creator = new SwipeMenuCreator() {
@@ -215,9 +190,11 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.READ_CONTACTS},
                     MY_PERMISSIONS_REQUEST_READ_CONTACTS);
-        } else
-        {
-            getPhoneContacts();
+        } else {
+            if(!IS_LOAD) {
+                getPhoneContacts();
+                IS_LOAD = true;
+            }
         }
     }
 
@@ -230,6 +207,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
                 getPhoneContacts();
+                adapter.notifyDataSetChanged();
             } else
             {
                 // Permission Denied
@@ -255,23 +233,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
                 //得到联系人ID
                 Long contactid = phoneCursor.getLong(PHONES_CONTACT_ID_INDEX);
 
-                //得到联系人头像ID
-                Long photoid = phoneCursor.getLong(PHONES_PHOTO_ID_INDEX);
-
-                //得到联系人头像Bitamp
-                Bitmap contactPhoto;
-
-                //photoid 大于0 表示联系人有头像 如果没有给此人设置头像则给他一个默认的
-                if(photoid > 0 ) {
-                    Uri photoUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI,contactid);
-                    InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(resolver, photoUri);
-                    contactPhoto = BitmapFactory.decodeStream(input);
-                }else {
-                    contactPhoto = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
-                }
-
                 mContactsName.add(contactName);
-                mContactsPhonto.add(contactPhoto);
                 mContactsID.add(contactid);
 
 
