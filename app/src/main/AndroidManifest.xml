@@ -2,10 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.carryj.root.contactbook">
 
-    <!-- 读取联系人权限 -->
-    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+
     <!-- 拨打电话权限 -->
     <uses-permission android:name="android.permission.CALL_PHONE"/>
+    <!-- 读取联系人权限 -->
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <!-- 写入联系人权限 -->
+    <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
+    <!-- 读取通话记录权限 -->
+    <uses-permission android:name="android.permission.READ_CALL_LOG"/>
+    <!-- 写入通话记录权限 -->
+    <uses-permission android:name="android.permission.WRITE_CALL_LOG"/>
 
     <application
         android:allowBackup="true"

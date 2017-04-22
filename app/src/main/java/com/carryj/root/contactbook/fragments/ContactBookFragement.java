@@ -46,7 +46,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
     private ContactBookAdapter adapter;
     private SwipeMenuListView listView;
 
-    /**获取库Phon表字段**/
+    /**获取库Phone表字段**/
     private static final String[] PHONES_PROJECTION = new String[] {
             Phone.DISPLAY_NAME, Phone.CONTACT_ID};
 
@@ -69,7 +69,6 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
 
     }
-
 
 
     @Override
@@ -155,9 +154,9 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
         tv_contact_book_add.setOnClickListener(this);
         iv_contact_book_box.setOnClickListener(this);
 
-
-
     }
+
+
 
 
     @Override
@@ -207,7 +206,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
                 getPhoneContacts();
-                adapter.notifyDataSetChanged();
+
             } else
             {
                 // Permission Denied
@@ -222,25 +221,45 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
     private void getPhoneContacts() {
         ContentResolver resolver = getContext().getContentResolver();
 
-        Cursor phoneCursor = resolver.query(Phone.CONTENT_URI, PHONES_PROJECTION, null, null, null);
+        if(mContactsName == null) {
 
-        if (phoneCursor != null) {
-            while (phoneCursor.moveToNext()) {
+            try {
 
-                //得到联系人名称
-                String contactName = phoneCursor.getString(PHONES_DISPLAY_NAME_INDEX);
+                Cursor phoneCursor = resolver.query(Phone.CONTENT_URI, PHONES_PROJECTION, null, null, null);
 
-                //得到联系人ID
-                Long contactid = phoneCursor.getLong(PHONES_CONTACT_ID_INDEX);
+                if (phoneCursor != null) {
+                    while (phoneCursor.moveToNext()) {
 
-                mContactsName.add(contactName);
-                mContactsID.add(contactid);
+                        //得到联系人名称
+                        String contactName = phoneCursor.getString(PHONES_DISPLAY_NAME_INDEX);
 
+                        //得到联系人ID
+                        Long contactid = phoneCursor.getLong(PHONES_CONTACT_ID_INDEX);
+
+                        mContactsName.add(contactName);
+                        mContactsID.add(contactid);
+
+
+                    }
+
+                    phoneCursor.close();
+                }
+
+            } catch (SecurityException e) {
+
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{Manifest.permission.READ_CONTACTS},
+                        MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+
+            } finally {
+
+                adapter.notifyDataSetChanged();
 
             }
 
-            phoneCursor.close();
         }
+
+
     }
 
 
