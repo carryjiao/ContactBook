@@ -34,7 +34,7 @@
             android:text="+"
             android:textColor="@color/colorAddGray"
             android:layout_centerVertical="true"
-            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
             android:layout_marginStart="10dp" />
 
         <ImageView
@@ -42,9 +42,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@android:drawable/ic_input_delete"
+            android:tint="@color/colorBrightWhite"
             android:layout_marginRight="8dp"
             android:layout_centerVertical="true"
-            android:layout_alignParentEnd="true" />
+            android:layout_alignParentRight="true" />
 
 
     </RelativeLayout>
@@ -90,8 +91,7 @@
                     android:textColor="@color/colorBlack"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true" />
+                    android:layout_alignParentLeft="true" />
 
             </LinearLayout>
 
