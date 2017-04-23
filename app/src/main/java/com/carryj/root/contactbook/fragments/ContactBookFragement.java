@@ -206,6 +206,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
                 getPhoneContacts();
+                IS_LOAD = true;
 
             } else
             {
@@ -221,45 +222,25 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
     private void getPhoneContacts() {
         ContentResolver resolver = getContext().getContentResolver();
 
-        if(mContactsName == null) {
+        Cursor phoneCursor = resolver.query(Phone.CONTENT_URI, PHONES_PROJECTION, null, null, null);
 
-            try {
+        if (phoneCursor != null) {
+            while (phoneCursor.moveToNext()) {
 
-                Cursor phoneCursor = resolver.query(Phone.CONTENT_URI, PHONES_PROJECTION, null, null, null);
+                //得到联系人名称
+                String contactName = phoneCursor.getString(PHONES_DISPLAY_NAME_INDEX);
 
-                if (phoneCursor != null) {
-                    while (phoneCursor.moveToNext()) {
+                //得到联系人ID
+                Long contactid = phoneCursor.getLong(PHONES_CONTACT_ID_INDEX);
 
-                        //得到联系人名称
-                        String contactName = phoneCursor.getString(PHONES_DISPLAY_NAME_INDEX);
+                mContactsName.add(contactName);
+                mContactsID.add(contactid);
 
-                        //得到联系人ID
-                        Long contactid = phoneCursor.getLong(PHONES_CONTACT_ID_INDEX);
-
-                        mContactsName.add(contactName);
-                        mContactsID.add(contactid);
-
-
-                    }
-
-                    phoneCursor.close();
-                }
-
-            } catch (SecurityException e) {
-
-                ActivityCompat.requestPermissions(getActivity(),
-                        new String[]{Manifest.permission.READ_CONTACTS},
-                        MY_PERMISSIONS_REQUEST_READ_CONTACTS);
-
-            } finally {
-
-                adapter.notifyDataSetChanged();
 
             }
 
+            phoneCursor.close();
         }
-
-
     }
 
 
