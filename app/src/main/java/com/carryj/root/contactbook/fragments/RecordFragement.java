@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CallLog;
 import android.provider.ContactsContract;
@@ -18,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,12 +42,13 @@ import java.util.Date;
 
 public class RecordFragement extends Fragment implements OnClickListener {
 
+    private static final int MY_PERMISSIONS_REQUEST_CALL_PHONE = 1;
     private static final int MY_PERMISSIONS_REQUEST_READ_CALL_LOG = 3;
 
     /**获取库Call表字段**/
     private static final String[] CALL_LOG_PROJECTION = new String[] {
             CallLog.Calls.NUMBER, CallLog.Calls.CACHED_NAME, CallLog.Calls.TYPE,
-            CallLog.Calls.DATE, CallLog.Calls.DURATION};
+            CallLog.Calls.DATE, CallLog.Calls.DURATION, CallLog.Calls.CACHED_NUMBER_TYPE};
 
     /**电话号码**/
     private static final int CALLS_NUMBER_INDEX = 0;
@@ -61,6 +64,9 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
     /**通话时长**/
     private static final int CALLS_DURATION_INDEX = 4;
+
+    /**号码类型**/
+    private static final int CALLS_CACHED_NUMBER_TYPE_INDEX = 4;
 
 
 
@@ -145,6 +151,15 @@ public class RecordFragement extends Fragment implements OnClickListener {
         });
 
         recordListView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
+
+        recordListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                callPhone(mData.get(position).getStrNumber());
+
+            }
+        });
 
 
 
@@ -246,12 +261,16 @@ public class RecordFragement extends Fragment implements OnClickListener {
                     //得到通话时长
                     Long duration = callLogCursor.getLong(CALLS_DURATION_INDEX);
 
+                    //得到号码类型
+                    int numberType = callLogCursor.getInt(CALLS_CACHED_NUMBER_TYPE_INDEX);
+
                     RecordListViewItemData itemData = new RecordListViewItemData();
                     itemData.setStrNumber(strNumber);
                     itemData.setStrCachedName(cachedName);
                     itemData.setcontactType(contactType);
                     itemData.setDate(date);
                     itemData.setDuration(duration);
+                    itemData.setPhoneType(numberType);
 
                     recordInfo.add(itemData);
 
@@ -273,4 +292,15 @@ public class RecordFragement extends Fragment implements OnClickListener {
         return recordInfo;
 
     }
+
+
+
+    public void callPhone(String telNum)
+    {
+        Intent intent = new Intent(Intent.ACTION_CALL);
+        Uri data = Uri.parse("tel:" + telNum);
+        intent.setData(data);
+        startActivity(intent);
+    }
+
 }

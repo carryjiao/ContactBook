@@ -90,7 +90,7 @@ public class RecordAdapter extends BaseAdapter{
             }
 
 
-            //viewHolder.tv_record_type.setText(itemData.getPhoneType());
+            viewHolder.tv_record_type.setText(itemData.getPhoneType());
 
             viewHolder.tv_record_time.setText(itemData.getDate());
         }

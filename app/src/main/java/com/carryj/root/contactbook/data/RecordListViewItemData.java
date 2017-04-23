@@ -48,8 +48,55 @@ public class RecordListViewItemData {
         this.contactType = contactType;
     }
 
-    public int getPhoneType() {
-        return phoneType;
+    public String getPhoneType() {
+        String numberType = new String(""+phoneType);
+
+        switch (phoneType) {
+            case 0:
+                break;
+            case 1:
+                numberType = new String("手机");
+                break;
+            case 2:
+                numberType = new String("手机");
+                break;
+            case 3:
+                numberType = new String("手机");
+                break;
+            case 4:
+                break;
+            case 5:
+                break;
+            case 6:
+                break;
+            case 7:
+                break;
+            case 8:
+                break;
+            case 9:
+                break;
+            case 10:
+                break;
+            case 11:
+                numberType = new String("总机");
+                break;
+            case 12:
+                numberType = new String("总机");
+                break;
+            case 13:
+                numberType = new String("总机");
+                break;
+            case 14:
+                break;
+            case 15:
+                break;
+            default:
+                numberType = new String("未知");
+                break;
+
+        }
+
+        return numberType;
     }
 
     public void setPhoneType(int phoneType) {
