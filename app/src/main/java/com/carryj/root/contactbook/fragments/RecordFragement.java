@@ -41,7 +41,6 @@ import java.util.Date;
 public class RecordFragement extends Fragment implements OnClickListener {
 
     private static final int MY_PERMISSIONS_REQUEST_READ_CALL_LOG = 3;
-    private static boolean IS_LOAD = false;
 
     /**获取库Call表字段**/
     private static final String[] CALL_LOG_PROJECTION = new String[] {
@@ -72,7 +71,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
     private SwipeMenuListView recordListView;
     private RecordAdapter adapter;
 
-    private ArrayList<RecordListViewItemData> data = new ArrayList<RecordListViewItemData>();
+    private ArrayList<RecordListViewItemData> mData = new ArrayList<RecordListViewItemData>();
 
 
 
@@ -82,10 +81,10 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        initData();
         View view = inflater.inflate(R.layout.fragment_record,null);
-
         initView(view);
-        testReadCallLog();
+
         return view;
     }
 
@@ -95,7 +94,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
         iv_record_box = (ImageView) view.findViewById(R.id.iv_record_box);
 
         recordListView = (SwipeMenuListView) view.findViewById(R.id.record_listview);
-        adapter = new RecordAdapter(getContext(), data);
+        adapter = new RecordAdapter(getContext(), mData);
         recordListView.setAdapter(adapter);
 
         SwipeMenuCreator creator = new SwipeMenuCreator() {
@@ -133,7 +132,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
                     case 0:
 
                         // delete
-                        data.remove(position);
+                        mData.remove(position);
                         adapter.notifyDataSetChanged();
                         break;
                     case 1:
@@ -178,7 +177,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
 
     //获取 READ_CALL_LOG 权限
-    public void testReadCallLog() {
+    public void initData() {
 
         if (ContextCompat.checkSelfPermission(getContext(),
                 Manifest.permission.READ_CALL_LOG)
@@ -189,10 +188,10 @@ public class RecordFragement extends Fragment implements OnClickListener {
                     new String[]{Manifest.permission.READ_CALL_LOG},
                     MY_PERMISSIONS_REQUEST_READ_CALL_LOG);
         } else {
-                if(!IS_LOAD) {
-                    initData();
-                    IS_LOAD = true;
-                }
+
+            mData = getRecordData();
+
+
         }
 
     }
@@ -205,7 +204,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
         {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
-                initData();
+                mData = getRecordData();
 
             } else
             {
@@ -218,9 +217,11 @@ public class RecordFragement extends Fragment implements OnClickListener {
     }
 
     /**得到手机通话记录**/
-    private void initData() {
-        ContentResolver resolver = getContext().getContentResolver();
+    private ArrayList<RecordListViewItemData> getRecordData() {
 
+        ArrayList<RecordListViewItemData> recordInfo = new ArrayList<RecordListViewItemData>();
+
+        ContentResolver resolver = getContext().getContentResolver();
 
         try {
 
@@ -252,7 +253,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
                     itemData.setDate(date);
                     itemData.setDuration(duration);
 
-                    data.add(itemData);
+                    recordInfo.add(itemData);
 
                 }
 
@@ -267,9 +268,9 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
         }finally {
 
-            adapter.notifyDataSetChanged();
-
         }
+
+        return recordInfo;
 
     }
 }

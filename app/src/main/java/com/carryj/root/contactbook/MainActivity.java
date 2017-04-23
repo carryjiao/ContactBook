@@ -45,7 +45,7 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setSelectBar(0);
+        setCurrentPage(2);
 
         iv_box = (ImageView) findViewById(R.id.iv_contact_book_box);
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -137,20 +137,16 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
         int id = v.getId();
         switch (id) {
             case R.id.ll_collect:
-                main_viewpager.setCurrentItem(0);
-                setSelectBar(0);
+                setCurrentPage(0);
                 break;
             case R.id.ll_record:
-                main_viewpager.setCurrentItem(1);
-                setSelectBar(1);
+                setCurrentPage(1);
                 break;
             case R.id.ll_contact:
-                main_viewpager.setCurrentItem(2);
-                setSelectBar(2);
+                setCurrentPage(2);
                 break;
             case R.id.ll_dial:
-                main_viewpager.setCurrentItem(3);
-                setSelectBar(3);
+                setCurrentPage(3);
                 break;
             default:
                 break;
@@ -180,6 +176,13 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
                 break;
 
         }
+    }
+
+    public void setCurrentPage(int position) {
+
+        main_viewpager.setCurrentItem(position);
+        setSelectBar(position);
+
     }
 
   /*  @Override
