@@ -48,13 +48,13 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
     /**获取库Phone表字段**/
     private static final String[] PHONES_PROJECTION = new String[] {
-            Phone.DISPLAY_NAME, Phone.CONTACT_ID};
+            Phone.DISPLAY_NAME, Phone.RAW_CONTACT_ID};
 
     /**联系人显示名称**/
     private static final int PHONES_DISPLAY_NAME_INDEX = 0;
 
     /**联系人的ID**/
-    private static final int PHONES_CONTACT_ID_INDEX = 1;
+    private static final int PHONES_RAW_CONTACT_ID_INDEX = 1;
 
 
 
@@ -207,7 +207,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
     private void getPhoneContacts() {
         ContentResolver resolver = getContext().getContentResolver();
 
-        Cursor phoneCursor = resolver.query(Phone.CONTENT_URI, PHONES_PROJECTION, null, null, null);
+        Cursor phoneCursor = resolver.query(Phone.CONTENT_URI, PHONES_PROJECTION, null, null, Phone.RAW_CONTACT_ID+" ASC");
 
         if (phoneCursor != null) {
             while (phoneCursor.moveToNext()) {
@@ -216,7 +216,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
                 String contactName = phoneCursor.getString(PHONES_DISPLAY_NAME_INDEX);
 
                 //得到联系人ID
-                Long contactid = phoneCursor.getLong(PHONES_CONTACT_ID_INDEX);
+                Long contactid = phoneCursor.getLong(PHONES_RAW_CONTACT_ID_INDEX);
 
                 mContactsName.add(contactName);
                 mContactsID.add(contactid);

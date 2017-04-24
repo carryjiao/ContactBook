@@ -10,7 +10,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CallLog;
-import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -29,7 +28,6 @@ import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.carryj.root.contactbook.R;
-import com.carryj.root.contactbook.adapter.ContactBookAdapter;
 import com.carryj.root.contactbook.adapter.RecordAdapter;
 import com.carryj.root.contactbook.data.RecordListViewItemData;
 
@@ -42,7 +40,6 @@ import java.util.Date;
 
 public class RecordFragement extends Fragment implements OnClickListener {
 
-    private static final int MY_PERMISSIONS_REQUEST_CALL_PHONE = 1;
     private static final int MY_PERMISSIONS_REQUEST_READ_CALL_LOG = 3;
 
     /**获取库Call表字段**/
@@ -66,7 +63,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
     private static final int CALLS_DURATION_INDEX = 4;
 
     /**号码类型**/
-    private static final int CALLS_CACHED_NUMBER_TYPE_INDEX = 4;
+    private static final int CALLS_CACHED_NUMBER_TYPE_INDEX = 5;
 
 
 
