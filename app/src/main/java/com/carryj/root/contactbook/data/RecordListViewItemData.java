@@ -1,6 +1,5 @@
 package com.carryj.root.contactbook.data;
 
-import android.provider.ContactsContract.CommonDataKinds.Phone;
 
 import com.carryj.root.contactbook.tools.GetStrPhoneType;
 
@@ -61,11 +60,24 @@ public class RecordListViewItemData {
 
     public String getDate() {
         Date currentDate = new Date(System.currentTimeMillis());
-        SimpleDateFormat df = new SimpleDateFormat("yy/MM/dd");
-        int diffMonth = currentDate.getMonth() - date.getMonth();
-        int diffDay = currentDate.getDay() - date.getDay();
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm");
+        Long diff = currentDate.getTime() - date.getTime();
+        System.out.println("+++++++++++++++++++============================= "+diff+" +++++++++++++++++++=============================");
+        if(diff <= 60*1000) {
+            return "刚刚";
+        }else if(diff < 60*60*1000) {
+            return diff+"分钟前";
+        }else if(diff < 24*60*60*1000) {
+            return df.format(date);
+        }else if(diff < 7*24*60*60*1000) {
+            df = new SimpleDateFormat("E");
+            return df.format(date);
+        }else {
+            df = new SimpleDateFormat("yy/MM/dd");
+            return df.format(date);
+        }
 
-        if(diffMonth > 0){
+        /*if(diffMonth > 0){
             return df.format(date);
         }else if(diffDay>7) {
             return df.format(date);
@@ -77,7 +89,7 @@ public class RecordListViewItemData {
         }else {
             df = new SimpleDateFormat("HH:mm");
             return df.format(date);
-        }
+        }*/
     }
 
     public void setDate(Date date) {
