@@ -105,7 +105,6 @@ public class RecordAdapter extends BaseAdapter{
         TextView tv_record_display_name;
         TextView tv_record_type;
         TextView tv_record_time;
-        ImageView im_record_detail;
 
         public ViewHolder() {
 

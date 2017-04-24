@@ -80,86 +80,67 @@ public class RecordListViewItemData implements Serializable{
         SimpleDateFormat df = new SimpleDateFormat("HH:mm");
         Long diff = currentDate.getTime() - date.getTime();
         //System.out.println("+++++++++++++++++++============================= "+diff+" +++++++++++++++++++=============================");
-        if(diff <= 60*1000) {
+        if(diff <= 120*1000) {
             return "刚刚";
         }else if(diff < 60*60*1000) {
-            return diff+"分钟前";
+            return diff/(60*1000)+"分钟前";
         }else if(diff < 12*60*60*1000) {
             return df.format(date);
         }else if(diff < 7*24*60*60*1000) {
-            df = new SimpleDateFormat("E");
+            df = new SimpleDateFormat("EEEE");
             return df.format(date);
         }else {
-            df = new SimpleDateFormat("yy/MM/dd");
-            return df.format(date);
+            return getDisplayDate();
         }
 
-        /*if(diffMonth > 0){
-            return df.format(date);
-        }else if(diffDay>7) {
-            return df.format(date);
-        }else if(1<diffDay) {
-            df = new SimpleDateFormat("E");
-            return df.format(date);
-        }else if(diffDay == 1){
-            return "昨天";
-        }else {
-            df = new SimpleDateFormat("HH:mm");
-            return df.format(date);
-        }*/
     }
+
+    public String getDisplayDate() {
+
+        SimpleDateFormat df = new SimpleDateFormat("yy/MM/dd");
+        return df.format(date);
+
+    }
+
+    public String getTime() {
+
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm");
+        return df.format(date);
+
+    }
+
+
 
     public void setDate(Date date) {
         this.date = date;
     }
 
-    public String getDuration() {
+    public String getDuration() {//以秒钟为单位
 
         StringBuilder sb = new StringBuilder();
 
         if (duration == 0) {
-            sb.append("00:00");
+            sb.append("0 秒钟");
         } else if (duration > 0 && duration < 60) {
-            sb.append("00:");
-            if (duration < 10) {
-                sb.append("0");
-            }
             sb.append(duration);
+            sb.append(" 秒钟");
 
         } else if (duration > 60 && duration < 3600) {
 
             long min = duration / 60;
             long sec = duration % 60;
-            if (min < 10) {
-                sb.append("0");
-            }
             sb.append(min);
-            sb.append(":");
-
-            if (sec < 10) {
-                sb.append("0");
-            }
+            sb.append("分");
             sb.append(sec);
+            sb.append("秒");
         } else if (duration > 3600) {
             long hour = duration / 3600;
             long min = duration % 3600 / 60;
             long sec = duration % 3600 % 60;
-            if (hour < 10) {
-                sb.append("0");
-            }
             sb.append(hour);
-            sb.append(":");
-
-            if (min < 10) {
-                sb.append("0");
-            }
+            sb.append("小时");
             sb.append(min);
-            sb.append(":");
-
-            if (sec < 10) {
-                sb.append("0");
-            }
-            sb.append(sec);
+            sb.append("分钟");
         }
 
         return sb.toString();

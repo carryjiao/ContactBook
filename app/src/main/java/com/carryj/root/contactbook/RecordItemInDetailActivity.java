@@ -1,7 +1,10 @@
 package com.carryj.root.contactbook;
 
 
+
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CallLog;
 import android.view.View;
@@ -13,6 +16,7 @@ import com.carryj.root.contactbook.data.RecordListViewItemData;
 import com.carryj.root.contactbook.fragments.RecordFragement;
 
 public class RecordItemInDetailActivity extends SweepBackActivity {
+
 
     private LinearLayout ll_record_item_in_detail_back;
     private LinearLayout ll_record_item_in_detail_contact_add;
@@ -74,10 +78,10 @@ public class RecordItemInDetailActivity extends SweepBackActivity {
         }
 
         //设置通话日期
-        //tv_record_item_in_detail_date.setText("");
+        tv_record_item_in_detail_date.setText(data.getDisplayDate());
 
         //设置通话时间
-        //tv_record_item_in_detail_time.setText();
+        tv_record_item_in_detail_time.setText(data.getTime());
 
         //设置通话类型
         String str = new String();
@@ -122,8 +126,30 @@ public class RecordItemInDetailActivity extends SweepBackActivity {
             case R.id.ll_record_item_in_detail_back:
                 this.finish();
                 break;
+            case R.id.im_record_item_in_detail_call_icon:
+                callPhone(data.getStrNumber());
+                break;
+            case R.id.ll_record_item_in_detail_contact_delete:
+                break;
+            case R.id.ll_record_item_in_detail_contact_add:
+                break;
             default:
                 break;
+        }
+
+    }
+
+    public void callPhone(String telNum)
+    {
+        Intent intent = new Intent(Intent.ACTION_CALL);
+        Uri data = Uri.parse("tel:" + telNum);
+        intent.setData(data);
+        try {
+            startActivity(intent);
+        }catch (SecurityException e){
+
+        }finally {
+
         }
 
     }
