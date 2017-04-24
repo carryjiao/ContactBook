@@ -28,6 +28,7 @@ import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.carryj.root.contactbook.R;
+import com.carryj.root.contactbook.RecordItemInDetailActivity;
 import com.carryj.root.contactbook.adapter.RecordAdapter;
 import com.carryj.root.contactbook.data.RecordListViewItemData;
 
@@ -41,6 +42,8 @@ import java.util.Date;
 public class RecordFragement extends Fragment implements OnClickListener {
 
     private static final int MY_PERMISSIONS_REQUEST_READ_CALL_LOG = 3;
+
+    public static final String RECORD_IN_DETAIL = "RECORD_IN_DETAIL";
 
     /**获取库Call表字段**/
     private static final String[] CALL_LOG_PROJECTION = new String[] {
@@ -104,6 +107,15 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
             @Override
             public void create(SwipeMenu menu) {
+                // create "open" item
+                SwipeMenuItem openItem = new SwipeMenuItem(getContext());
+                openItem.setBackground(new ColorDrawable(Color.rgb(0xC9,
+                        0xC9, 0xCE)));
+                openItem.setWidth(dp2px(60));
+                openItem.setTitle("打开");
+                openItem.setTitleSize(18);
+                openItem.setTitleColor(Color.WHITE);
+                menu.addMenuItem(openItem);
 
                 // create "delete" item
                 SwipeMenuItem deleteItem = new SwipeMenuItem(getContext());
@@ -133,13 +145,18 @@ public class RecordFragement extends Fragment implements OnClickListener {
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
                 switch (index) {
                     case 0:
+                        // open
+                        Intent intent = new Intent(RecordFragement.this.getContext(), RecordItemInDetailActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable(RECORD_IN_DETAIL, mData.get(position));
+                        intent.putExtras(bundle);
+                        startActivity(intent);
+                        break;
+                    case 1:
 
                         // delete
                         mData.remove(position);
                         adapter.notifyDataSetChanged();
-                        break;
-                    case 1:
-                        // open
                         break;
                 }
                 // false : close the menu; true : not close the menu

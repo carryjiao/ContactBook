@@ -59,7 +59,7 @@ public class RecordAdapter extends BaseAdapter{
             viewHolder.tv_record_display_name = (TextView) convertView.findViewById(R.id.tv_record_display_name);
             viewHolder.tv_record_type = (TextView) convertView.findViewById(R.id.tv_record_type);
             viewHolder.tv_record_time = (TextView) convertView.findViewById(R.id.tv_record_time);
-            viewHolder.im_record_detail = (ImageView) convertView.findViewById(R.id.im_record_detail);
+
 
             convertView.setTag(viewHolder);
         } else {

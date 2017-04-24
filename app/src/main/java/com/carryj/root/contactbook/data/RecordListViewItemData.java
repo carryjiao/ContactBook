@@ -1,8 +1,11 @@
 package com.carryj.root.contactbook.data;
 
 
+import android.provider.CallLog;
+
 import com.carryj.root.contactbook.tools.GetStrPhoneType;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -10,7 +13,7 @@ import java.util.Date;
  * Created by root on 17/4/22.
  */
 
-public class RecordListViewItemData {
+public class RecordListViewItemData implements Serializable{
 
 
     private String strNumber;
@@ -45,6 +48,20 @@ public class RecordListViewItemData {
         return contactType;
     }
 
+    public String getStrContactType() {
+
+        String str = new String();
+
+        if (contactType == CallLog.Calls.INCOMING_TYPE) {
+            str = new String("呼入电话");
+        } else if (contactType == CallLog.Calls.OUTGOING_TYPE) {
+            str = new String("呼出电话");
+        } else if (contactType == CallLog.Calls.MISSED_TYPE) {
+            str = new String("未接来电");
+        }
+        return str;
+    }
+
     public void setcontactType(int contactType) {
         this.contactType = contactType;
     }
@@ -62,12 +79,12 @@ public class RecordListViewItemData {
         Date currentDate = new Date(System.currentTimeMillis());
         SimpleDateFormat df = new SimpleDateFormat("HH:mm");
         Long diff = currentDate.getTime() - date.getTime();
-        System.out.println("+++++++++++++++++++============================= "+diff+" +++++++++++++++++++=============================");
+        //System.out.println("+++++++++++++++++++============================= "+diff+" +++++++++++++++++++=============================");
         if(diff <= 60*1000) {
             return "刚刚";
         }else if(diff < 60*60*1000) {
             return diff+"分钟前";
-        }else if(diff < 24*60*60*1000) {
+        }else if(diff < 12*60*60*1000) {
             return df.format(date);
         }else if(diff < 7*24*60*60*1000) {
             df = new SimpleDateFormat("E");

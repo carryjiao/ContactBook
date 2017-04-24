@@ -26,7 +26,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=".."
+                android:text="&lt;"
                 android:textSize="30sp"
                 android:textColor="@color/colorBlack" />
 
@@ -76,13 +76,13 @@
         android:layout_marginLeft="@dimen/record_item_in_detail_margin_left">
 
         <ImageView
-            android:id="@+id/record_item_in_detail_icon"
+            android:id="@+id/im_record_item_in_detail_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/im_icon"/>
 
         <TextView
-            android:id="@+id/record_item_in_detail_name"
+            android:id="@+id/tv_record_item_in_detail_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/record_item_in_detail_margin_left"
@@ -107,6 +107,178 @@
             android:textSize="10sp"
             android:typeface="monospace"
             android:textColor="@color/colorCharBGGray"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:layout_marginLeft="@dimen/record_item_in_detail_margin_left"
+        android:layout_marginRight="@dimen/record_item_in_detail_margin_left">
+
+        <TextView
+            android:id="@+id/tv_record_item_in_detail_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="昨天"
+            android:textSize="15sp"
+            android:typeface="monospace" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp">
+
+            <TextView
+                android:id="@+id/tv_record_item_in_detail_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="12:19"
+                android:textSize="15sp"
+                android:typeface="monospace" />
+
+            <TextView
+                android:id="@+id/tv_record_item_in_detail_catact_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="呼入电话"
+                android:textSize="15sp"
+                android:typeface="monospace"
+                android:textColor="@color/colorBlack"/>
+
+            <TextView
+                android:id="@+id/tv_record_item_in_detail_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:text="30秒钟"
+                android:textSize="15sp"
+                android:typeface="monospace"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:gravity="center_vertical"
+        android:background="@color/colorTitleBGGray">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/record_item_in_detail_margin_left"
+            android:text="电话号码"
+            android:textSize="10sp"
+            android:typeface="monospace"
+            android:textColor="@color/colorCharBGGray"/>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:gravity="center_vertical"
+        android:layout_marginLeft="@dimen/record_item_in_detail_margin_left"
+        android:layout_marginRight="@dimen/record_item_in_detail_margin_left">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_record_item_in_detail_number_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="手机"
+                android:textSize="20sp"
+                android:typeface="monospace"
+                android:textColor="@color/colorCharBlue"/>
+
+            <TextView
+                android:id="@+id/tv_record_item_in_detail_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="13251356557"
+                android:textSize="20sp"
+                android:typeface="monospace"
+                android:textColor="@color/colorCharBlue"/>
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="9dp"
+            android:rotation="-90">
+
+            <ImageView
+                android:id="@+id/im_record_item_in_detail_call_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_menu_call"
+                android:tint="@color/colorCharBlue"/>
+
+        </FrameLayout>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:gravity="center_vertical"
+        android:background="@color/colorTitleBGGray">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/record_item_in_detail_margin_left"
+            android:text="快捷功能"
+            android:textSize="10sp"
+            android:typeface="monospace"
+            android:textColor="@color/colorCharBGGray"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_record_item_in_detail_contact_add"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/record_item_in_detail_margin_left"
+            android:text="创建新联系人"
+            android:textSize="20sp"
+            android:typeface="monospace"
+            android:textColor="@color/colorCharBlue"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_record_item_in_detail_contact_delete"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/record_item_in_detail_margin_left"
+            android:text="删除通话记录"
+            android:textSize="20sp"
+            android:typeface="monospace"
+            android:textColor="@color/colorRed"/>
 
     </LinearLayout>
 

@@ -46,20 +46,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_toLeftOf="@+id/im_record_detail"
-        android:layout_marginRight="10dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="80dp"
         android:text="07:14"
         android:textColor="@color/colorCharBGGray"
         android:textSize="10sp"/>
 
-    <ImageView
-        android:id="@+id/im_record_detail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="@dimen/listview_margin"
-        android:src="@android:drawable/ic_menu_info_details"
-        android:tint="@color/colorCharBlue"/>
+
 </RelativeLayout>
 
