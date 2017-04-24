@@ -2,6 +2,8 @@ package com.carryj.root.contactbook.data;
 
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 
+import com.carryj.root.contactbook.tools.GetStrPhoneType;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -49,76 +51,7 @@ public class RecordListViewItemData {
     }
 
     public String getPhoneType() {
-        String numberType = new String("");
-
-        switch (phoneType) {
-
-            case Phone.TYPE_HOME://1
-                numberType = new String("住宅电话");
-                break;
-
-            case Phone.TYPE_MOBILE://2
-                numberType = new String("手机");
-                break;
-
-            case Phone.TYPE_WORK://3
-                numberType = new String("单位电话");
-                break;
-
-            case Phone.TYPE_FAX_WORK://4
-                numberType = new String("单位传真");
-                break;
-
-            case Phone.TYPE_FAX_HOME://5
-                numberType = new String("住宅传真");
-                break;
-
-            case Phone.TYPE_PAGER://6
-                numberType = new String("寻呼机");
-                break;
-
-            case Phone.TYPE_CALLBACK://8
-                numberType = new String("回拨号码");
-                break;
-
-            case Phone.TYPE_CAR://9
-                numberType = new String("车载电话");
-                break;
-
-            case Phone.TYPE_COMPANY_MAIN://10
-                numberType = new String("公司总机");
-                break;
-
-            case Phone.TYPE_ISDN://11
-                numberType = new String("ISDN");
-                break;
-
-            case Phone.TYPE_MAIN://12
-                numberType = new String("总机");
-                break;
-
-            case Phone.TYPE_RADIO://14
-                numberType = new String("无线装置");
-                break;
-
-            case Phone.TYPE_TELEX://15
-                numberType = new String("电报");
-                break;
-
-            case Phone.TYPE_WORK_MOBILE://17
-                numberType = new String("单位手机");
-                break;
-
-            case Phone.TYPE_WORK_PAGER://18
-                numberType = new String("单位寻呼机");
-                break;
-
-            default:
-                numberType = new String("未知");
-                break;
-
-        }
-
+        String numberType = new GetStrPhoneType().getStrPhoneType(phoneType);
         return numberType;
     }
 
