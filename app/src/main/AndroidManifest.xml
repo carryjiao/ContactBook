@@ -37,8 +37,9 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity android:name=".BaseFragmentActivity"></activity>
-        <activity android:name=".RecordItemInDetailActivity"></activity>
+        <activity android:name=".BaseFragmentActivity" />
+        <activity android:name=".RecordItemInDetailActivity" />
+        <activity android:name=".ContactPersonalShowActivity"></activity>
     </application>
 
 </manifest>

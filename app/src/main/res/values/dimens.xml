@@ -21,5 +21,8 @@
     <!--Activity_record_item_in_detail-->
     <dimen name="record_item_in_detail_margin_left">20dp</dimen>
 
+    <!--Activity_contact_personal_show-->
+    <dimen name="contact_personal_show_margin_left">20dp</dimen>
+
 
 </resources>
