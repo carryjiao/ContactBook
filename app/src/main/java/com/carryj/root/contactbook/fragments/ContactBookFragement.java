@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
@@ -17,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
@@ -26,8 +26,10 @@ import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.carryj.root.contactbook.ContactPersonalShowActivity;
 import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.adapter.ContactBookAdapter;
+import com.carryj.root.contactbook.data.ContactListViewItemData;
 
 import java.util.ArrayList;
 
@@ -38,6 +40,7 @@ import java.util.ArrayList;
 public class ContactBookFragement extends Fragment implements OnClickListener {
 
     private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 2;
+    public static final String CONTACT_SHOW = "CONTACT_SHOW";
     private static boolean IS_LOAD = false;
 
 
@@ -57,12 +60,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
     private static final int PHONES_RAW_CONTACT_ID_INDEX = 1;
 
 
-
-    /**联系人名称**/
-    private ArrayList<String> mContactsName = new ArrayList<String>();
-
-    /**联系人ID**/
-    private ArrayList<Long> mContactsID = new ArrayList<Long>();
+    private ArrayList<ContactListViewItemData> mData = new ArrayList<ContactListViewItemData>();
 
 
     public ContactBookFragement() {
@@ -83,7 +81,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
         tv_contact_book_add = (TextView) view.findViewById(R.id.tv_contact_book_add);
         iv_contact_book_box = (ImageView) view.findViewById(R.id.iv_contact_book_box);
         listView = (SwipeMenuListView) view.findViewById(R.id.contact_book_listview);
-        adapter = new ContactBookAdapter(getContext(), mContactsName, mContactsID);
+        adapter = new ContactBookAdapter(getContext(), mData);
         listView.setAdapter(adapter);
 
         SwipeMenuCreator creator = new SwipeMenuCreator() {
@@ -121,7 +119,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
                     case 0:
 
                         // delete
-                        mContactsName.remove(position);
+                        mData.remove(position);
                         adapter.notifyDataSetChanged();
                         break;
                     case 1:
@@ -134,6 +132,17 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
         });
 
         listView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(ContactBookFragement.this.getContext(), ContactPersonalShowActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(CONTACT_SHOW, mData.get(position));
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        });
 
 
         tv_contact_book_add.setOnClickListener(this);
@@ -175,10 +184,9 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
                     new String[]{Manifest.permission.READ_CONTACTS},
                     MY_PERMISSIONS_REQUEST_READ_CONTACTS);
         } else {
-            if(!IS_LOAD) {
-                getPhoneContacts();
-                IS_LOAD = true;
-            }
+
+            mData = getPhoneContacts();
+
         }
     }
 
@@ -191,7 +199,6 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
                 getPhoneContacts();
-                IS_LOAD = true;
 
             } else
             {
@@ -204,7 +211,9 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
     }
 
     /**得到手机通讯录联系人信息**/
-    private void getPhoneContacts() {
+    private ArrayList<ContactListViewItemData> getPhoneContacts() {
+        ArrayList<ContactListViewItemData> contactInfo = new ArrayList<ContactListViewItemData>();
+
         ContentResolver resolver = getContext().getContentResolver();
 
         Cursor phoneCursor = resolver.query(Phone.CONTENT_URI, PHONES_PROJECTION, null, null, Phone.RAW_CONTACT_ID+" ASC");
@@ -216,20 +225,26 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
                 String contactName = phoneCursor.getString(PHONES_DISPLAY_NAME_INDEX);
 
                 //得到联系人ID
-                Long contactid = phoneCursor.getLong(PHONES_RAW_CONTACT_ID_INDEX);
+                int rawContactid = phoneCursor.getInt(PHONES_RAW_CONTACT_ID_INDEX);
 
-                mContactsName.add(contactName);
-                mContactsID.add(contactid);
+                ContactListViewItemData data = new ContactListViewItemData();
+
+                data.setName(contactName);
+                data.setRawContactID(rawContactid);
+
+                contactInfo.add(data);
 
 
             }
 
             phoneCursor.close();
         }
+
+        return contactInfo;
     }
 
 
-    /**得到手机SIM卡联系人人信息**/
+    /**得到手机SIM卡联系人人信息**//*
     private void getSIMContacts() {
         ContentResolver resolver = getContext().getContentResolver();
         // 获取Sims卡联系人
@@ -248,5 +263,5 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
             phoneCursor.close();
         }
-    }
+    }*/
 }

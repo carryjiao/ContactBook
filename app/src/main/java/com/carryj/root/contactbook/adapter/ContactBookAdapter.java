@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.carryj.root.contactbook.R;
+import com.carryj.root.contactbook.data.ContactListViewItemData;
 
 import java.util.ArrayList;
 
@@ -21,24 +22,22 @@ import java.util.ArrayList;
 public class ContactBookAdapter extends BaseAdapter{
 
     private Context mContext;
-    private ArrayList<String> mContactsName;
-    private ArrayList<Long> mContactsID;
+    private ArrayList<ContactListViewItemData> mData;
 
-    public ContactBookAdapter(Context mContext, ArrayList<String> mContactsName, ArrayList<Long> mContactsID) {
+    public ContactBookAdapter(Context mContext, ArrayList<ContactListViewItemData> mData) {
         this.mContext =mContext;
-        this.mContactsName = mContactsName;
-        this.mContactsID = mContactsID;
+        this.mData = mData;
 
     }
 
     @Override
     public int getCount() {
-        return mContactsName.size();
+        return mData.size();
     }
 
     @Override
-    public String getItem(int position) {
-        return mContactsName.get(position);
+    public ContactListViewItemData getItem(int position) {
+        return mData.get(position);
     }
 
     @Override
@@ -59,10 +58,10 @@ public class ContactBookAdapter extends BaseAdapter{
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        String str = getItem(position);
-        if (str != null) {
-            viewHolder.tv_name.setText(mContactsName.get(position));
-            viewHolder.ContactID = mContactsID.get(position);
+        ContactListViewItemData data = getItem(position);
+        if (data != null) {
+            viewHolder.tv_name.setText(data.getName());
+
         }
 
         return convertView;
@@ -71,7 +70,7 @@ public class ContactBookAdapter extends BaseAdapter{
     private static class ViewHolder {
 
         TextView tv_name;
-        Long ContactID;
+
         public ViewHolder() {
 
         }
