@@ -91,7 +91,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
 
         Cursor emailCursor = resolver.query(CommonDataKinds.Phone.CONTENT_URI,
                 new String[]{CommonDataKinds.Phone.DATA1},
-                "raw_contact_id = ?",
+                ContactsContract.Contacts.Data.RAW_CONTACT_ID + "=?",
                 new String[]{rawContactID}, null);
         if(emailCursor == null)
             System.out.print("========================================== NULL ======================================");
