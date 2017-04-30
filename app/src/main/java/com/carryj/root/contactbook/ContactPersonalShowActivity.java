@@ -37,8 +37,11 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     private String number;
     private String numberType;
     private String email;
+    private String remark;
 
     private LinearLayout ll_contact_personal_show_back;
+    private LinearLayout ll_contact_personal_show_email_block;
+    private LinearLayout ll_contact_personal_show_remark_block;
 
     private TextView tv_contact_personal_show_edit;
     private TextView tv_contact_personal_show_name;
@@ -95,10 +98,6 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         Cursor emailCursor = resolver.query(CommonDataKinds.Email.CONTENT_URI,
                 null, CommonDataKinds.Email.CONTACT_ID + "=?",
                 new String[]{contactID}, null);
-        if(emailCursor == null) {
-            email = new String("");
-        }
-
 
         if (emailCursor != null) {
             while (emailCursor.moveToNext()) {
@@ -107,6 +106,20 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
 
             }
             emailCursor.close();
+        }
+
+        //获取备注
+        Cursor remarkCursor = resolver.query(ContactsContract.Data.CONTENT_URI, null,
+                ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?",
+                new String[]{contactID, CommonDataKinds.Note.CONTENT_ITEM_TYPE}, null);
+
+        if (remarkCursor != null) {
+            while (remarkCursor.moveToNext()) {
+                //得到备注
+                remark = remarkCursor.getString(remarkCursor.getColumnIndex(CommonDataKinds.Note.NOTE));
+
+            }
+            remarkCursor.close();
         }
 
     }
@@ -121,13 +134,26 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         tv_contact_personal_show_number_type = (TextView) findViewById(R.id.tv_contact_personal_show_number_type);
         tv_contact_personal_show_number = (TextView) findViewById(R.id.tv_contact_personal_show_number);
         im_contact_personal_show_call_icon = (ImageView) findViewById(R.id.im_contact_personal_show_call_icon);
+
+        ll_contact_personal_show_email_block = (LinearLayout) findViewById(R.id.ll_contact_personal_show_email_block);
         tv_contact_personal_show_email = (TextView) findViewById(R.id.tv_contact_personal_show_email);
+
+        ll_contact_personal_show_remark_block = (LinearLayout) findViewById(R.id.ll_contact_personal_show_remark_block);
         tv_contact_personal_show_remark = (TextView) findViewById(R.id.tv_contact_personal_show_remark);
 
         tv_contact_personal_show_name.setText(name);
         tv_contact_personal_show_number_type.setText(numberType);
         tv_contact_personal_show_number.setText(number);
-        tv_contact_personal_show_email.setText(email);
+
+        if(email == null)
+            ll_contact_personal_show_email_block.setVisibility(View.GONE);
+        else
+            tv_contact_personal_show_email.setText(email);
+
+        if(remark == null)
+            ll_contact_personal_show_remark_block.setVisibility(View.GONE);
+        else
+            tv_contact_personal_show_remark.setText(remark);
 
 
 
