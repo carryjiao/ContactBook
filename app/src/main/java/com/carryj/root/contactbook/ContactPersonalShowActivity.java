@@ -12,9 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.carryj.root.contactbook.data.CollectListViewItemData;
 import com.carryj.root.contactbook.data.ContactListViewItemData;
-import com.carryj.root.contactbook.fragments.CollectFragement;
 import com.carryj.root.contactbook.fragments.ContactBookFragement;
 import com.carryj.root.contactbook.tools.GetStrPhoneType;
 import com.carryj.root.contactbook.tools.PhoneNumberTransformer;

@@ -2,12 +2,14 @@ package com.carryj.root.contactbook.fragments;
 
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.support.v4.app.Fragment;
 import android.util.TypedValue;
@@ -144,6 +146,7 @@ public class CollectFragement extends Fragment implements OnClickListener {
                     case 1:
 
                         // delete
+                        deleteCollect(mData.get(position).getContactID());
                         mData.remove(position);
                         adapter.notifyDataSetChanged();
                         break;
@@ -253,5 +256,12 @@ public class CollectFragement extends Fragment implements OnClickListener {
 
         return collectInfo;
 
+    }
+
+    private void deleteCollect(String contactID) {
+        ContentValues values = new ContentValues();
+        values.put(Phone.STARRED,0);
+        getContext().getContentResolver().update(ContactsContract.RawContacts.CONTENT_URI,
+                values, ContactsContract.RawContacts.CONTACT_ID+"=?",new String[]{contactID});
     }
 }
