@@ -1,16 +1,39 @@
 package com.carryj.root.contactbook.fragments;
 
+import android.Manifest;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.CallLog;
+import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.baoyz.swipemenulistview.SwipeMenu;
+import com.baoyz.swipemenulistview.SwipeMenuCreator;
+import com.baoyz.swipemenulistview.SwipeMenuItem;
+import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.carryj.root.contactbook.ContactPersonalShowActivity;
 import com.carryj.root.contactbook.R;
+import com.carryj.root.contactbook.adapter.CollectAdapter;
+import com.carryj.root.contactbook.data.CollectListViewItemData;
+
+
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by root on 17/4/10.
@@ -18,9 +41,30 @@ import com.carryj.root.contactbook.R;
 
 public class CollectFragement extends Fragment implements OnClickListener {
 
-    //private GridView gridView;
+    public static final String CONTACT_PERSONAL_SHOW = "CONTACT_PERSONAL_SHOW";
+
     private TextView tv_collect_add;
     private ImageView iv_collect_box;
+    private CollectAdapter adapter;
+    private SwipeMenuListView listView;
+
+    /**获取库contact表字段**/
+    private static final String[] Collect_PROJECTION = new String[] {
+            CommonDataKinds.Phone.NUMBER,
+            CommonDataKinds.Phone.DISPLAY_NAME,
+            CommonDataKinds.Phone.TYPE};
+
+    /**电话号码**/
+    private static final int COLLECT_NUMBER_INDEX = 0;
+
+    /**姓名**/
+    private static final int COLLECT_DISPLAY_NAME_INDEX = 1;
+
+    /**号码类型**/
+    private static final int COLLECT_TYPE_INDEX = 2;
+
+    private ArrayList<CollectListViewItemData> mData = new ArrayList<CollectListViewItemData>();
+
 
     public CollectFragement() {
 
@@ -28,38 +72,107 @@ public class CollectFragement extends Fragment implements OnClickListener {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        initData();
         View view = inflater.inflate(R.layout.fragment_collect,null);
         initView(view);
         return view;
     }
 
+    private void initData() {
+        mData = getCollectData();
+    }
+
     private void initView(View view) {
         tv_collect_add = (TextView) view.findViewById(R.id.tv_collect_add);
         iv_collect_box = (ImageView) view.findViewById(R.id.iv_collect_box);
-        //gridView = (GridView) view.findViewById(R.id.grid_view_dial_number);
+        listView = (SwipeMenuListView) view.findViewById(R.id.collect_listview);
+        adapter = new CollectAdapter(getContext(), mData);
+        listView.setAdapter(adapter);
 
-        tv_collect_add.setOnClickListener(this);
-        iv_collect_box.setOnClickListener(this);
+        SwipeMenuCreator creator = new SwipeMenuCreator() {
 
-        /*data_list = new ArrayList<Map<String, String>>();
-        getData();
-        String[] from = {"number","str"};
-        int[] to = {R.id.tv_dial_number,R.id.tv_dial_char};
-        simpleAdapter = new SimpleAdapter(getContext(),data_list,R.layout.dial_number_item,from,to);
-        gridView.setAdapter(simpleAdapter);*/
+            @Override
+            public void create(SwipeMenu menu) {
+                // create "open" item
+                SwipeMenuItem openItem = new SwipeMenuItem(getContext());
+                openItem.setBackground(new ColorDrawable(Color.rgb(0xC9,
+                        0xC9, 0xCE)));
+                openItem.setWidth(dp2px(60));
+                openItem.setTitle("打开");
+                openItem.setTitleSize(18);
+                openItem.setTitleColor(Color.WHITE);
+                menu.addMenuItem(openItem);
+
+                // create "delete" item
+                SwipeMenuItem deleteItem = new SwipeMenuItem(getContext());
+                // set item background
+                deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
+                        0x3F, 0x25)));
+                // set item width
+                deleteItem.setWidth(dp2px(60));
+                /*// set a icon
+                deleteItem.setIcon(R.drawable.ic_delete);*/
+                // set item title
+                deleteItem.setTitle("删除");
+                // set item title fontsize
+                deleteItem.setTitleSize(18);
+                // set item title font color
+                deleteItem.setTitleColor(Color.WHITE);
+                // add to menu
+                menu.addMenuItem(deleteItem);
+            }
+        };
+
+// set creator
+        listView.setMenuCreator(creator);
+
+        listView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
+                switch (index) {
+                    case 0:
+                        // open
+                        Intent intent = new Intent(CollectFragement.this.getContext(), ContactPersonalShowActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable(CONTACT_PERSONAL_SHOW, mData.get(position));
+                        intent.putExtras(bundle);
+                        startActivity(intent);
+                        break;
+                    case 1:
+
+                        // delete
+                        mData.remove(position);
+                        adapter.notifyDataSetChanged();
+                        break;
+                }
+                // false : close the menu; true : not close the menu
+                return false;
+            }
+        });
+
+        listView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                callPhone(mData.get(position).getStrPhoneNumber());
+
+            }
+        });
+
+        initEvent();
+
+
 
     }
 
-    /*public List<Map<String,String>> getData() {
-        for (int i = 0; i < number.length; i++) {
-            Map<String,String> map = new HashMap<String, String>();
-            map.put("number",number[i]);
-            map.put("str",str[i]);
-            data_list.add(map);
-        }
+    private void initEvent(){
+        tv_collect_add.setOnClickListener(this);
+        iv_collect_box.setOnClickListener(this);
 
-        return data_list;
-    }*/
+    }
+
 
     @Override
     public void onClick(View v) {
@@ -74,5 +187,65 @@ public class CollectFragement extends Fragment implements OnClickListener {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+    }
+
+    private int dp2px(int dp) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
+    }
+
+    public void callPhone(String telNum)
+    {
+        Intent intent = new Intent(Intent.ACTION_CALL);
+        Uri data = Uri.parse("tel:" + telNum);
+        intent.setData(data);
+        startActivity(intent);
+    }
+
+    private ArrayList<CollectListViewItemData> getCollectData() {
+
+        ArrayList<CollectListViewItemData> collectInfo = new ArrayList<CollectListViewItemData>();
+
+        ContentResolver resolver = getContext().getContentResolver();
+
+        try {
+
+            Cursor collectCursor = resolver.query(
+                    ContactsContract.RawContacts.CONTENT_URI,
+                    Collect_PROJECTION,
+                    ContactsContract.RawContacts.STARRED+"=?",
+                    new String[]{"1"}, null);
+
+            if (collectCursor != null) {
+                while (collectCursor.moveToNext()) {
+
+                    //得到电话号码
+                    String strNumber = collectCursor.getString(COLLECT_NUMBER_INDEX);
+
+                    //得到联系人名称
+                    String cachedName = collectCursor.getString(COLLECT_DISPLAY_NAME_INDEX);
+
+                    //得到号码类型
+                    int numberType = collectCursor.getInt(COLLECT_TYPE_INDEX);
+
+                    CollectListViewItemData itemData = new CollectListViewItemData();
+                    itemData.setStrPhoneNumber(strNumber);
+                    itemData.setName(cachedName);
+                    itemData.setPhoneType(numberType);
+
+                    collectInfo.add(itemData);
+
+                }
+
+                collectCursor.close();
+            }
+
+        }catch (SecurityException e) {
+
+        }finally {
+
+        }
+
+        return collectInfo;
+
     }
 }
