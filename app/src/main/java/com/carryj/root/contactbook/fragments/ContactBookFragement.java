@@ -2,10 +2,12 @@ package com.carryj.root.contactbook.fragments;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
@@ -51,13 +53,15 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
     /**获取库Phone表字段**/
     private static final String[] PHONES_PROJECTION = new String[] {
-            Phone.DISPLAY_NAME, Phone.RAW_CONTACT_ID};
+            Phone.DISPLAY_NAME, Phone.RAW_CONTACT_ID, Phone.CONTACT_ID};
 
     /**联系人显示名称**/
     private static final int PHONES_DISPLAY_NAME_INDEX = 0;
 
     /**联系人的ID**/
     private static final int PHONES_RAW_CONTACT_ID_INDEX = 1;
+
+    private static final int PHONES_CONTACT_ID_INDEX = 2;
 
 
     private ArrayList<ContactListViewItemData> mData = new ArrayList<ContactListViewItemData>();
@@ -119,6 +123,9 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
                     case 0:
 
                         // delete
+                        getContext().getContentResolver().delete(
+                                ContentUris.withAppendedId(ContactsContract.RawContacts.CONTENT_URI,
+                                        mData.get(position).getID()), null, null);
                         mData.remove(position);
                         adapter.notifyDataSetChanged();
                         break;
@@ -219,6 +226,12 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
         Cursor phoneCursor = resolver.query(Phone.CONTENT_URI, PHONES_PROJECTION, null, null, Phone.RAW_CONTACT_ID+" ASC");
 
         if (phoneCursor != null) {
+
+
+            //*************************************************************************************
+
+
+
             while (phoneCursor.moveToNext()) {
 
                 //得到联系人名称
@@ -227,10 +240,13 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
                 //得到联系人ID
                 int rawContactid = phoneCursor.getInt(PHONES_RAW_CONTACT_ID_INDEX);
 
+                int contactID = phoneCursor.getInt(PHONES_CONTACT_ID_INDEX);
+
                 ContactListViewItemData data = new ContactListViewItemData();
 
                 data.setName(contactName);
                 data.setRawContactID(rawContactid);
+                data.setContactID(contactID);
 
                 contactInfo.add(data);
 

@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.carryj.root.contactbook.data.ContactListViewItemData;
 import com.carryj.root.contactbook.fragments.ContactBookFragement;
 import com.carryj.root.contactbook.tools.GetStrPhoneType;
+import com.carryj.root.contactbook.tools.PhoneNumberTransformer;
 
 public class ContactPersonalShowActivity extends SweepBackActivity {
 
@@ -31,6 +32,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
 
     private ContactListViewItemData data;
     private String rawContactID;
+    private String contactID;
     private String name;
     private String number;
     private String numberType;
@@ -60,12 +62,13 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
 
         data = (ContactListViewItemData) getIntent().getSerializableExtra(ContactBookFragement.CONTACT_SHOW);
         rawContactID = data.getRawContactID();
+        contactID = data.getContactID();
         name = data.getName();
 
         ContentResolver resolver = getContentResolver();
 
         Cursor phoneCursor = resolver.query(CommonDataKinds.Phone.CONTENT_URI, PERSON_INFOMATION_PROJECTION,
-                ContactsContract.Contacts.Data.RAW_CONTACT_ID + "=?", new String[]{rawContactID}, null);
+                CommonDataKinds.Phone.CONTACT_ID + "=?", new String[]{contactID}, null);
 
 
         if (phoneCursor != null) {
@@ -77,33 +80,35 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                 numberType = new GetStrPhoneType().getStrPhoneType(phoneCursor.getInt(PHONE_TYPE_INDEX));
 
             }
+            phoneCursor.close();
 
         }
-        phoneCursor.close();
+
+
+        PhoneNumberTransformer pntf = new PhoneNumberTransformer();
+        pntf.setStrPhoneNumber(number);
+        number = pntf.getStrPhoneNumber();
 
 
 
         //获取E-Mail
-        /*Cursor emailCursor = resolver.query(CommonDataKinds.Phone.CONTENT_URI,
-                new String[]{CommonDataKinds.Phone.DATA1},
-                ContactsContract.Contacts.Data.RAW_CONTACT_ID + "=?"+" and "+ContactsContract.Contacts.Data.MIMETYPE + "=?",
-                new String[]{rawContactID,"1"}, null);*/
+        Cursor emailCursor = resolver.query(CommonDataKinds.Email.CONTENT_URI,
+                null, CommonDataKinds.Email.CONTACT_ID + "=?",
+                new String[]{contactID}, null);
+        if(emailCursor == null) {
+            email = new String("");
+        }
 
-        Cursor emailCursor = resolver.query(CommonDataKinds.Phone.CONTENT_URI,
-                new String[]{CommonDataKinds.Phone.DATA1},
-                ContactsContract.Contacts.Data.RAW_CONTACT_ID + "=?",
-                new String[]{rawContactID}, null);
-        if(emailCursor == null)
-            System.out.print("========================================== NULL ======================================");
 
         if (emailCursor != null) {
             while (emailCursor.moveToNext()) {
                 //得到email
-                email = emailCursor.getString(0);
+                email = emailCursor.getString(emailCursor.getColumnIndex(CommonDataKinds.Email.DATA));
 
             }
+            emailCursor.close();
         }
-        emailCursor.close();
+
     }
 
     @Override
@@ -122,11 +127,8 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         tv_contact_personal_show_name.setText(name);
         tv_contact_personal_show_number_type.setText(numberType);
         tv_contact_personal_show_number.setText(number);
+        tv_contact_personal_show_email.setText(email);
 
-        if(email != null)
-            tv_contact_personal_show_email.setText(email);
-        else
-            tv_contact_personal_show_email.setText("");
 
 
     }

@@ -10,6 +10,7 @@ public class ContactListViewItemData implements Serializable {
 
     private String name;
     private int rawContactID;
+    private int contactID;
 
     public ContactListViewItemData() {
 
@@ -27,7 +28,19 @@ public class ContactListViewItemData implements Serializable {
         return rawContactID+"";
     }
 
+    public int getID() {
+        return rawContactID;
+    }
+
     public void setRawContactID(int rawContactID) {
         this.rawContactID = rawContactID;
+    }
+
+    public String getContactID() {
+        return contactID+"";
+    }
+
+    public void setContactID(int contactID) {
+        this.contactID = contactID;
     }
 }
