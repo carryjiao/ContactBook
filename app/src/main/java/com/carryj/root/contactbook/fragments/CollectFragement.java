@@ -1,6 +1,6 @@
 package com.carryj.root.contactbook.fragments;
 
-import android.Manifest;
+
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
@@ -8,10 +8,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.CallLog;
-import android.provider.ContactsContract;
-import android.provider.ContactsContract.CommonDataKinds;
-import android.support.v4.app.ActivityCompat;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.support.v4.app.Fragment;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -26,14 +23,14 @@ import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
-import com.carryj.root.contactbook.ContactPersonalShowActivity;
+import com.carryj.root.contactbook.CollectPersonalShowActivity;
 import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.adapter.CollectAdapter;
 import com.carryj.root.contactbook.data.CollectListViewItemData;
 
 
 import java.util.ArrayList;
-import java.util.Date;
+
 
 /**
  * Created by root on 17/4/10.
@@ -50,9 +47,11 @@ public class CollectFragement extends Fragment implements OnClickListener {
 
     /**获取库contact表字段**/
     private static final String[] Collect_PROJECTION = new String[] {
-            CommonDataKinds.Phone.NUMBER,
-            CommonDataKinds.Phone.DISPLAY_NAME,
-            CommonDataKinds.Phone.TYPE};
+            Phone.NUMBER,
+            Phone.DISPLAY_NAME,
+            Phone.TYPE,
+            Phone.RAW_CONTACT_ID,
+            Phone.CONTACT_ID};
 
     /**电话号码**/
     private static final int COLLECT_NUMBER_INDEX = 0;
@@ -62,6 +61,10 @@ public class CollectFragement extends Fragment implements OnClickListener {
 
     /**号码类型**/
     private static final int COLLECT_TYPE_INDEX = 2;
+
+    private static final int COLLECT_RAW_CONTACT_ID_INDEX = 3;
+
+    private static final int COLLECT_CONTACT_ID_INDEX = 4;
 
     private ArrayList<CollectListViewItemData> mData = new ArrayList<CollectListViewItemData>();
 
@@ -132,7 +135,7 @@ public class CollectFragement extends Fragment implements OnClickListener {
                 switch (index) {
                     case 0:
                         // open
-                        Intent intent = new Intent(CollectFragement.this.getContext(), ContactPersonalShowActivity.class);
+                        Intent intent = new Intent(CollectFragement.this.getContext(), CollectPersonalShowActivity.class);
                         Bundle bundle = new Bundle();
                         bundle.putSerializable(CONTACT_PERSONAL_SHOW, mData.get(position));
                         intent.putExtras(bundle);
@@ -209,11 +212,8 @@ public class CollectFragement extends Fragment implements OnClickListener {
 
         try {
 
-            Cursor collectCursor = resolver.query(
-                    ContactsContract.RawContacts.CONTENT_URI,
-                    Collect_PROJECTION,
-                    ContactsContract.RawContacts.STARRED+"=?",
-                    new String[]{"1"}, null);
+            Cursor collectCursor = resolver.query(Phone.CONTENT_URI, Collect_PROJECTION,
+                    Phone.STARRED+"=?", new String[]{"1"}, null);
 
             if (collectCursor != null) {
                 while (collectCursor.moveToNext()) {
@@ -227,10 +227,16 @@ public class CollectFragement extends Fragment implements OnClickListener {
                     //得到号码类型
                     int numberType = collectCursor.getInt(COLLECT_TYPE_INDEX);
 
+                    int rawContactID = collectCursor.getInt(COLLECT_RAW_CONTACT_ID_INDEX);
+
+                    int contactID = collectCursor.getInt(COLLECT_CONTACT_ID_INDEX);
+
                     CollectListViewItemData itemData = new CollectListViewItemData();
                     itemData.setStrPhoneNumber(strNumber);
                     itemData.setName(cachedName);
                     itemData.setPhoneType(numberType);
+                    itemData.setRawContactID(rawContactID);
+                    itemData.setContactID(contactID);
 
                     collectInfo.add(itemData);
 

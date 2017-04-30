@@ -13,13 +13,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.carryj.root.contactbook.data.CollectListViewItemData;
-import com.carryj.root.contactbook.data.ContactListViewItemData;
 import com.carryj.root.contactbook.fragments.CollectFragement;
-import com.carryj.root.contactbook.fragments.ContactBookFragement;
 import com.carryj.root.contactbook.tools.GetStrPhoneType;
 import com.carryj.root.contactbook.tools.PhoneNumberTransformer;
 
-public class ContactPersonalShowActivity extends SweepBackActivity {
+public class CollectPersonalShowActivity extends SweepBackActivity {
 
     private String[] PERSON_INFOMATION_PROJECTION = new String[]{
             CommonDataKinds.Phone.TYPE,
@@ -32,7 +30,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
 
 
 
-    private ContactListViewItemData data;
+    private CollectListViewItemData data;
 
     private String rawContactID;
     private String contactID;
@@ -46,6 +44,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     private LinearLayout ll_contact_personal_show_email_block;
     private LinearLayout ll_contact_personal_show_remark_block;
 
+    private TextView tv_back_str;
     private TextView tv_contact_personal_show_edit;
     private TextView tv_contact_personal_show_name;
     private TextView tv_contact_personal_show_number_type;
@@ -66,7 +65,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     @Override
     protected void initData() {
 
-        data = (ContactListViewItemData) getIntent().getSerializableExtra(ContactBookFragement.CONTACT_SHOW);
+        data = (CollectListViewItemData) getIntent().getSerializableExtra(CollectFragement.CONTACT_PERSONAL_SHOW);
         rawContactID = data.getRawContactID();
         contactID = data.getContactID();
         name = data.getName();
@@ -131,6 +130,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     protected void initView() {
 
         ll_contact_personal_show_back = (LinearLayout) findViewById(R.id.ll_contact_personal_show_back);
+        tv_back_str = (TextView) findViewById(R.id.tv_back_str);
         tv_contact_personal_show_edit = (TextView) findViewById(R.id.tv_contact_personal_show_edit);
         im_contact_personal_show_icon = (ImageView) findViewById(R.id.im_contact_personal_show_icon);
         tv_contact_personal_show_name = (TextView) findViewById(R.id.tv_contact_personal_show_name);
@@ -144,6 +144,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         ll_contact_personal_show_remark_block = (LinearLayout) findViewById(R.id.ll_contact_personal_show_remark_block);
         tv_contact_personal_show_remark = (TextView) findViewById(R.id.tv_contact_personal_show_remark);
 
+        tv_back_str.setText("个人收藏");
         tv_contact_personal_show_name.setText(name);
         tv_contact_personal_show_number_type.setText(numberType);
         tv_contact_personal_show_number.setText(number);
