@@ -48,7 +48,8 @@ public class RecordFragement extends Fragment implements OnClickListener {
     /**获取库Call表字段**/
     private static final String[] CALL_LOG_PROJECTION = new String[] {
             CallLog.Calls.NUMBER, CallLog.Calls.CACHED_NAME, CallLog.Calls.TYPE,
-            CallLog.Calls.DATE, CallLog.Calls.DURATION, CallLog.Calls.CACHED_NUMBER_TYPE};
+            CallLog.Calls.DATE, CallLog.Calls.DURATION,
+            CallLog.Calls.CACHED_NUMBER_TYPE, CallLog.Calls._ID};
 
     /**电话号码**/
     private static final int CALLS_NUMBER_INDEX = 0;
@@ -67,6 +68,8 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
     /**号码类型**/
     private static final int CALLS_CACHED_NUMBER_TYPE_INDEX = 5;
+
+    private static final int CALLS_ID_INDEX = 6;
 
 
 
@@ -155,6 +158,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
                     case 1:
 
                         // delete
+                        deleteRecord(mData.get(position).get_id());
                         mData.remove(position);
                         adapter.notifyDataSetChanged();
                         break;
@@ -278,6 +282,8 @@ public class RecordFragement extends Fragment implements OnClickListener {
                     //得到号码类型
                     int numberType = callLogCursor.getInt(CALLS_CACHED_NUMBER_TYPE_INDEX);
 
+                    int _id = callLogCursor.getInt(CALLS_ID_INDEX);
+
                     RecordListViewItemData itemData = new RecordListViewItemData();
                     itemData.setStrNumber(strNumber);
                     itemData.setStrCachedName(cachedName);
@@ -285,6 +291,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
                     itemData.setDate(date);
                     itemData.setDuration(duration);
                     itemData.setPhoneType(numberType);
+                    itemData.set_id(_id);
 
                     recordInfo.add(itemData);
 
@@ -317,4 +324,13 @@ public class RecordFragement extends Fragment implements OnClickListener {
         startActivity(intent);
     }
 
+    private void deleteRecord(int id) {
+        try {
+            getContext().getContentResolver().delete(CallLog.Calls.CONTENT_URI,
+                    CallLog.Calls._ID+"=?", new String[]{id+""});
+
+        }catch (SecurityException e){
+
+        }
+    }
 }

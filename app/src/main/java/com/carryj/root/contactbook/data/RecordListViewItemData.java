@@ -22,6 +22,7 @@ public class RecordListViewItemData implements Serializable{
     private int phoneType;
     private Date date;
     private Long duration;
+    private int _id;
 
 
     public RecordListViewItemData() {
@@ -148,5 +149,13 @@ public class RecordListViewItemData implements Serializable{
 
     public void setDuration(Long duration) {
         this.duration = duration;
+    }
+
+    public int get_id() {
+        return _id;
+    }
+
+    public void set_id(int _id) {
+        this._id = _id;
     }
 }
