@@ -107,7 +107,8 @@ public class DialFragement extends Fragment implements OnClickListener {
             //删除拨号最后一个数字
             case R.id.iv_dial_delete:
                 String str = tv_show_dial_number.getText().toString();
-                tv_show_dial_number.setText(str.substring(0,str.length()-1));
+                if(str.length()>0)
+                    tv_show_dial_number.setText(str.substring(0,str.length()-1));
                 break;
             case R.id.btn_dial_number_1:
                 tv_show_dial_number.append("1");
