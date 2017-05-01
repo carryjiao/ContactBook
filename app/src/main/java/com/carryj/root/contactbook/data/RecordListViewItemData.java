@@ -87,7 +87,7 @@ public class RecordListViewItemData implements Serializable{
             return diff/(60*1000)+"分钟前";
         }else if(diff < 12*60*60*1000) {
             return df.format(date);
-        }else if(diff < 7*24*60*60*1000) {
+        }else if(diff < 3*24*60*60*1000) {
             df = new SimpleDateFormat("EEEE");
             return df.format(date);
         }else {

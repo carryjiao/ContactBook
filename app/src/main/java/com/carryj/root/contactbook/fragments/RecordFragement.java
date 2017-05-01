@@ -191,6 +191,28 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
     @Override
     public void onClick(View v) {
+        int id = v.getId();
+        switch (id) {
+            case R.id.tv_record_all:
+                tv_record_all.setTextColor(Color.parseColor("#E5E5E5"));
+                tv_record_missed_call.setTextColor(Color.parseColor("#030303"));
+                mData = getRecordData(null,null);
+                adapter.notifyDataSetChanged();
+                Toast.makeText(getContext(), "Changed!", Toast.LENGTH_LONG).show();
+                break;
+            case R.id.tv_record_missed_call:
+                tv_record_all.setTextColor(Color.parseColor("#030303"));
+                tv_record_missed_call.setTextColor(Color.parseColor("#E5E5E5"));
+                String selection = new String(CallLog.Calls.TYPE+"=?");
+                String[] selectionArgs = new String[]{CallLog.Calls.MISSED_TYPE+""};
+                mData = getRecordData(selection,selectionArgs);
+                adapter.notifyDataSetChanged();
+                Toast.makeText(getContext(), "Changed!", Toast.LENGTH_LONG).show();
+                break;
+            default:
+                break;
+        }
+
 
     }
 
@@ -222,7 +244,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
                     MY_PERMISSIONS_REQUEST_READ_CALL_LOG);
         } else {
 
-            mData = getRecordData();
+            mData = getRecordData(null,null);
 
 
         }
@@ -237,7 +259,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
         {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
-                mData = getRecordData();
+                mData = getRecordData(null,null);
 
             } else
             {
@@ -250,7 +272,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
     }
 
     /**得到手机通话记录**/
-    private ArrayList<RecordListViewItemData> getRecordData() {
+    private ArrayList<RecordListViewItemData> getRecordData(String selection, String[] selectionArgs) {
 
         ArrayList<RecordListViewItemData> recordInfo = new ArrayList<RecordListViewItemData>();
 
@@ -259,7 +281,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
         try {
 
             Cursor callLogCursor = resolver.query(CallLog.Calls.CONTENT_URI, CALL_LOG_PROJECTION,
-                    null, null, CallLog.Calls.DEFAULT_SORT_ORDER);
+                    selection, selectionArgs, CallLog.Calls.DEFAULT_SORT_ORDER);
 
             if (callLogCursor != null) {
                 while (callLogCursor.moveToNext()) {

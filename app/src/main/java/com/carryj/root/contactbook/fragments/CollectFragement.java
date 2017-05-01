@@ -25,8 +25,10 @@ import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.carryj.root.contactbook.AddCollectActivity;
 import com.carryj.root.contactbook.CollectPersonalShowActivity;
 import com.carryj.root.contactbook.R;
+import com.carryj.root.contactbook.RecordItemInDetailActivity;
 import com.carryj.root.contactbook.adapter.CollectAdapter;
 import com.carryj.root.contactbook.data.CollectListViewItemData;
 
@@ -182,6 +184,15 @@ public class CollectFragement extends Fragment implements OnClickListener {
 
     @Override
     public void onClick(View v) {
+        int id = v.getId();
+        switch (id) {
+            case R.id.tv_collect_add:
+                Intent intent = new Intent(this.getContext(), AddCollectActivity.class);
+                startActivity(intent);
+                break;
+            default:
+                break;
+        }
 
     }
 

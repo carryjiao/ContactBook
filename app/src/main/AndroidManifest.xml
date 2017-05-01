@@ -39,8 +39,9 @@
 
         <activity android:name=".BaseFragmentActivity" />
         <activity android:name=".RecordItemInDetailActivity" />
-        <activity android:name=".ContactPersonalShowActivity"></activity>
-        <activity android:name=".CollectPersonalShowActivity"></activity>
+        <activity android:name=".ContactPersonalShowActivity" />
+        <activity android:name=".CollectPersonalShowActivity" />
+        <activity android:name=".AddCollectActivity"></activity>
     </application>
 
 </manifest>
