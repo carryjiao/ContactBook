@@ -28,7 +28,6 @@ import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.carryj.root.contactbook.AddCollectActivity;
 import com.carryj.root.contactbook.CollectPersonalShowActivity;
 import com.carryj.root.contactbook.R;
-import com.carryj.root.contactbook.RecordItemInDetailActivity;
 import com.carryj.root.contactbook.adapter.CollectAdapter;
 import com.carryj.root.contactbook.data.CollectListViewItemData;
 
@@ -71,6 +70,7 @@ public class CollectFragement extends Fragment implements OnClickListener {
     private static final int COLLECT_CONTACT_ID_INDEX = 4;
 
     private ArrayList<CollectListViewItemData> mData = new ArrayList<CollectListViewItemData>();
+    private ArrayList<CollectListViewItemData> collectData = new ArrayList<CollectListViewItemData>();
 
 
     public CollectFragement() {
@@ -149,7 +149,9 @@ public class CollectFragement extends Fragment implements OnClickListener {
 
                         // delete
                         deleteCollect(mData.get(position).getContactID());
-                        mData.remove(position);
+                        collectData = getCollectData();
+                        mData.clear();
+                        mData.addAll(collectData);
                         adapter.notifyDataSetChanged();
                         break;
                 }
@@ -227,7 +229,7 @@ public class CollectFragement extends Fragment implements OnClickListener {
         try {
 
             Cursor collectCursor = resolver.query(Phone.CONTENT_URI, Collect_PROJECTION,
-                    Phone.STARRED+"=?", new String[]{"1"}, null);
+                    Phone.STARRED+"=?", new String[]{"1"},  Phone.RAW_CONTACT_ID+" ASC");
 
             if (collectCursor != null) {
                 while (collectCursor.moveToNext()) {

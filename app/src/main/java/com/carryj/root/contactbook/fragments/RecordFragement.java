@@ -43,6 +43,11 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
     private static final int MY_PERMISSIONS_REQUEST_READ_CALL_LOG = 3;
 
+    private static final String FLAG_ALLRECORD = "FLAG_ALLRECORD";
+    private static final String FLAG_MISSEDCALL = "FLAG_MISSEDCALL";
+    private String FLAG = FLAG_ALLRECORD;
+
+
     public static final String RECORD_IN_DETAIL = "RECORD_IN_DETAIL";
 
     private static final String selection = CallLog.Calls.TYPE+"=?";
@@ -95,6 +100,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        FLAG = FLAG_ALLRECORD;
         initData();
         View view = inflater.inflate(R.layout.fragment_record,null);
         initView(view);
@@ -164,7 +170,15 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
                         // delete
                         deleteRecord(mData.get(position).get_id());
-                        mData.remove(position);
+                        mData.clear();
+                        if(FLAG == FLAG_ALLRECORD) {
+                            allRcordData = getRecordData(null, null);
+                            mData.addAll(allRcordData);
+                        }
+                        else {
+                            missedCallRecordData = getRecordData(selection, selectionArgs);
+                            mData.addAll(missedCallRecordData);
+                        }
                         adapter.notifyDataSetChanged();
                         break;
                 }
@@ -199,6 +213,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
         int id = v.getId();
         switch (id) {
             case R.id.tv_record_all:
+                FLAG = FLAG_ALLRECORD;
                 tv_record_all.setTextColor(Color.parseColor("#E5E5E5"));
                 tv_record_missed_call.setTextColor(Color.parseColor("#030303"));
                 allRcordData = getRecordData(null,null);
@@ -207,6 +222,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
                 adapter.notifyDataSetChanged();
                 break;
             case R.id.tv_record_missed_call:
+                FLAG = FLAG_MISSEDCALL;
                 tv_record_all.setTextColor(Color.parseColor("#030303"));
                 tv_record_missed_call.setTextColor(Color.parseColor("#E5E5E5"));
                 missedCallRecordData = getRecordData(selection,selectionArgs);

@@ -145,7 +145,9 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
                         getContext().getContentResolver().delete(
                                 ContentUris.withAppendedId(ContactsContract.RawContacts.CONTENT_URI,
                                         mData.get(position).getID()), null, null);
-                        mData.remove(position);
+                        allContactData = getPhoneContacts();
+                        mData.clear();
+                        mData.addAll(allContactData);
                         adapter.notifyDataSetChanged();
                         break;
                     case 1:
@@ -225,7 +227,6 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
         } else {
 
             mData = getPhoneContacts();
-            allContactData.addAll(mData);
 
         }
     }
@@ -239,7 +240,6 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
                 mData = getPhoneContacts();
-                allContactData.addAll(mData);
 
             } else
             {
@@ -333,6 +333,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             if (s != null && s.length() > 0) {
+                allContactData = getPhoneContacts();
                 searchResultData = new ContactBookSearch().searchContact(s, allContactData);
                 mData.clear();
                 mData.addAll(searchResultData);
@@ -340,6 +341,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
             }else {
                 tv_contact_book_search.setVisibility(View.VISIBLE);
                 iv_contact_book_search.setVisibility(View.VISIBLE);
+                allContactData = getPhoneContacts();
                 mData.clear();
                 mData.addAll(allContactData);
                 adapter.notifyDataSetChanged();
