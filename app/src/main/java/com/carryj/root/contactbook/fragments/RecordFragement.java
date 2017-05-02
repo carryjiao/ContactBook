@@ -45,6 +45,9 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
     public static final String RECORD_IN_DETAIL = "RECORD_IN_DETAIL";
 
+    private static final String selection = CallLog.Calls.TYPE+"=?";
+    private static final String[] selectionArgs = new String[]{CallLog.Calls.MISSED_TYPE+""};
+
     /**获取库Call表字段**/
     private static final String[] CALL_LOG_PROJECTION = new String[] {
             CallLog.Calls.NUMBER, CallLog.Calls.CACHED_NAME, CallLog.Calls.TYPE,
@@ -81,6 +84,8 @@ public class RecordFragement extends Fragment implements OnClickListener {
     private RecordAdapter adapter;
 
     private ArrayList<RecordListViewItemData> mData = new ArrayList<RecordListViewItemData>();
+    private ArrayList<RecordListViewItemData> allRcordData = new ArrayList<RecordListViewItemData>();
+    private ArrayList<RecordListViewItemData> missedCallRecordData = new ArrayList<RecordListViewItemData>();
 
 
 
@@ -196,18 +201,18 @@ public class RecordFragement extends Fragment implements OnClickListener {
             case R.id.tv_record_all:
                 tv_record_all.setTextColor(Color.parseColor("#E5E5E5"));
                 tv_record_missed_call.setTextColor(Color.parseColor("#030303"));
-                mData = getRecordData(null,null);
+                allRcordData = getRecordData(null,null);
+                mData.clear();
+                mData.addAll(allRcordData);
                 adapter.notifyDataSetChanged();
-                Toast.makeText(getContext(), "Changed!", Toast.LENGTH_LONG).show();
                 break;
             case R.id.tv_record_missed_call:
                 tv_record_all.setTextColor(Color.parseColor("#030303"));
                 tv_record_missed_call.setTextColor(Color.parseColor("#E5E5E5"));
-                String selection = new String(CallLog.Calls.TYPE+"=?");
-                String[] selectionArgs = new String[]{CallLog.Calls.MISSED_TYPE+""};
-                mData = getRecordData(selection,selectionArgs);
+                missedCallRecordData = getRecordData(selection,selectionArgs);
+                mData.clear();
+                mData.addAll(missedCallRecordData);
                 adapter.notifyDataSetChanged();
-                Toast.makeText(getContext(), "Changed!", Toast.LENGTH_LONG).show();
                 break;
             default:
                 break;
@@ -246,7 +251,6 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
             mData = getRecordData(null,null);
 
-
         }
 
     }
@@ -260,6 +264,8 @@ public class RecordFragement extends Fragment implements OnClickListener {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
                 mData = getRecordData(null,null);
+                allRcordData.addAll(mData);
+                missedCallRecordData = getRecordData(selection,selectionArgs);
 
             } else
             {
