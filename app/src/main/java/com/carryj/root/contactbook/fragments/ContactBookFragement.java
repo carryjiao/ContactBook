@@ -23,6 +23,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.widget.Toast;
@@ -48,7 +50,8 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
     private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 2;
     public static final String CONTACT_SHOW = "CONTACT_SHOW";
-    private static boolean IS_LOAD = false;
+
+
 
 
     private TextView tv_contact_book_add;
@@ -94,6 +97,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
     }
 
     private void initView(View view) {
+
         tv_contact_book_add = (TextView) view.findViewById(R.id.tv_contact_book_add);
         et_contact_book_search = (EditText) view.findViewById(R.id.et_contact_book_search);
         tv_contact_book_search = (TextView) view.findViewById(R.id.tv_contact_book_search);
@@ -168,7 +172,6 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
 
         tv_contact_book_add.setOnClickListener(this);
-        et_contact_book_search.setOnClickListener(this);
         iv_contact_book_box.setOnClickListener(this);
         et_contact_book_search.addTextChangedListener(new MyTextWatcher());
 
@@ -181,9 +184,13 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
     public void onClick(View v) {
         int id = v.getId();
         switch (id) {
-            case R.id.et_contact_book_search:
-                tv_contact_book_search.setVisibility(View.GONE);
-                iv_contact_book_search.setVisibility(View.GONE);
+            case R.id.tv_contact_book_add:
+
+                break;
+            case R.id.iv_contact_book_box:
+
+                break;
+            default:
                 break;
 
         }
@@ -319,7 +326,8 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+            tv_contact_book_search.setVisibility(View.GONE);
+            iv_contact_book_search.setVisibility(View.GONE);
         }
 
         @Override
@@ -330,6 +338,8 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
                 mData.addAll(searchResultData);
                 adapter.notifyDataSetChanged();
             }else {
+                tv_contact_book_search.setVisibility(View.VISIBLE);
+                iv_contact_book_search.setVisibility(View.VISIBLE);
                 mData.clear();
                 mData.addAll(allContactData);
                 adapter.notifyDataSetChanged();
