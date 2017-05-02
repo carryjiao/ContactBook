@@ -17,10 +17,11 @@ public class ContactBookSearch {
     /*按号码-拼音模糊搜索*/
 
     public static ArrayList<ContactListViewItemData> searchContact(
-            String str, ArrayList<ContactListViewItemData> allContactData) {
+            CharSequence str, ArrayList<ContactListViewItemData> allContactData) {
 
         ArrayList<ContactListViewItemData> resultData = new ArrayList<ContactListViewItemData>();
 
+        //以电话号码方式查询
         if (str.toString().startsWith("0") || str.toString().startsWith("1")
                 || str.toString().startsWith("+")) {
 
@@ -45,9 +46,9 @@ public class ContactBookSearch {
             finder.setResource(str.toString());
             result = finder.getSpelling();
 
-            if (contains(itemData, result)) {
+            if (contains(itemData, result)) {//是拼音
                 resultData.add(itemData);
-            } else if (itemData.getNumber().contains(str)) {
+            } else if (itemData.getNumber().contains(str)) {//是数字
 
                 resultData.add(itemData);
             }

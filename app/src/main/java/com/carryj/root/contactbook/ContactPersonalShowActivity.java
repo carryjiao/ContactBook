@@ -15,19 +15,8 @@ import android.widget.TextView;
 import com.carryj.root.contactbook.data.ContactListViewItemData;
 import com.carryj.root.contactbook.fragments.ContactBookFragement;
 import com.carryj.root.contactbook.tools.GetStrPhoneType;
-import com.carryj.root.contactbook.tools.PhoneNumberTransformer;
 
 public class ContactPersonalShowActivity extends SweepBackActivity {
-
-    private String[] PERSON_INFOMATION_PROJECTION = new String[]{
-            CommonDataKinds.Phone.TYPE,
-            CommonDataKinds.Phone.NUMBER
-    };
-
-    private static int PHONE_TYPE_INDEX = 0;
-    private static int PHONE_NUMBER_INDEX = 1;
-
-
 
 
     private ContactListViewItemData data;
@@ -68,30 +57,28 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         rawContactID = data.getRawContactID();
         contactID = data.getContactID();
         name = data.getName();
+        number = data.getNumber();
 
         ContentResolver resolver = getContentResolver();
 
-        Cursor phoneCursor = resolver.query(CommonDataKinds.Phone.CONTENT_URI, PERSON_INFOMATION_PROJECTION,
-                CommonDataKinds.Phone.CONTACT_ID + "=?", new String[]{contactID}, null);
+        Cursor phoneCursor = resolver.query(CommonDataKinds.Phone.CONTENT_URI,
+                new String[]{CommonDataKinds.Phone.TYPE},
+                CommonDataKinds.Phone.CONTACT_ID + "=?",
+                new String[]{contactID}, null);
 
 
         if (phoneCursor != null) {
             while (phoneCursor.moveToNext()) {
-                //获取电话号码
-                number = phoneCursor.getString(PHONE_NUMBER_INDEX);
 
                 //获取号码类型
-                numberType = new GetStrPhoneType().getStrPhoneType(phoneCursor.getInt(PHONE_TYPE_INDEX));
+                numberType = new GetStrPhoneType().getStrPhoneType(phoneCursor.
+                        getColumnIndex(CommonDataKinds.Phone.TYPE));
 
             }
             phoneCursor.close();
 
         }
 
-
-        PhoneNumberTransformer pntf = new PhoneNumberTransformer();
-        pntf.setStrPhoneNumber(number);
-        number = pntf.getStrPhoneNumber();
 
 
 
@@ -188,6 +175,9 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                 }finally {
 
                 }
+                break;
+            default:
+                break;
         }
 
     }

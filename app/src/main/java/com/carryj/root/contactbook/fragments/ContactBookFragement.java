@@ -36,6 +36,7 @@ import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.adapter.ContactBookAdapter;
 import com.carryj.root.contactbook.data.ContactListViewItemData;
 import com.carryj.root.contactbook.tools.ContactBookSearch;
+import com.carryj.root.contactbook.tools.PhoneNumberTransformer;
 
 import java.util.ArrayList;
 
@@ -75,6 +76,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
     private ArrayList<ContactListViewItemData> mData = new ArrayList<ContactListViewItemData>();
     private ArrayList<ContactListViewItemData> searchResultData = new ArrayList<ContactListViewItemData>();
+    private ArrayList<ContactListViewItemData> allContactData = new ArrayList<ContactListViewItemData>();
 
 
     public ContactBookFragement() {
@@ -216,6 +218,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
         } else {
 
             mData = getPhoneContacts();
+            allContactData.addAll(mData);
 
         }
     }
@@ -228,7 +231,8 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
         {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
-                getPhoneContacts();
+                mData = getPhoneContacts();
+                allContactData.addAll(mData);
 
             } else
             {
@@ -266,6 +270,10 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
                 int contactID = phoneCursor.getInt(PHONES_CONTACT_ID_INDEX);
 
                 String number = phoneCursor.getString(PHONES_NUMBER_INDEX);
+                //将电话号码中的"-"去掉
+                PhoneNumberTransformer pntf = new PhoneNumberTransformer();
+                pntf.setStrPhoneNumber(number);
+                number = pntf.getStrPhoneNumber();
 
                 ContactListViewItemData data = new ContactListViewItemData();
 
@@ -316,9 +324,16 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            String str = et_contact_book_search.getText().toString();
-            mData = new ContactBookSearch().searchContact(str, mData);
-            adapter.notifyDataSetChanged();
+            if (s != null && s.length() > 0) {
+                searchResultData = new ContactBookSearch().searchContact(s, allContactData);
+                mData.clear();
+                mData.addAll(searchResultData);
+                adapter.notifyDataSetChanged();
+            }else {
+                mData.clear();
+                mData.addAll(allContactData);
+                adapter.notifyDataSetChanged();
+            }
 
         }
 
