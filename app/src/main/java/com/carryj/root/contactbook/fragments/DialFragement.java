@@ -11,6 +11,7 @@ import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -24,7 +25,7 @@ import com.carryj.root.contactbook.R;
  * Created by root on 17/4/10.
  */
 
-public class DialFragement extends Fragment implements OnClickListener {
+public class DialFragement extends Fragment implements OnClickListener,OnLongClickListener {
 
 
     private static final int MY_PERMISSIONS_REQUEST_CALL_PHONE = 1;
@@ -81,6 +82,7 @@ public class DialFragement extends Fragment implements OnClickListener {
 
         tv_dial_add.setOnClickListener(this);
         iv_dial_delete.setOnClickListener(this);
+        iv_dial_delete.setOnLongClickListener(this);
 
         btn1.setOnClickListener(this);
         btn2.setOnClickListener(this);
@@ -154,6 +156,20 @@ public class DialFragement extends Fragment implements OnClickListener {
                 break;
         }
 
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        int id = v.getId();
+        switch (id) {
+            case R.id.iv_dial_delete:
+                tv_show_dial_number.setText("");
+                break;
+            default:
+                break;
+
+        }
+        return false;
     }
 
     public void testCall(View view)

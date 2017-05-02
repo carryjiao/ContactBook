@@ -7,23 +7,12 @@
     <RelativeLayout
         android:id="@+id/dial_text_bar"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="@dimen/toolbar_height"
         android:gravity="center_vertical"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:background="@color/colorTitleBlue">
-
-
-        <TextView
-            android:id="@+id/tv_show_dial_number"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginTop="3dp"
-            android:layout_marginBottom="3dp"
-            android:layout_centerInParent="true"
-            android:textSize="30sp"
-            android:textColor="@color/colorBrightWhite"/>
 
         <TextView
             android:id="@+id/tv_dial_add"
@@ -37,8 +26,21 @@
             android:layout_alignParentLeft="true"
             android:layout_marginStart="10dp" />
 
+
+        <com.carryj.root.contactbook.ui.AutoFitTextView
+            android:id="@+id/tv_show_dial_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_toRightOf="@id/tv_dial_add"
+            android:layout_toLeftOf="@+id/iv_dial_delete"
+            android:gravity="center"
+            android:textSize="30sp"
+            android:textColor="@color/colorBrightWhite" />
+
+
         <ImageView
-            android:id="@+id/iv_dial_delete"
+            android:id="@id/iv_dial_delete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@android:drawable/ic_input_delete"
