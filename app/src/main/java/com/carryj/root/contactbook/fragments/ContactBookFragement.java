@@ -13,12 +13,15 @@ import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
@@ -32,6 +35,7 @@ import com.carryj.root.contactbook.ContactPersonalShowActivity;
 import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.adapter.ContactBookAdapter;
 import com.carryj.root.contactbook.data.ContactListViewItemData;
+import com.carryj.root.contactbook.tools.ContactBookSearch;
 
 import java.util.ArrayList;
 
@@ -47,13 +51,16 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
 
     private TextView tv_contact_book_add;
+    private EditText et_contact_book_search;
+    private TextView tv_contact_book_search;
+    private ImageView iv_contact_book_search;
     private ImageView iv_contact_book_box;
     private ContactBookAdapter adapter;
     private SwipeMenuListView listView;
 
     /**获取库Phone表字段**/
     private static final String[] PHONES_PROJECTION = new String[] {
-            Phone.DISPLAY_NAME, Phone.RAW_CONTACT_ID, Phone.CONTACT_ID};
+            Phone.DISPLAY_NAME, Phone.RAW_CONTACT_ID, Phone.CONTACT_ID, Phone.NUMBER};
 
     /**联系人显示名称**/
     private static final int PHONES_DISPLAY_NAME_INDEX = 0;
@@ -63,8 +70,11 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
     private static final int PHONES_CONTACT_ID_INDEX = 2;
 
+    private static final int PHONES_NUMBER_INDEX = 3;
+
 
     private ArrayList<ContactListViewItemData> mData = new ArrayList<ContactListViewItemData>();
+    private ArrayList<ContactListViewItemData> searchResultData = new ArrayList<ContactListViewItemData>();
 
 
     public ContactBookFragement() {
@@ -83,6 +93,9 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
     private void initView(View view) {
         tv_contact_book_add = (TextView) view.findViewById(R.id.tv_contact_book_add);
+        et_contact_book_search = (EditText) view.findViewById(R.id.et_contact_book_search);
+        tv_contact_book_search = (TextView) view.findViewById(R.id.tv_contact_book_search);
+        iv_contact_book_search = (ImageView) view.findViewById(R.id.iv_contact_book_search);
         iv_contact_book_box = (ImageView) view.findViewById(R.id.iv_contact_book_box);
         listView = (SwipeMenuListView) view.findViewById(R.id.contact_book_listview);
         adapter = new ContactBookAdapter(getContext(), mData);
@@ -153,7 +166,9 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
 
         tv_contact_book_add.setOnClickListener(this);
+        et_contact_book_search.setOnClickListener(this);
         iv_contact_book_box.setOnClickListener(this);
+        et_contact_book_search.addTextChangedListener(new MyTextWatcher());
 
     }
 
@@ -162,6 +177,14 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
     @Override
     public void onClick(View v) {
+        int id = v.getId();
+        switch (id) {
+            case R.id.et_contact_book_search:
+                tv_contact_book_search.setVisibility(View.GONE);
+                iv_contact_book_search.setVisibility(View.GONE);
+                break;
+
+        }
 
     }
 
@@ -242,11 +265,14 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
                 int contactID = phoneCursor.getInt(PHONES_CONTACT_ID_INDEX);
 
+                String number = phoneCursor.getString(PHONES_NUMBER_INDEX);
+
                 ContactListViewItemData data = new ContactListViewItemData();
 
                 data.setName(contactName);
                 data.setRawContactID(rawContactid);
                 data.setContactID(contactID);
+                data.setNumber(number);
 
                 contactInfo.add(data);
 
@@ -280,4 +306,25 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
             phoneCursor.close();
         }
     }*/
+
+    private class MyTextWatcher implements TextWatcher {
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            String str = et_contact_book_search.getText().toString();
+            mData = new ContactBookSearch().searchContact(str, mData);
+            adapter.notifyDataSetChanged();
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+
+        }
+    }
 }
