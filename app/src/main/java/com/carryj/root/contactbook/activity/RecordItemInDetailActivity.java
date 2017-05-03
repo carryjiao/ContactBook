@@ -1,4 +1,4 @@
-package com.carryj.root.contactbook;
+package com.carryj.root.contactbook.activity;
 
 
 
@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.data.RecordListViewItemData;
 import com.carryj.root.contactbook.fragments.RecordFragement;
 
