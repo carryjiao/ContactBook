@@ -1,4 +1,4 @@
-package com.carryj.root.contactbook;
+package com.carryj.root.contactbook.activity;
 
 import android.Manifest;
 import android.content.ContentUris;
@@ -10,17 +10,20 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.ContactsContract.RawContacts;
-import android.provider.ContactsContract.CommonDataKinds.StructuredName;
-import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Im;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.Data;
+import android.provider.ContactsContract.RawContacts;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.carryj.root.contactbook.R;
+import com.carryj.root.contactbook.SweepBackActivity;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,7 +31,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 
-public class AddContactActivity extends SweepBackActivity {
+public class ShowORCodeActivity extends SweepBackActivity {
 
     private String SELECTOR;
     private ImageView imageView;
@@ -95,7 +98,7 @@ public class AddContactActivity extends SweepBackActivity {
     protected void initView() {
 
         handler = new Handler() {
-            public void handleMessage(android.os.Message msg) {
+            public void handleMessage(Message msg) {
 
                 imageView = (ImageView) findViewById(R.id.imageView);
                 imageView.setImageBitmap((Bitmap) msg.obj);
