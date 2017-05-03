@@ -1,39 +1,23 @@
 package com.carryj.root.contactbook;
 
-import android.Manifest;
 import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.provider.ContactsContract.RawContacts;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Im;
 import android.provider.ContactsContract.Data;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.Toast;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 
 public class AddContactActivity extends SweepBackActivity {
 
     private String SELECTOR;
-    private ImageView imageView;
-    private Bitmap ORCode;
-    private Handler handler;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,61 +30,14 @@ public class AddContactActivity extends SweepBackActivity {
 
 
 
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.INTERNET)
-                != PackageManager.PERMISSION_GRANTED)
-        {
-
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.INTERNET}, 99);
-        } else
-        {
-            new Thread(){
-                @Override
-                public void run()
-                {
-                    ORCode = getBitmap("http://qr.liantu.com/api.php?text=焦消13251356557");
-                    Message msg = new Message();
-                    // 把bm存入消息中,发送到主线程
-                    msg.obj = ORCode;
-                    handler.sendMessage(msg);
-                }
-            }.start();
-
-        }
-
-
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
-    {
 
-        if (requestCode == 99)
-        {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
-            {
-                ORCode = getBitmap("http://qr.liantu.com/api.php?text=焦消13251356557");
-            } else
-            {
-                // Permission Denied
-                Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
-            }
-            return;
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
 
     @Override
     protected void initView() {
 
-        handler = new Handler() {
-            public void handleMessage(android.os.Message msg) {
 
-                imageView = (ImageView) findViewById(R.id.imageView);
-                imageView.setImageBitmap((Bitmap) msg.obj);
-            }
-        };
 
     }
 
@@ -178,26 +115,4 @@ public class AddContactActivity extends SweepBackActivity {
     }
 
 
-    public static Bitmap getBitmap(String path) {
-        HttpURLConnection conn = null;
-        try {
-
-            URL url = new URL(path);
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setConnectTimeout(5000);
-            conn.setRequestMethod("GET");
-            if (conn.getResponseCode() == 200){
-                InputStream inputStream = conn.getInputStream();
-                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                return bitmap;
-            }else
-                System.out.println("失败");
-
-        }catch (IOException e){
-            e.printStackTrace();
-        }finally {
-            conn.disconnect();//断开连接
-        }
-        return null;
-    }
 }

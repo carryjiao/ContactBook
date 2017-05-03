@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -55,12 +54,276 @@
 
     </RelativeLayout>
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageView"
-        android:layout_marginLeft="50dp"
-        android:layout_marginTop="50dp"
-        android:src="@drawable/ic_launcher"/>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!--姓名模块-->
+            <LinearLayout
+                android:id="@+id/ll_add_contact_name_block"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+                    android:gravity="center_vertical"
+                    android:background="@color/colorTitleBGGray">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/contact_personal_show_margin_left"
+                        android:text="个人信息"
+                        android:textSize="10sp"
+                        android:typeface="monospace"
+                        android:textColor="@color/colorCharBGGray"/>
+
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:id="@+id/im_add_contact_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/im_icon"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="@dimen/add_contact_margin_left"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_toRightOf="@id/im_add_contact_icon"
+                        android:layout_marginLeft="@dimen/add_contact_margin_left"
+                        android:layout_marginRight="@dimen/add_contact_margin_left">
+
+                        <EditText
+                            android:id="@+id/et_add_contact_surname"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="姓"
+                            android:textSize="@dimen/add_contact_text_size"
+                            android:textColor="@color/colorCharBGGray"/>
+
+                        <EditText
+                            android:id="@+id/et_add_contact_given_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="名"
+                            android:textSize="@dimen/add_contact_text_size"
+                            android:textColor="@color/colorCharBGGray"/>
+
+                        <EditText
+                            android:id="@+id/et_add_contact_company"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="公司"
+                            android:textSize="@dimen/add_contact_text_size"
+                            android:textColor="@color/colorCharBGGray"/>
+
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+
+            <!--电话号码模块-->
+            <LinearLayout
+                android:id="@+id/add_contact_number_block"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+                    android:gravity="center_vertical"
+                    android:background="@color/colorTitleBGGray">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/contact_personal_show_margin_left"
+                        android:text="电话号码"
+                        android:textSize="10sp"
+                        android:typeface="monospace"
+                        android:textColor="@color/colorCharBGGray"/>
+
+                </LinearLayout>
+
+                <android.support.v7.app.AlertController.RecycleListView
+                    android:id="@+id/add_contact_number_recycle_listview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/add_contact_margin_left"
+                    android:layout_marginRight="@dimen/add_contact_margin_left">
+                    
+                </android.support.v7.app.AlertController.RecycleListView>
+                
+                <LinearLayout
+                    android:id="@+id/ll_add_contact_name_add"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginLeft="@dimen/add_contact_margin_left"
+                    android:layout_marginRight="@dimen/add_contact_margin_left">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@android:drawable/ic_menu_add"
+                        android:tint="@color/colorGreen"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="添加电话"
+                        android:textSize="@dimen/add_contact_text_size"
+                        android:textColor="@color/colorCharBlue"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <!--电子邮件模块-->
+            <LinearLayout
+                android:id="@+id/add_contact_email_block"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+                    android:gravity="center_vertical"
+                    android:background="@color/colorTitleBGGray">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/contact_personal_show_margin_left"
+                        android:text="电子邮件"
+                        android:textSize="10sp"
+                        android:typeface="monospace"
+                        android:textColor="@color/colorCharBGGray"/>
+
+                </LinearLayout>
+
+                <android.support.v7.app.AlertController.RecycleListView
+                    android:id="@+id/add_contact_email_recycle_listview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/add_contact_margin_left"
+                    android:layout_marginRight="@dimen/add_contact_margin_left">
+
+                </android.support.v7.app.AlertController.RecycleListView>
+
+                <LinearLayout
+                    android:id="@+id/ll_add_contact_email_add"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginLeft="@dimen/add_contact_margin_left"
+                    android:layout_marginRight="@dimen/add_contact_margin_left">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@android:drawable/ic_menu_add"
+                        android:tint="@color/colorGreen"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="添加电子邮件"
+                        android:textSize="@dimen/add_contact_text_size"
+                        android:textColor="@color/colorCharBlue"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <!--即时通信模块-->
+            <LinearLayout
+                android:id="@+id/add_contact_im_block"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+                    android:gravity="center_vertical"
+                    android:background="@color/colorTitleBGGray">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/contact_personal_show_margin_left"
+                        android:text="即时通信"
+                        android:textSize="10sp"
+                        android:typeface="monospace"
+                        android:textColor="@color/colorCharBGGray"/>
+
+                </LinearLayout>
+
+                <android.support.v7.app.AlertController.RecycleListView
+                    android:id="@+id/add_contact_im_recycle_listview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/add_contact_margin_left"
+                    android:layout_marginRight="@dimen/add_contact_margin_left">
+
+                </android.support.v7.app.AlertController.RecycleListView>
+
+                <LinearLayout
+                    android:id="@+id/ll_add_contact_im_add"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginLeft="@dimen/add_contact_margin_left"
+                    android:layout_marginRight="@dimen/add_contact_margin_left">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@android:drawable/ic_menu_add"
+                        android:tint="@color/colorGreen"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="添加即时聊天信息"
+                        android:textSize="@dimen/add_contact_text_size"
+                        android:textColor="@color/colorCharBlue"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
 
 </LinearLayout>

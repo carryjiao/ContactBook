@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/rl_add_contact_title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/toolbar_height"
+        android:gravity="center_vertical"
+        android:background="@color/colorTitleBlue"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true">
+
+        <LinearLayout
+            android:id="@+id/ll_add_contact_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="&lt;"
+                android:textSize="30sp"
+                android:textColor="@color/colorBlack" />
+
+            <TextView
+                android:id="@+id/tv_add_contact_back_str"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="所有联系人"
+                android:textSize="18sp"
+                android:textColor="@color/colorBlack" />
+
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/tv_add_contact_done"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:text="完成"
+            android:textSize="20sp"
+            android:textColor="@color/colorCharBGGray"/>
+
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="50dp"
+        android:src="@drawable/ic_launcher"/>
+
+</LinearLayout>
