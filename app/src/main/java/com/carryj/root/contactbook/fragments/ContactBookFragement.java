@@ -51,6 +51,8 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
     private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 2;
     public static final String CONTACT_SHOW = "CONTACT_SHOW";
+    public static final String SELECTOR = "SELECTOR";
+    private static final String FROM_CONTACT_BOOK_FRAGEMENT_ADD = "FROM_CONTACT_BOOK_FRAGEMENT_ADD";
 
 
 
@@ -189,6 +191,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
         switch (id) {
             case R.id.tv_contact_book_add:
                 Intent intent = new Intent(ContactBookFragement.this.getContext(), AddContactActivity.class);
+                intent.putExtra(SELECTOR,FROM_CONTACT_BOOK_FRAGEMENT_ADD);
                 startActivity(intent);
 
                 break;
