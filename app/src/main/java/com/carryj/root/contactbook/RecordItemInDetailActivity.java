@@ -13,10 +13,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.carryj.root.contactbook.data.RecordListViewItemData;
+import com.carryj.root.contactbook.fragments.DialFragement;
 import com.carryj.root.contactbook.fragments.RecordFragement;
 
 public class RecordItemInDetailActivity extends SweepBackActivity {
 
+
+    public static final String SELECTOR = "SELECTOR";
+    public static final String NUMBER = "NUMBER";
+    private static final String FROM_RECORD_ITEM_IN_DETAIL_ACTIVITY_NEW = "FROM_RECORD_ITEM_IN_DETAIL_ACTIVITY_NEW";
 
     private LinearLayout ll_record_item_in_detail_back;
     private LinearLayout ll_record_item_in_detail_contact_add;
@@ -133,6 +138,12 @@ public class RecordItemInDetailActivity extends SweepBackActivity {
             case R.id.ll_record_item_in_detail_contact_delete:
                 break;
             case R.id.ll_record_item_in_detail_contact_add:
+
+                String number = tv_record_item_in_detail_number.getText().toString();
+                Intent intent = new Intent(RecordItemInDetailActivity.this, AddContactActivity.class);
+                intent.putExtra(SELECTOR,FROM_RECORD_ITEM_IN_DETAIL_ACTIVITY_NEW);
+                intent.putExtra(NUMBER,number);
+                startActivity(intent);
                 break;
             default:
                 break;

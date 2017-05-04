@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.carryj.root.contactbook.AddContactActivity;
 import com.carryj.root.contactbook.R;
 
 
@@ -29,6 +30,9 @@ public class DialFragement extends Fragment implements OnClickListener,OnLongCli
 
 
     private static final int MY_PERMISSIONS_REQUEST_CALL_PHONE = 1;
+    public static final String SELECTOR = "SELECTOR";
+    public static final String NUMBER = "NUMBER";
+    private static final String FROM_DIAL_FRAGEMENT_ADD = "FROM_DIAL_FRAGEMENT_ADD";
 
     private TextView tv_dial_add;
     private TextView tv_show_dial_number;
@@ -112,6 +116,13 @@ public class DialFragement extends Fragment implements OnClickListener,OnLongCli
                 if(str.length()>0)
                     tv_show_dial_number.setText(str.substring(0,str.length()-1));
                 break;
+            case R.id.tv_dial_add:
+                String number = tv_show_dial_number.getText().toString();
+                Intent intent = new Intent(DialFragement.this.getContext(), AddContactActivity.class);
+                intent.putExtra(SELECTOR,FROM_DIAL_FRAGEMENT_ADD);
+                intent.putExtra(NUMBER,number);
+                startActivity(intent);
+                break;
             case R.id.btn_dial_number_1:
                 tv_show_dial_number.append("1");
                 break;
@@ -165,6 +176,7 @@ public class DialFragement extends Fragment implements OnClickListener,OnLongCli
             case R.id.iv_dial_delete:
                 tv_show_dial_number.setText("");
                 break;
+
             default:
                 break;
 

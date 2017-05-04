@@ -74,17 +74,18 @@ public class AddContactActivity extends SweepBackActivity {
     protected void initData() {
 
         SELECTOR = getIntent().getStringExtra("SELECTOR");
-        if(SELECTOR == FROM_CONTACT_BOOK_FRAGEMENT_ADD){
+        if(SELECTOR.equals(FROM_CONTACT_BOOK_FRAGEMENT_ADD)){
             phoneNumber = "";
-        }else if(SELECTOR == FROM_DIAL_FRAGEMENT_ADD||SELECTOR == FROM_RECORD_ITEM_IN_DETAIL_ACTIVITY_NEW) {
+        }else if(SELECTOR.equals(FROM_DIAL_FRAGEMENT_ADD) ||SELECTOR.equals(FROM_RECORD_ITEM_IN_DETAIL_ACTIVITY_NEW)) {
             phoneNumber = getIntent().getStringExtra("NUMBER");
+            AddContactNumberData numberItemData = new AddContactNumberData();
+            numberItemData.setPhoneNumber(phoneNumber);
+            myNumberData.add(numberItemData);
         }else {
             phoneNumber = "";
         }
 
-        AddContactNumberData numberItemData = new AddContactNumberData();
-        numberItemData.setPhoneNumber(phoneNumber);
-        myNumberData.add(numberItemData);
+
 
 
 
