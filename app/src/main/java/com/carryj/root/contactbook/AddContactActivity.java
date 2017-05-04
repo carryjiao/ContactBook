@@ -21,6 +21,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.carryj.root.contactbook.adapter.AddContactEmailAdapter;
+import com.carryj.root.contactbook.adapter.AddContactImAdapter;
 import com.carryj.root.contactbook.adapter.AddContactNumberAdapter;
 import com.carryj.root.contactbook.data.AddContactEmailData;
 import com.carryj.root.contactbook.data.AddContactImData;
@@ -58,15 +60,14 @@ public class AddContactActivity extends SweepBackActivity {
     private LinearLayout ll_add_contact_im_add;
 
     private  ArrayList<AddContactNumberData> myNumberData = new ArrayList<AddContactNumberData>();
-    private  ArrayList<AddContactNumberData> myNumberChangeData = new ArrayList<AddContactNumberData>();
-
     private ArrayList<AddContactEmailData> myEmailData = new ArrayList<AddContactEmailData>();
-    private ArrayList<AddContactEmailData> myEmailChangeData = new ArrayList<AddContactEmailData>();
-
     private ArrayList<AddContactImData> myImData = new ArrayList<AddContactImData>();
-    private ArrayList<AddContactImData> myImChangeData = new ArrayList<AddContactImData>();
 
     private AddContactNumberAdapter numberAdapter;
+    private AddContactEmailAdapter emailAdapter;
+    private AddContactImAdapter imAdapter;
+
+
 
 
     @Override
@@ -126,12 +127,43 @@ public class AddContactActivity extends SweepBackActivity {
         }
 
 
+        /*电话号码模块*/
         numberAdapter = new AddContactNumberAdapter(this, myNumberData);
         add_contact_number_recyclerview.setLayoutManager(new LinearLayoutManager(this));
         add_contact_number_recyclerview.setAdapter(numberAdapter);
         add_contact_number_recyclerview.addItemDecoration(new DividerItemDecoration(this,
                 DividerItemDecoration.VERTICAL_LIST));
 
+        /*电子邮箱模块*/
+        emailAdapter = new AddContactEmailAdapter(this, myEmailData);
+        add_contact_email_recyclerview.setLayoutManager(new LinearLayoutManager(this));
+        add_contact_email_recyclerview.setAdapter(emailAdapter);
+        add_contact_email_recyclerview.addItemDecoration(new DividerItemDecoration(this,
+                DividerItemDecoration.VERTICAL_LIST));
+
+        /*及时通信模块*/
+        imAdapter = new AddContactImAdapter(this, myImData);
+        add_contact_im_recyclerview.setLayoutManager(new LinearLayoutManager(this));
+        add_contact_im_recyclerview.setAdapter(imAdapter);
+        add_contact_im_recyclerview.addItemDecoration(new DividerItemDecoration(this,
+                DividerItemDecoration.VERTICAL_LIST));
+
+
+
+
+
+    }
+
+    @Override
+    protected void initEvents() {
+        ll_add_contact_back.setOnClickListener(this);
+        tv_add_contact_done.setOnClickListener(this);
+        ll_add_contact_number_add.setOnClickListener(this);
+        ll_add_contact_email_add.setOnClickListener(this);
+        ll_add_contact_im_add.setOnClickListener(this);
+
+
+        /*电话号码模块*/
         //删除按钮监听器
         numberAdapter.setOnItemListener(new AddContactNumberAdapter.OnItemListener() {
             @Override
@@ -173,16 +205,87 @@ public class AddContactActivity extends SweepBackActivity {
         });
 
 
+        /*电子邮箱模块*/
+        //删除按钮监听
+        emailAdapter.setOnItemListener(new AddContactEmailAdapter.OnItemListener() {
+            @Override
+            public void onClick(int position) {
+                emailAdapter.deleteEmailData(position);
+            }
+        });
 
-    }
+        //电子邮箱类型监听器
+        emailAdapter.setOnItemSpinnerListener(new AddContactEmailAdapter.OnItemSpinnerListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id, int listposition) {
+                int type = position+1;
+                myEmailData.get(listposition).setEmailType(type+"");//设置电子邮箱类型
+            }
 
-    @Override
-    protected void initEvents() {
-        ll_add_contact_back.setOnClickListener(this);
-        tv_add_contact_done.setOnClickListener(this);
-        ll_add_contact_number_add.setOnClickListener(this);
-        ll_add_contact_email_add.setOnClickListener(this);
-        ll_add_contact_im_add.setOnClickListener(this);
+            @Override
+            public void onNothingSelected(AdapterView<?> parent, int listposition) {
+
+            }
+        });
+
+        //电子邮箱号码监听器
+        emailAdapter.myAddTextChangeListener(new AddContactEmailAdapter.TextChangeListener() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after, int listposition) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count, int listposition) {
+                //myNumberData.get(listposition).setPhoneNumber(s.toString());//设置电话号码
+            }
+
+            @Override
+            public void afterTextChanged(Editable s, int listposition) {
+                myEmailData.get(listposition).setEmail(s.toString());//设置电子邮箱号
+            }
+        });
+
+        /*即时通信模块*/
+        //删除按钮监听
+        imAdapter.setOnItemListener(new AddContactImAdapter.OnItemListener() {
+            @Override
+            public void onClick(int position) {
+                imAdapter.deleteImData(position);
+            }
+        });
+
+        //电子邮箱类型监听器
+        imAdapter.setOnItemSpinnerListener(new AddContactImAdapter.OnItemSpinnerListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id, int listposition) {
+                int type = position+1;
+                myImData.get(listposition).setImType(type+"");//设置电子邮箱类型
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent, int listposition) {
+
+            }
+        });
+
+        //电子邮箱号码监听器
+        imAdapter.myAddTextChangeListener(new AddContactImAdapter.TextChangeListener() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after, int listposition) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count, int listposition) {
+                //myNumberData.get(listposition).setPhoneNumber(s.toString());//设置电话号码
+            }
+
+            @Override
+            public void afterTextChanged(Editable s, int listposition) {
+                myImData.get(listposition).setIm(s.toString());//设置电子邮箱号
+            }
+        });
     }
 
     @Override
@@ -206,8 +309,10 @@ public class AddContactActivity extends SweepBackActivity {
                 numberAdapter.addNumberData(0);
                 break;
             case R.id.ll_add_contact_email_add:
+                emailAdapter.addEmailData(0);
                 break;
             case R.id.ll_add_contact_im_add:
+                imAdapter.addImData(0);
                 break;
             default:
                 break;
