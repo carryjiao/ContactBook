@@ -116,6 +116,12 @@ public class AddContactActivity extends SweepBackActivity {
         add_contact_number_recyclerview.setAdapter(numberAdapter);
         add_contact_number_recyclerview.addItemDecoration(new DividerItemDecoration(this,
                 DividerItemDecoration.VERTICAL_LIST));
+        numberAdapter.setOnItemListener(new AddContactNumberAdapter.OnItemListener() {
+            @Override
+            public void onClick(View v, int position, AddContactNumberData numberItemData) {
+                numberAdapter.deleteNumberData(position);
+            }
+        });
 
 
 
@@ -136,7 +142,7 @@ public class AddContactActivity extends SweepBackActivity {
             case R.id.tv_add_contact_done:
                 break;
             case R.id.ll_add_contact_number_add:
-                numberAdapter.addNumberData(1);
+                numberAdapter.addNumberData(0);
                 break;
             case R.id.ll_add_contact_email_add:
                 break;

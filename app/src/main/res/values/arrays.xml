@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="numbertype">
+        <item>住宅</item>
+        <item>手机</item>
+        <item>单位</item>
+        <item>单位传真</item>
+        <item>住宅传真</item>
+        <item>寻呼机</item>
+        <item>回拨号码</item>
+        <item>车载电话</item>
+        <item>公司总机</item>
+        <item>ISDN</item>
+        <item>总机</item>
+        <item>其他传真</item>
+        <item>无线装置</item>
+        <item>电报</item>
+        <item>单位手机</item>
+        <item>单位寻呼机</item>
+    </string-array>
+
+    <string-array name="emailtype">
+        <item>住宅</item>
+        <item>手机</item>
+        <item>单位</item>
+        <item>单位传真</item>
+        <item>住宅传真</item>
+        <item>寻呼机</item>
+        <item>回拨号码</item>
+        <item>车载电话</item>
+        <item>公司总机</item>
+        <item>ISDN</item>
+        <item>总机</item>
+        <item>其他传真</item>
+        <item>无线装置</item>
+        <item>电报</item>
+        <item>单位手机</item>
+        <item>单位寻呼机</item>
+    </string-array>
+
+
+    <string-array name="imtype">
+        <item>住宅</item>
+        <item>手机</item>
+        <item>单位</item>
+        <item>单位传真</item>
+        <item>住宅传真</item>
+        <item>寻呼机</item>
+        <item>回拨号码</item>
+        <item>车载电话</item>
+        <item>公司总机</item>
+        <item>ISDN</item>
+        <item>总机</item>
+        <item>其他传真</item>
+        <item>无线装置</item>
+        <item>电报</item>
+        <item>单位手机</item>
+        <item>单位寻呼机</item>
+    </string-array>
+</resources>

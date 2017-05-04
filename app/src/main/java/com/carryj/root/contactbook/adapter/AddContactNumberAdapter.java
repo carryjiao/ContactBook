@@ -78,7 +78,7 @@ public class AddContactNumberAdapter extends RecyclerView.Adapter<AddContactNumb
             type = (Spinner) view.findViewById(R.id.sp_add_contact_number_item_type);
             number = (TextView) view.findViewById(R.id.et_add_contact_number_item_number);
 
-            view.setOnClickListener(new View.OnClickListener() {
+            delete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if(listener!=null){
