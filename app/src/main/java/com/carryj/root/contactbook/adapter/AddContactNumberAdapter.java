@@ -2,9 +2,12 @@ package com.carryj.root.contactbook.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -24,6 +27,8 @@ public class AddContactNumberAdapter extends RecyclerView.Adapter<AddContactNumb
     private Context context;
     private ArrayList<AddContactNumberData> numberData;
     private OnItemListener listener;
+    private OnItemSpinnerListener spinnerListener;
+    private TextChangeListener textChangeListener;
 
 
     public AddContactNumberAdapter(Context context, ArrayList<AddContactNumberData> numberData) {
@@ -35,8 +40,29 @@ public class AddContactNumberAdapter extends RecyclerView.Adapter<AddContactNumb
     public void setOnItemListener(OnItemListener onItemListener) {
         this.listener = onItemListener;
     }
+
+    public void setOnItemSpinnerListener(OnItemSpinnerListener onItemSpinnerListener) {
+        this.spinnerListener = onItemSpinnerListener;
+    }
+
+    public void myAddTextChangeListener(TextChangeListener textChangeListener) {
+        this.textChangeListener = textChangeListener;
+    }
+
+
     public interface OnItemListener {
-        void onClick(View v, int position, AddContactNumberData numberItemData);
+        void onClick(int position);
+    }
+
+    public interface OnItemSpinnerListener {
+        void onItemSelected(AdapterView<?> parent, View view, int position, long id, int listposition);
+        void onNothingSelected(AdapterView<?> parent, int listposition);
+    }
+
+    public interface TextChangeListener {
+        public void beforeTextChanged(CharSequence s, int start, int count, int after, int listposition);
+        public void onTextChanged(CharSequence s, int start, int before, int count, int listposition);
+        public void afterTextChanged(Editable s, int listposition);
     }
 
     @Override
@@ -69,20 +95,60 @@ public class AddContactNumberAdapter extends RecyclerView.Adapter<AddContactNumb
 
     class NumberViewHolder extends RecyclerView.ViewHolder {
         ImageView delete;
-        Spinner type;
+        Spinner spinner;
         TextView number;
 
         public NumberViewHolder(final View view) {
             super(view);
             delete = (ImageView) view.findViewById(R.id.im_add_contact_number_item_delete);
-            type = (Spinner) view.findViewById(R.id.sp_add_contact_number_item_type);
+            spinner = (Spinner) view.findViewById(R.id.sp_add_contact_number_item_type);
             number = (TextView) view.findViewById(R.id.et_add_contact_number_item_number);
 
             delete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if(listener!=null){
-                        listener.onClick(view, getLayoutPosition(), numberData.get(getLayoutPosition()));
+                        listener.onClick(getLayoutPosition());
+                    }
+                }
+            });
+
+
+            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    if(spinnerListener!=null) {
+                        spinnerListener.onItemSelected(parent, view, position, id, getLayoutPosition());
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                    if(spinnerListener!=null) {
+                        spinnerListener.onNothingSelected(parent, getLayoutPosition());
+                    }
+                }
+            });
+
+            number.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    if(textChangeListener!=null){
+                        textChangeListener.beforeTextChanged(s, start, count, after, getLayoutPosition());
+                    }
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if(textChangeListener!=null){
+                        textChangeListener.onTextChanged(s, start, before, count, getLayoutPosition());
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    if(textChangeListener!=null){
+                        textChangeListener.afterTextChanged(s, getLayoutPosition());
                     }
                 }
             });

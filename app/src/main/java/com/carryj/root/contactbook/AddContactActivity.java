@@ -12,11 +12,14 @@ import android.provider.ContactsContract.CommonDataKinds.Im;
 import android.provider.ContactsContract.Data;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.carryj.root.contactbook.adapter.AddContactNumberAdapter;
 import com.carryj.root.contactbook.data.AddContactEmailData;
@@ -37,6 +40,7 @@ public class AddContactActivity extends SweepBackActivity {
     private String phoneNumber;
 
     private TextView tv_add_contact_done;
+    private TextView tv_add_contact_back_str;
 
     private ImageView im_add_contact_icon;
 
@@ -48,6 +52,7 @@ public class AddContactActivity extends SweepBackActivity {
     private RecyclerView add_contact_email_recyclerview;
     private RecyclerView add_contact_im_recyclerview;
 
+    private LinearLayout ll_add_contact_back;
     private LinearLayout ll_add_contact_number_add;
     private LinearLayout ll_add_contact_email_add;
     private LinearLayout ll_add_contact_im_add;
@@ -96,6 +101,8 @@ public class AddContactActivity extends SweepBackActivity {
     @Override
     protected void initView() {
 
+        ll_add_contact_back = (LinearLayout) findViewById(R.id.ll_add_contact_back);
+        tv_add_contact_back_str = (TextView) findViewById(R.id.tv_add_contact_back_str);
         tv_add_contact_done = (TextView) findViewById(R.id.tv_add_contact_done);
         im_add_contact_icon = (ImageView) findViewById(R.id.im_add_contact_icon);
         et_add_contact_surname = (EditText) findViewById(R.id.et_add_contact_surname);
@@ -111,15 +118,57 @@ public class AddContactActivity extends SweepBackActivity {
         add_contact_im_recyclerview = (RecyclerView) findViewById(R.id.add_contact_im_recyclerview);
         ll_add_contact_im_add = (LinearLayout) findViewById(R.id.ll_add_contact_im_add);
 
+        //返回处显示的字符串
+        if(SELECTOR.equals(FROM_DIAL_FRAGEMENT_ADD)){
+            tv_add_contact_back_str.setText("拨号界面");
+        }else if(SELECTOR.equals(FROM_RECORD_ITEM_IN_DETAIL_ACTIVITY_NEW)) {
+            tv_add_contact_back_str.setText("通话记录");
+        }
+
+
         numberAdapter = new AddContactNumberAdapter(this, myNumberData);
         add_contact_number_recyclerview.setLayoutManager(new LinearLayoutManager(this));
         add_contact_number_recyclerview.setAdapter(numberAdapter);
         add_contact_number_recyclerview.addItemDecoration(new DividerItemDecoration(this,
                 DividerItemDecoration.VERTICAL_LIST));
+
+        //删除按钮监听器
         numberAdapter.setOnItemListener(new AddContactNumberAdapter.OnItemListener() {
             @Override
-            public void onClick(View v, int position, AddContactNumberData numberItemData) {
+            public void onClick(int position) {
                 numberAdapter.deleteNumberData(position);
+            }
+        });
+
+        //电话号码类型监听器
+        numberAdapter.setOnItemSpinnerListener(new AddContactNumberAdapter.OnItemSpinnerListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id, int listposition) {
+                int type = position+1;
+                myNumberData.get(listposition).setPhoneNumberType(type+"");//设置电话号码类型
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent, int listposition) {
+
+            }
+        });
+
+        //电话号码监听器
+        numberAdapter.myAddTextChangeListener(new AddContactNumberAdapter.TextChangeListener() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after, int listposition) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count, int listposition) {
+                //myNumberData.get(listposition).setPhoneNumber(s.toString());//设置电话号码
+            }
+
+            @Override
+            public void afterTextChanged(Editable s, int listposition) {
+                myNumberData.get(listposition).setPhoneNumber(s.toString());//设置电话号码
             }
         });
 
@@ -129,6 +178,7 @@ public class AddContactActivity extends SweepBackActivity {
 
     @Override
     protected void initEvents() {
+        ll_add_contact_back.setOnClickListener(this);
         tv_add_contact_done.setOnClickListener(this);
         ll_add_contact_number_add.setOnClickListener(this);
         ll_add_contact_email_add.setOnClickListener(this);
@@ -139,7 +189,18 @@ public class AddContactActivity extends SweepBackActivity {
     public void onClick(View v) {
         int id = v.getId();
         switch (id) {
+            case R.id.ll_add_contact_back:
+                this.finish();
+                break;
             case R.id.tv_add_contact_done:
+                //获取名字
+                StringBuilder sb = new StringBuilder();
+                sb.append(et_add_contact_surname.getText().toString());
+                sb.append(et_add_contact_given_name.getText().toString());
+                String name = sb.toString();
+                insert(name, myNumberData, myEmailData, myImData);
+                Toast.makeText(this,"添加成功",Toast.LENGTH_SHORT).show();
+                this.finish();
                 break;
             case R.id.ll_add_contact_number_add:
                 numberAdapter.addNumberData(0);

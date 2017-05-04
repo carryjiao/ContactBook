@@ -71,8 +71,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
             while (phoneCursor.moveToNext()) {
 
                 //获取号码类型
-                numberType = new GetStrPhoneType().getStrPhoneType(phoneCursor.
-                        getColumnIndex(CommonDataKinds.Phone.TYPE));
+                numberType = new GetStrPhoneType().getStrPhoneType(phoneCursor.getInt(0));
 
             }
             phoneCursor.close();
