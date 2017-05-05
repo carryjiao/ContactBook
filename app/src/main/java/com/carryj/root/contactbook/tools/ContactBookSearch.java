@@ -3,6 +3,7 @@ package com.carryj.root.contactbook.tools;
 import android.text.TextUtils;
 
 import com.carryj.root.contactbook.data.ContactListViewItemData;
+import com.carryj.root.contactbook.data.PhoneNumberData;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -26,9 +27,14 @@ public class ContactBookSearch {
                 || str.toString().startsWith("+")) {
 
             for(ContactListViewItemData itemData : allContactData) {
-                if(itemData.getName() != null && itemData.getNumber() != null) {
-                    if(itemData.getNumber().contains(str) || itemData.getName().contains(str)) {
+                if(itemData.getName() != null && itemData.getNumbers() != null) {
+                    if(itemData.getName().contains(str)) {
                         resultData.add(itemData);
+                    }
+                    for(PhoneNumberData numberData:itemData.getNumbers()){
+                        if(numberData.getNumber().contains(str)) {
+                            resultData.add(itemData);
+                        }
                     }
                 }
 
@@ -48,9 +54,14 @@ public class ContactBookSearch {
 
             if (contains(itemData, result)) {//是拼音
                 resultData.add(itemData);
-            } else if (itemData.getNumber().contains(str)) {//是数字
+            } /*else if (itemData.getNumber().contains(str)) {//是数字
 
                 resultData.add(itemData);
+            }*/
+            for(PhoneNumberData numberData:itemData.getNumbers()){
+                if(numberData.getNumber().contains(str)) {
+                    resultData.add(itemData);
+                }
             }
         }
         return resultData;
