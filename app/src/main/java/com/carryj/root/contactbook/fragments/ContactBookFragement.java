@@ -114,7 +114,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
         adapter = new ContactBookAdapter(getContext(), mData);
         listView.setAdapter(adapter);
 
-        SwipeMenuCreator creator = new SwipeMenuCreator() {
+        final SwipeMenuCreator creator = new SwipeMenuCreator() {
 
             @Override
             public void create(SwipeMenu menu) {
@@ -147,11 +147,16 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
                 switch (index) {
                     case 0:
-
-                        // delete
+                        //*************************************************************************************************************
+                        // delete   先查后删
+                        Cursor cursor = getContext().getContentResolver().query(Phone.CONTENT_URI,
+                                new String[]{Phone.RAW_CONTACT_ID},Phone.LOOKUP_KEY+"=?",
+                                new String[]{mData.get(position).getLookUp()},null);
+                        int rawContactID = cursor.getInt(0);
                         getContext().getContentResolver().delete(
                                 ContentUris.withAppendedId(ContactsContract.RawContacts.CONTENT_URI,
-                                        mData.get(position).getID()), null, null);
+                                        rawContactID), null, null);
+                        //*************************************************************************************************************
                         allContactData = getPhoneContacts();
                         mData.clear();
                         mData.addAll(allContactData);
@@ -280,33 +285,10 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
                 //获取lookup
                 String lookUp = contactsCursor.getString(1);
 
-                //获取每个人联系人的多个电话号码号码
-                ArrayList<PhoneNumberData> numberData = new ArrayList<PhoneNumberData>();
-                Cursor numberCursor = resolver.query(Phone.CONTENT_URI,
-                        new String[]{Phone.NUMBER, Phone.TYPE}, ContactsContract.Data.LOOKUP_KEY+"=?",
-                        new String[]{lookUp+""},null);
-                if(numberCursor != null) {
-                    while (numberCursor.moveToNext()) {
-                        PhoneNumberData number = new PhoneNumberData();
-                        String numberStr = numberCursor.getString(0);
-                        //将电话号码中的"-"去掉
-                        PhoneNumberTransformer pntf = new PhoneNumberTransformer();
-                        pntf.setStrPhoneNumber(numberStr);
-                        numberStr = pntf.getStrPhoneNumber();
-                        number.setNumber(numberStr);
-                        //获取电话号码类型
-                        String numberType = new GetStrPhoneType().getStrPhoneType(numberCursor.getInt(1));
-                        number.setNumberType(numberType);
-                        numberData.add(number);
-                    }
-                    numberCursor.close();
-                }
-
                 ContactListViewItemData data = new ContactListViewItemData();
 
                 data.setName(contactName);
                 data.setLookUp(lookUp);
-                data.setNumbers(numberData);
 
                 contactInfo.add(data);
 
@@ -331,8 +313,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             if (s != null && s.length() > 0) {
-                allContactData = getPhoneContacts();
-                searchResultData = new ContactBookSearch().searchContact(s, allContactData);
+                searchResultData = new ContactBookSearch().searchContact(getContext(), s);
                 mData.clear();
                 mData.addAll(searchResultData);
                 adapter.notifyDataSetChanged();

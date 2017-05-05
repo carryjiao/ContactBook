@@ -1,5 +1,8 @@
 package com.carryj.root.contactbook.tools;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.text.TextUtils;
 
 import com.carryj.root.contactbook.data.ContactListViewItemData;
@@ -17,24 +20,39 @@ public class ContactBookSearch {
 
     /*按号码-拼音模糊搜索*/
 
-    public static ArrayList<ContactListViewItemData> searchContact(
-            CharSequence str, ArrayList<ContactListViewItemData> allContactData) {
+    public static ArrayList<ContactListViewItemData> searchContact(Context context,
+            CharSequence str) {
 
+        ArrayList<ContactListViewItemData> allContactData = new ArrayList<ContactListViewItemData>();
         ArrayList<ContactListViewItemData> resultData = new ArrayList<ContactListViewItemData>();
+
+        Cursor phoneCursor = context.getContentResolver().query(Phone.CONTENT_URI,
+                new String[]{Phone.DISPLAY_NAME, Phone.NUMBER, Phone.LOOKUP_KEY},
+                null,null,Phone.RAW_CONTACT_ID+" ASC");
+        if(phoneCursor!=null){
+            while (phoneCursor.moveToNext()){
+                String name = phoneCursor.getString(0);
+                String number = phoneCursor.getString(1);
+                String lookUp = phoneCursor.getString(2);
+                PhoneNumberTransformer pntf = new PhoneNumberTransformer();
+                pntf.setStrPhoneNumber(number);
+                number = pntf.getStrPhoneNumber();
+                ContactListViewItemData itemData = new ContactListViewItemData();
+                itemData.setName(name);
+                itemData.setNumber(number);
+                itemData.setLookUp(lookUp);
+                allContactData.add(itemData);
+            }
+        }
 
         //以电话号码方式查询
         if (str.toString().startsWith("0") || str.toString().startsWith("1")
                 || str.toString().startsWith("+")) {
 
             for(ContactListViewItemData itemData : allContactData) {
-                if(itemData.getName() != null && itemData.getNumbers() != null) {
-                    if(itemData.getName().contains(str)) {
+                if(itemData.getName() != null && itemData.getNumber() != null) {
+                    if(itemData.getName().contains(str)||itemData.getNumber().contains(str)) {
                         resultData.add(itemData);
-                    }
-                    for(PhoneNumberData numberData:itemData.getNumbers()){
-                        if(numberData.getNumber().contains(str)) {
-                            resultData.add(itemData);
-                        }
                     }
                 }
 
@@ -54,15 +72,11 @@ public class ContactBookSearch {
 
             if (contains(itemData, result)) {//是拼音
                 resultData.add(itemData);
-            } /*else if (itemData.getNumber().contains(str)) {//是数字
+            }else if (itemData.getNumber().contains(str)) {//是数字
 
                 resultData.add(itemData);
-            }*/
-            for(PhoneNumberData numberData:itemData.getNumbers()){
-                if(numberData.getNumber().contains(str)) {
-                    resultData.add(itemData);
-                }
             }
+
         }
         return resultData;
 

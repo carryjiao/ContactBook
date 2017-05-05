@@ -65,31 +65,30 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         data = (ContactListViewItemData) getIntent().getSerializableExtra(ContactBookFragement.CONTACT_SHOW);
         lookUp = data.getLookUp();
         name = data.getName();
-        numberDatas = data.getNumbers();
 
         ContentResolver resolver = getContentResolver();
 
-        /*if(numberDatas != null){
-            for(PhoneNumberData numberData : numberDatas) {
+        Cursor phoneCursor = resolver.query(CommonDataKinds.Phone.CONTENT_URI,
+                new String[]{CommonDataKinds.Phone.TYPE, CommonDataKinds.Phone.NUMBER},
+                CommonDataKinds.Phone.LOOKUP_KEY + "=?",
+                new String[]{lookUp}, null);
 
-                Cursor phoneCursor = resolver.query(CommonDataKinds.Phone.CONTENT_URI,
-                        new String[]{CommonDataKinds.Phone.TYPE},
-                        CommonDataKinds.Phone.NUMBER + "=?",
-                        new String[]{numberData.getNumber()}, null);
+        if (phoneCursor != null) {
+            while (phoneCursor.moveToNext()) {
+                PhoneNumberData numberData = new PhoneNumberData();
 
-                if (phoneCursor != null) {
-                    while (phoneCursor.moveToNext()) {
+                //获取号码类型
+                String numberType = new GetStrPhoneType().getStrPhoneType(phoneCursor.getInt(0));
+                String number = phoneCursor.getString(1);
+                numberData.setNumberType(numberType);
+                numberData.setNumber(number);
+                numberDatas.add(numberData);
 
-                        //获取号码类型
-                        String numberType = new GetStrPhoneType().getStrPhoneType(phoneCursor.getInt(0));
-                        numberData.setNumberType(numberType);
-
-                    }
-                    phoneCursor.close();
-
-                }
             }
-        }*/
+            phoneCursor.close();
+
+        }
+
 
 
         //获取E-Mail
