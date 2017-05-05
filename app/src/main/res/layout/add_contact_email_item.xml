@@ -24,7 +24,7 @@
     <EditText
         android:id="@+id/et_add_contact_email_item_number"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/add_contact_item_height"
         android:layout_marginLeft="@dimen/add_contact_item_margin_left"
         android:text="465938001@qq.com"
         android:textColor="@color/colorBlack"

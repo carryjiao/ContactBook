@@ -360,6 +360,8 @@ public class AddContactActivity extends SweepBackActivity {
                 values.put(Email.DATA, emailItemData.getEmail());
                 values.put(Email.TYPE, emailItemData.getEmailType());
                 getContentResolver().insert(Data.CONTENT_URI, values);
+
+
             }
 
             // 向data表插入QQ数据
@@ -370,6 +372,33 @@ public class AddContactActivity extends SweepBackActivity {
                 values.put(Im.DATA, imItemData.getIm());
                 values.put(Im.PROTOCOL, imItemData.getImType());
                 getContentResolver().insert(Data.CONTENT_URI, values);
+            }
+
+            int type = 0;
+            switch (type) {
+                case Im.PROTOCOL_CUSTOM://-1
+                    break;
+                case Im.PROTOCOL_AIM://0
+                    break;
+
+                case Im.PROTOCOL_MSN://1
+                    break;
+                case Im.PROTOCOL_YAHOO://2
+                    break;
+                case Im.PROTOCOL_SKYPE://3
+                    break;
+                case Im.PROTOCOL_QQ://4
+                    break;
+                case Im.PROTOCOL_GOOGLE_TALK://5
+                    break;
+                case Im.PROTOCOL_JABBER://7
+                    break;
+                case Im.PROTOCOL_NETMEETING://8
+                    break;
+
+
+
+
             }
         }
 

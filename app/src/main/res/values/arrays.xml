@@ -1,60 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="numbertype">
-        <item>住宅</item>
-        <item>手机</item>
-        <item>单位</item>
-        <item>单位传真</item>
-        <item>住宅传真</item>
-        <item>寻呼机</item>
-        <item>回拨号码</item>
-        <item>车载电话</item>
-        <item>公司总机</item>
-        <item>ISDN</item>
-        <item>总机</item>
-        <item>其他传真</item>
-        <item>无线装置</item>
-        <item>电报</item>
-        <item>单位手机</item>
-        <item>单位寻呼机</item>
+        <item>住宅</item><!--1-->
+        <item>手机</item><!--2-->
+        <item>单位</item><!--3-->
+        <item>单位传真</item><!--4-->
+        <item>住宅传真</item><!--5-->
+        <item>寻呼机</item><!--6-->
+        <item>其他</item><!--7-->
+        <item>回拨号码</item><!--8-->
+        <item>车载电话</item><!--9-->
+        <item>公司总机</item><!--10-->
+        <item>ISDN</item><!--11-->
+        <item>总机</item><!--12-->
+        <item>其他传真</item><!--13-->
+        <item>无线装置</item><!--14-->
+        <item>电报</item><!--15-->
+        <item>TTY TDD</item><!--16-->
+        <item>单位手机</item><!--17-->
+        <item>单位寻呼机</item><!--18-->
+        <item>助理</item><!--19-->
+        <item>彩信</item><!--20-->
     </string-array>
 
     <string-array name="emailtype">
-        <item>住宅</item>
-        <item>手机</item>
-        <item>单位</item>
-        <item>单位传真</item>
-        <item>住宅传真</item>
-        <item>寻呼机</item>
-        <item>回拨号码</item>
-        <item>车载电话</item>
-        <item>公司总机</item>
-        <item>ISDN</item>
-        <item>总机</item>
-        <item>其他传真</item>
-        <item>无线装置</item>
-        <item>电报</item>
-        <item>单位手机</item>
-        <item>单位寻呼机</item>
+        <item>个人</item><!--1-->
+        <item>工作</item><!--2-->
+        <item>其他</item><!--3-->
+        <item>手机</item><!--4-->
     </string-array>
 
 
     <string-array name="imtype">
-        <item>住宅</item>
-        <item>手机</item>
-        <item>单位</item>
-        <item>单位传真</item>
-        <item>住宅传真</item>
-        <item>寻呼机</item>
-        <item>回拨号码</item>
-        <item>车载电话</item>
-        <item>公司总机</item>
-        <item>ISDN</item>
-        <item>总机</item>
-        <item>其他传真</item>
-        <item>无线装置</item>
-        <item>电报</item>
-        <item>单位手机</item>
-        <item>单位寻呼机</item>
+        <item>MSN</item><!--1-->
+        <item>YAHOO</item><!--2-->
+        <item>SKYPE</item><!--3-->
+        <item>QQ</item><!--4-->
+        <item>GOOGLE TALK</item><!--5-->
+        <item>ICQ</item><!--6-->
+        <item>JABBER</item><!--7-->
+        <item>NETMEETING</item><!--8-->
+
+
     </string-array>
 </resources>

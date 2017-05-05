@@ -111,7 +111,7 @@
                         <EditText
                             android:id="@+id/et_add_contact_surname"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:layout_height="@dimen/add_contact_item_height"
                             android:text="姓"
                             android:textSize="@dimen/add_contact_text_size"
                             android:textColor="@color/colorCharBGGray"/>
@@ -119,7 +119,7 @@
                         <EditText
                             android:id="@+id/et_add_contact_given_name"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:layout_height="@dimen/add_contact_item_height"
                             android:text="名"
                             android:textSize="@dimen/add_contact_text_size"
                             android:textColor="@color/colorCharBGGray"/>
@@ -127,7 +127,7 @@
                         <EditText
                             android:id="@+id/et_add_contact_company"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:layout_height="@dimen/add_contact_item_height"
                             android:text="公司"
                             android:textSize="@dimen/add_contact_text_size"
                             android:textColor="@color/colorCharBGGray"/>
@@ -190,7 +190,8 @@
 
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="@dimen/add_contact_item_height"
+                        android:gravity="center_vertical"
                         android:text="添加电话"
                         android:textSize="@dimen/add_contact_text_size"
                         android:textColor="@color/colorCharBlue"/>
@@ -250,7 +251,8 @@
 
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="@dimen/add_contact_item_height"
+                        android:gravity="center_vertical"
                         android:text="添加电子邮件"
                         android:textSize="@dimen/add_contact_text_size"
                         android:textColor="@color/colorCharBlue"/>
@@ -312,7 +314,8 @@
 
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="@dimen/add_contact_item_height"
+                        android:gravity="center_vertical"
                         android:text="添加即时聊天信息"
                         android:textSize="@dimen/add_contact_text_size"
                         android:textColor="@color/colorCharBlue"/>
