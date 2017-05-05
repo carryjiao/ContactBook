@@ -1,6 +1,7 @@
 package com.carryj.root.contactbook.data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * Created by root on 17/4/27.
@@ -12,6 +13,7 @@ public class ContactListViewItemData implements Serializable {
     private int rawContactID;
     private int contactID;
     private String number;
+    private ArrayList<String> numbers;
 
     public ContactListViewItemData() {
 
@@ -51,5 +53,13 @@ public class ContactListViewItemData implements Serializable {
 
     public void setNumber(String number) {
         this.number = number;
+    }
+
+    public ArrayList<String> getNumbers() {
+        return numbers;
+    }
+
+    public void setNumbers(ArrayList<String> numbers) {
+        this.numbers = numbers;
     }
 }

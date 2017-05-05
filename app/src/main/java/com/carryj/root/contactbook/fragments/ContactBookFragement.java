@@ -23,8 +23,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.widget.Toast;
@@ -67,7 +65,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
     /**获取库Phone表字段**/
     private static final String[] PHONES_PROJECTION = new String[] {
-            Phone.DISPLAY_NAME, Phone.RAW_CONTACT_ID, Phone.CONTACT_ID, Phone.NUMBER};
+            Phone.DISPLAY_NAME, Phone.RAW_CONTACT_ID, Phone.CONTACT_ID};
 
     /**联系人显示名称**/
     private static final int PHONES_DISPLAY_NAME_INDEX = 0;
@@ -76,8 +74,6 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
     private static final int PHONES_RAW_CONTACT_ID_INDEX = 1;
 
     private static final int PHONES_CONTACT_ID_INDEX = 2;
-
-    private static final int PHONES_NUMBER_INDEX = 3;
 
 
     private ArrayList<ContactListViewItemData> mData = new ArrayList<ContactListViewItemData>();
@@ -282,18 +278,29 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
                 int contactID = phoneCursor.getInt(PHONES_CONTACT_ID_INDEX);
 
-                String number = phoneCursor.getString(PHONES_NUMBER_INDEX);
-                //将电话号码中的"-"去掉
-                PhoneNumberTransformer pntf = new PhoneNumberTransformer();
-                pntf.setStrPhoneNumber(number);
-                number = pntf.getStrPhoneNumber();
+                //获取每个人联系人的多个电话号码号码
+                ArrayList<String> numberData = new ArrayList<String>();
+                Cursor numberCursor = resolver.query(Phone.CONTENT_URI,
+                        new String[]{Phone.NUMBER}, Phone.CONTACT_ID+"=?",
+                        new String[]{contactID+""},null);
+                if(numberCursor != null) {
+                    while (numberCursor.moveToNext()) {
+                        String number = numberCursor.getString(0);
+                        //将电话号码中的"-"去掉
+                        PhoneNumberTransformer pntf = new PhoneNumberTransformer();
+                        pntf.setStrPhoneNumber(number);
+                        number = pntf.getStrPhoneNumber();
+                        numberData.add(number);
+                    }
+                    numberCursor.close();
+                }
 
                 ContactListViewItemData data = new ContactListViewItemData();
 
                 data.setName(contactName);
                 data.setRawContactID(rawContactid);
                 data.setContactID(contactID);
-                data.setNumber(number);
+                data.setNumbers(numberData);
 
                 contactInfo.add(data);
 
@@ -305,7 +312,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
         return contactInfo;
     }
-    
+
 
     private class MyTextWatcher implements TextWatcher {
 
