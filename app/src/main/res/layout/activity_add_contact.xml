@@ -50,7 +50,7 @@
             android:layout_marginRight="10dp"
             android:text="完成"
             android:textSize="20sp"
-            android:textColor="@color/colorCharBGGray"/>
+            android:textColor="@color/colorBlack"/>
 
     </RelativeLayout>
 
@@ -112,25 +112,25 @@
                             android:id="@+id/et_add_contact_surname"
                             android:layout_width="match_parent"
                             android:layout_height="@dimen/add_contact_item_height"
-                            android:text="姓"
+                            android:hint="姓"
                             android:textSize="@dimen/add_contact_text_size"
-                            android:textColor="@color/colorCharBGGray"/>
+                            android:textColor="@color/colorBlack"/>
 
                         <EditText
                             android:id="@+id/et_add_contact_given_name"
                             android:layout_width="match_parent"
                             android:layout_height="@dimen/add_contact_item_height"
-                            android:text="名"
+                            android:hint="名"
                             android:textSize="@dimen/add_contact_text_size"
-                            android:textColor="@color/colorCharBGGray"/>
+                            android:textColor="@color/colorBlack"/>
 
                         <EditText
                             android:id="@+id/et_add_contact_company"
                             android:layout_width="match_parent"
                             android:layout_height="@dimen/add_contact_item_height"
-                            android:text="公司"
+                            android:hint="公司"
                             android:textSize="@dimen/add_contact_text_size"
-                            android:textColor="@color/colorCharBGGray"/>
+                            android:textColor="@color/colorBlack"/>
 
 
                     </LinearLayout>

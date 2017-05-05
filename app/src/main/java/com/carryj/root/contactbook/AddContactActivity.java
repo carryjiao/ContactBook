@@ -374,32 +374,6 @@ public class AddContactActivity extends SweepBackActivity {
                 getContentResolver().insert(Data.CONTENT_URI, values);
             }
 
-            int type = 0;
-            switch (type) {
-                case Im.PROTOCOL_CUSTOM://-1
-                    break;
-                case Im.PROTOCOL_AIM://0
-                    break;
-
-                case Im.PROTOCOL_MSN://1
-                    break;
-                case Im.PROTOCOL_YAHOO://2
-                    break;
-                case Im.PROTOCOL_SKYPE://3
-                    break;
-                case Im.PROTOCOL_QQ://4
-                    break;
-                case Im.PROTOCOL_GOOGLE_TALK://5
-                    break;
-                case Im.PROTOCOL_JABBER://7
-                    break;
-                case Im.PROTOCOL_NETMEETING://8
-                    break;
-
-
-
-
-            }
         }
 
         catch (Exception e)

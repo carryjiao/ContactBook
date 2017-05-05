@@ -305,28 +305,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
         return contactInfo;
     }
-
-
-    /**得到手机SIM卡联系人人信息**//*
-    private void getSIMContacts() {
-        ContentResolver resolver = getContext().getContentResolver();
-        // 获取Sims卡联系人
-        Uri uri = Uri.parse("content://icc/adn");
-        Cursor phoneCursor = resolver.query(uri, PHONES_PROJECTION, null, null,
-                null);
-
-        if (phoneCursor != null) {
-            while (phoneCursor.moveToNext()) {
-                // 得到联系人名称
-                String contactName = phoneCursor.getString(PHONES_DISPLAY_NAME_INDEX);
-
-                mContactsName.add(contactName);
-
-            }
-
-            phoneCursor.close();
-        }
-    }*/
+    
 
     private class MyTextWatcher implements TextWatcher {
 
