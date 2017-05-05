@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -36,7 +37,9 @@ import com.carryj.root.contactbook.ContactPersonalShowActivity;
 import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.adapter.ContactBookAdapter;
 import com.carryj.root.contactbook.data.ContactListViewItemData;
+import com.carryj.root.contactbook.data.PhoneNumberData;
 import com.carryj.root.contactbook.tools.ContactBookSearch;
+import com.carryj.root.contactbook.tools.GetStrPhoneType;
 import com.carryj.root.contactbook.tools.PhoneNumberTransformer;
 
 import java.util.ArrayList;
@@ -63,9 +66,14 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
     private ContactBookAdapter adapter;
     private SwipeMenuListView listView;
 
+
+    private static final String[] CONTACTS_PROJECTION = new String[] {
+            Contacts.DISPLAY_NAME, Contacts.LOOKUP_KEY};
+
     /**获取库Phone表字段**/
     private static final String[] PHONES_PROJECTION = new String[] {
             Phone.DISPLAY_NAME, Phone.RAW_CONTACT_ID, Phone.CONTACT_ID};
+
 
     /**联系人显示名称**/
     private static final int PHONES_DISPLAY_NAME_INDEX = 0;
@@ -259,37 +267,36 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
         ContentResolver resolver = getContext().getContentResolver();
 
-        Cursor phoneCursor = resolver.query(Phone.CONTENT_URI, PHONES_PROJECTION, null, null, Phone.RAW_CONTACT_ID+" ASC");
+        Cursor contactsCursor = resolver.query(Contacts.CONTENT_URI, CONTACTS_PROJECTION,
+                null, null, Contacts.NAME_RAW_CONTACT_ID+" ASC");
 
-        if (phoneCursor != null) {
-
-
-            //*************************************************************************************
+        if (contactsCursor != null) {
 
 
-
-            while (phoneCursor.moveToNext()) {
+            while (contactsCursor.moveToNext()) {
 
                 //得到联系人名称
-                String contactName = phoneCursor.getString(PHONES_DISPLAY_NAME_INDEX);
-
-                //得到联系人ID
-                int rawContactid = phoneCursor.getInt(PHONES_RAW_CONTACT_ID_INDEX);
-
-                int contactID = phoneCursor.getInt(PHONES_CONTACT_ID_INDEX);
+                String contactName = contactsCursor.getString(0);
+                //获取lookup
+                String lookUp = contactsCursor.getString(1);
 
                 //获取每个人联系人的多个电话号码号码
-                ArrayList<String> numberData = new ArrayList<String>();
+                ArrayList<PhoneNumberData> numberData = new ArrayList<PhoneNumberData>();
                 Cursor numberCursor = resolver.query(Phone.CONTENT_URI,
-                        new String[]{Phone.NUMBER}, Phone.CONTACT_ID+"=?",
-                        new String[]{contactID+""},null);
+                        new String[]{Phone.NUMBER, Phone.TYPE}, ContactsContract.Data.LOOKUP_KEY+"=?",
+                        new String[]{lookUp+""},null);
                 if(numberCursor != null) {
                     while (numberCursor.moveToNext()) {
-                        String number = numberCursor.getString(0);
+                        PhoneNumberData number = new PhoneNumberData();
+                        String numberStr = numberCursor.getString(0);
                         //将电话号码中的"-"去掉
                         PhoneNumberTransformer pntf = new PhoneNumberTransformer();
-                        pntf.setStrPhoneNumber(number);
-                        number = pntf.getStrPhoneNumber();
+                        pntf.setStrPhoneNumber(numberStr);
+                        numberStr = pntf.getStrPhoneNumber();
+                        number.setNumber(numberStr);
+                        //获取电话号码类型
+                        String numberType = new GetStrPhoneType().getStrPhoneType(numberCursor.getInt(1));
+                        number.setNumberType(numberType);
                         numberData.add(number);
                     }
                     numberCursor.close();
@@ -298,8 +305,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
                 ContactListViewItemData data = new ContactListViewItemData();
 
                 data.setName(contactName);
-                data.setRawContactID(rawContactid);
-                data.setContactID(contactID);
+                data.setLookUp(lookUp);
                 data.setNumbers(numberData);
 
                 contactInfo.add(data);
@@ -307,7 +313,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
             }
 
-            phoneCursor.close();
+            contactsCursor.close();
         }
 
         return contactInfo;

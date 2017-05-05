@@ -1,33 +1,42 @@
 package com.carryj.root.contactbook;
 
+import android.content.ClipboardManager;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.carryj.root.contactbook.adapter.ContactPersonalShowNumberAdapter;
 import com.carryj.root.contactbook.data.ContactListViewItemData;
+import com.carryj.root.contactbook.data.PhoneNumberData;
 import com.carryj.root.contactbook.fragments.ContactBookFragement;
 import com.carryj.root.contactbook.tools.GetStrPhoneType;
+import com.carryj.root.contactbook.ui.DividerItemDecoration;
+
+import java.util.ArrayList;
 
 public class ContactPersonalShowActivity extends SweepBackActivity {
 
 
     private ContactListViewItemData data;
 
-    private String rawContactID;
-    private String contactID;
+    private String lookUp;
     private String name;
-    private String number;
-    private String numberType;
     private String email;
     private String remark;
+
+    private ArrayList<PhoneNumberData> numberDatas = new ArrayList<PhoneNumberData>();
 
     private LinearLayout ll_contact_personal_show_back;
     private LinearLayout ll_contact_personal_show_email_block;
@@ -35,13 +44,13 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
 
     private TextView tv_contact_personal_show_edit;
     private TextView tv_contact_personal_show_name;
-    private TextView tv_contact_personal_show_number_type;
-    private TextView tv_contact_personal_show_number;
     private TextView tv_contact_personal_show_email;
     private TextView tv_contact_personal_show_remark;
 
     private ImageView im_contact_personal_show_icon;
-    private ImageView im_contact_personal_show_call_icon;
+
+    private RecyclerView rv_contact_personal_show_number;
+    private ContactPersonalShowNumberAdapter numberAdapter;
 
 
     @Override
@@ -54,37 +63,39 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     protected void initData() {
 
         data = (ContactListViewItemData) getIntent().getSerializableExtra(ContactBookFragement.CONTACT_SHOW);
-        rawContactID = data.getRawContactID();
-        contactID = data.getContactID();
+        lookUp = data.getLookUp();
         name = data.getName();
-        number = data.getNumber();
+        numberDatas = data.getNumbers();
 
         ContentResolver resolver = getContentResolver();
 
-        Cursor phoneCursor = resolver.query(CommonDataKinds.Phone.CONTENT_URI,
-                new String[]{CommonDataKinds.Phone.TYPE},
-                CommonDataKinds.Phone.CONTACT_ID + "=?",
-                new String[]{contactID}, null);
+        /*if(numberDatas != null){
+            for(PhoneNumberData numberData : numberDatas) {
 
+                Cursor phoneCursor = resolver.query(CommonDataKinds.Phone.CONTENT_URI,
+                        new String[]{CommonDataKinds.Phone.TYPE},
+                        CommonDataKinds.Phone.NUMBER + "=?",
+                        new String[]{numberData.getNumber()}, null);
 
-        if (phoneCursor != null) {
-            while (phoneCursor.moveToNext()) {
+                if (phoneCursor != null) {
+                    while (phoneCursor.moveToNext()) {
 
-                //获取号码类型
-                numberType = new GetStrPhoneType().getStrPhoneType(phoneCursor.getInt(0));
+                        //获取号码类型
+                        String numberType = new GetStrPhoneType().getStrPhoneType(phoneCursor.getInt(0));
+                        numberData.setNumberType(numberType);
 
+                    }
+                    phoneCursor.close();
+
+                }
             }
-            phoneCursor.close();
-
-        }
-
-
+        }*/
 
 
         //获取E-Mail
         Cursor emailCursor = resolver.query(CommonDataKinds.Email.CONTENT_URI,
-                null, CommonDataKinds.Email.CONTACT_ID + "=?",
-                new String[]{contactID}, null);
+                null, CommonDataKinds.Email.LOOKUP_KEY + "=?",
+                new String[]{lookUp}, null);
 
         if (emailCursor != null) {
             while (emailCursor.moveToNext()) {
@@ -97,8 +108,8 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
 
         //获取备注
         Cursor remarkCursor = resolver.query(ContactsContract.Data.CONTENT_URI, null,
-                ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?",
-                new String[]{contactID, CommonDataKinds.Note.CONTENT_ITEM_TYPE}, null);
+                ContactsContract.Data.LOOKUP_KEY + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?",
+                new String[]{lookUp, CommonDataKinds.Note.CONTENT_ITEM_TYPE}, null);
 
         if (remarkCursor != null) {
             while (remarkCursor.moveToNext()) {
@@ -118,9 +129,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         tv_contact_personal_show_edit = (TextView) findViewById(R.id.tv_contact_personal_show_edit);
         im_contact_personal_show_icon = (ImageView) findViewById(R.id.im_contact_personal_show_icon);
         tv_contact_personal_show_name = (TextView) findViewById(R.id.tv_contact_personal_show_name);
-        tv_contact_personal_show_number_type = (TextView) findViewById(R.id.tv_contact_personal_show_number_type);
-        tv_contact_personal_show_number = (TextView) findViewById(R.id.tv_contact_personal_show_number);
-        im_contact_personal_show_call_icon = (ImageView) findViewById(R.id.im_contact_personal_show_call_icon);
+        rv_contact_personal_show_number = (RecyclerView) findViewById(R.id.rv_contact_personal_show_number);
 
         ll_contact_personal_show_email_block = (LinearLayout) findViewById(R.id.ll_contact_personal_show_email_block);
         tv_contact_personal_show_email = (TextView) findViewById(R.id.tv_contact_personal_show_email);
@@ -129,8 +138,13 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         tv_contact_personal_show_remark = (TextView) findViewById(R.id.tv_contact_personal_show_remark);
 
         tv_contact_personal_show_name.setText(name);
-        tv_contact_personal_show_number_type.setText(numberType);
-        tv_contact_personal_show_number.setText(number);
+
+        numberAdapter = new ContactPersonalShowNumberAdapter(this,numberDatas);
+        rv_contact_personal_show_number.setLayoutManager(new LinearLayoutManager(this));
+        rv_contact_personal_show_number.setAdapter(numberAdapter);
+        rv_contact_personal_show_number.addItemDecoration(new DividerItemDecoration(this,
+                DividerItemDecoration.VERTICAL_LIST));
+
 
         if(email == null)
             ll_contact_personal_show_email_block.setVisibility(View.GONE);
@@ -150,7 +164,38 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     protected void initEvents() {
         ll_contact_personal_show_back.setOnClickListener(this);
         tv_contact_personal_show_edit.setOnClickListener(this);
-        im_contact_personal_show_call_icon.setOnClickListener(this);
+
+        numberAdapter.setOnItemClickListener(new ContactPersonalShowNumberAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int position) {
+                try {
+                    String number = numberDatas.get(position).getNumber();
+                    Intent intent = new Intent(Intent.ACTION_CALL);
+                    Uri data = Uri.parse("tel:" + number);
+                    intent.setData(data);
+                    startActivity(intent);
+                }catch (SecurityException e){
+
+                }finally {
+
+                }
+
+            }
+        });
+
+        //长按将号码复制到系统粘贴板上
+        numberAdapter.setOnItemLongClickListener(new ContactPersonalShowNumberAdapter.OnItemLongClickListener() {
+            @Override
+            public boolean onLongClick(View v, int position) {
+                String number = numberDatas.get(position).getNumber();
+                ClipboardManager clip = (ClipboardManager)getApplicationContext().
+                        getSystemService(Context.CLIPBOARD_SERVICE);
+                clip.setText(number);
+                Toast.makeText(getApplicationContext(), "已复制到粘贴板",Toast.LENGTH_SHORT).show();
+
+                return false;
+            }
+        });
 
     }
 
@@ -162,18 +207,6 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                 this.finish();
                 break;
             case R.id.tv_contact_personal_show_edit:
-                break;
-            case R.id.im_contact_personal_show_call_icon:
-                try {
-                    Intent intent = new Intent(Intent.ACTION_CALL);
-                    Uri data = Uri.parse("tel:" + number);
-                    intent.setData(data);
-                    startActivity(intent);
-                }catch (SecurityException e){
-
-                }finally {
-
-                }
                 break;
             default:
                 break;

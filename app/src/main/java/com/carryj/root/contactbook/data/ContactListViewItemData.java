@@ -13,7 +13,8 @@ public class ContactListViewItemData implements Serializable {
     private int rawContactID;
     private int contactID;
     private String number;
-    private ArrayList<String> numbers;
+    private String lookUp;
+    private ArrayList<PhoneNumberData> numbers;
 
     public ContactListViewItemData() {
 
@@ -55,11 +56,19 @@ public class ContactListViewItemData implements Serializable {
         this.number = number;
     }
 
-    public ArrayList<String> getNumbers() {
+    public ArrayList<PhoneNumberData> getNumbers() {
         return numbers;
     }
 
-    public void setNumbers(ArrayList<String> numbers) {
+    public void setNumbers(ArrayList<PhoneNumberData> numbers) {
         this.numbers = numbers;
+    }
+
+    public String getLookUp() {
+        return lookUp;
+    }
+
+    public void setLookUp(String lookUp) {
+        this.lookUp = lookUp;
     }
 }
