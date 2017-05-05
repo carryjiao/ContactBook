@@ -27,6 +27,7 @@ import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.carryj.root.contactbook.AddCollectActivity;
 import com.carryj.root.contactbook.CollectPersonalShowActivity;
+import com.carryj.root.contactbook.ContactPersonalShowActivity;
 import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.adapter.CollectAdapter;
 import com.carryj.root.contactbook.data.CollectListViewItemData;
@@ -43,6 +44,11 @@ public class CollectFragement extends Fragment implements OnClickListener {
 
     public static final String CONTACT_PERSONAL_SHOW = "CONTACT_PERSONAL_SHOW";
 
+    public static final String SELECTOR = "SELECTOR";
+    public static final String FROM_COLLECT_FRAGMENT = "FROM_COLLECT_FRAGMENT";
+    public static final String NAME = "NAME";
+    public static final String LOOKUP = "LOOKUP";
+
     private TextView tv_collect_add;
     private ImageView iv_collect_box;
     private CollectAdapter adapter;
@@ -50,14 +56,14 @@ public class CollectFragement extends Fragment implements OnClickListener {
 
     /**获取库contact表字段**/
     private static final String[] Collect_PROJECTION = new String[] {
-            Phone.NUMBER,
+            Phone.LOOKUP_KEY,
             Phone.DISPLAY_NAME,
             Phone.TYPE,
             Phone.RAW_CONTACT_ID,
             Phone.CONTACT_ID};
 
-    /**电话号码**/
-    private static final int COLLECT_NUMBER_INDEX = 0;
+
+    private static final int COLLECT_LOOKUP_INDEX = 0;
 
     /**姓名**/
     private static final int COLLECT_DISPLAY_NAME_INDEX = 1;
@@ -139,10 +145,12 @@ public class CollectFragement extends Fragment implements OnClickListener {
                 switch (index) {
                     case 0:
                         // open
-                        Intent intent = new Intent(CollectFragement.this.getContext(), CollectPersonalShowActivity.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable(CONTACT_PERSONAL_SHOW, mData.get(position));
-                        intent.putExtras(bundle);
+                        String name = mData.get(position).getName();
+                        String lookUp = mData.get(position).getLookUp();
+                        Intent intent = new Intent(CollectFragement.this.getContext(), ContactPersonalShowActivity.class);
+                        intent.putExtra(SELECTOR, FROM_COLLECT_FRAGMENT);
+                        intent.putExtra(NAME, name);
+                        intent.putExtra(LOOKUP,lookUp);
                         startActivity(intent);
                         break;
                     case 1:
@@ -234,8 +242,7 @@ public class CollectFragement extends Fragment implements OnClickListener {
             if (collectCursor != null) {
                 while (collectCursor.moveToNext()) {
 
-                    //得到电话号码
-                    String strNumber = collectCursor.getString(COLLECT_NUMBER_INDEX);
+                    String lookUp = collectCursor.getString(COLLECT_LOOKUP_INDEX);
 
                     //得到联系人名称
                     String cachedName = collectCursor.getString(COLLECT_DISPLAY_NAME_INDEX);
@@ -248,7 +255,7 @@ public class CollectFragement extends Fragment implements OnClickListener {
                     int contactID = collectCursor.getInt(COLLECT_CONTACT_ID_INDEX);
 
                     CollectListViewItemData itemData = new CollectListViewItemData();
-                    itemData.setStrPhoneNumber(strNumber);
+                    itemData.setLookUp(lookUp);
                     itemData.setName(cachedName);
                     itemData.setPhoneType(numberType);
                     itemData.setRawContactID(rawContactID);

@@ -55,6 +55,10 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
     public static final String SELECTOR = "SELECTOR";
     private static final String FROM_CONTACT_BOOK_FRAGEMENT_ADD = "FROM_CONTACT_BOOK_FRAGEMENT_ADD";
 
+    public static final String FROM_CONTACT_BOOK_FRAGMENT = "FROM_CONTACT_BOOK_FRAGMENT";
+    public static final String NAME = "NAME";
+    public static final String LOOKUP = "LOOKUP";
+
 
 
 
@@ -149,14 +153,21 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
                     case 0:
                         //*************************************************************************************************************
                         // delete   先查后删
+                        String lookUp = mData.get(position).getLookUp();
                         Cursor cursor = getContext().getContentResolver().query(Phone.CONTENT_URI,
                                 new String[]{Phone.RAW_CONTACT_ID},Phone.LOOKUP_KEY+"=?",
-                                new String[]{mData.get(position).getLookUp()},null);
-                        int rawContactID = cursor.getInt(0);
-                        getContext().getContentResolver().delete(
-                                ContentUris.withAppendedId(ContactsContract.RawContacts.CONTENT_URI,
-                                        rawContactID), null, null);
-                        //*************************************************************************************************************
+                                new String[]{lookUp},null);
+                        if(cursor!=null){
+                            while (cursor.moveToNext()){
+                                int rawContactID = cursor.getInt(0);
+                                getContext().getContentResolver().delete(
+                                        ContentUris.withAppendedId(ContactsContract.RawContacts.CONTENT_URI,
+                                                rawContactID), null, null);
+                                //*************************************************************************************************************
+
+                            }
+                        }
+
                         allContactData = getPhoneContacts();
                         mData.clear();
                         mData.addAll(allContactData);
@@ -176,10 +187,12 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String name = mData.get(position).getName();
+                String lookUp = mData.get(position).getLookUp();
                 Intent intent = new Intent(ContactBookFragement.this.getContext(), ContactPersonalShowActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable(CONTACT_SHOW, mData.get(position));
-                intent.putExtras(bundle);
+                intent.putExtra(SELECTOR,FROM_CONTACT_BOOK_FRAGMENT);
+                intent.putExtra(NAME,name);
+                intent.putExtra(LOOKUP,lookUp);
                 startActivity(intent);
             }
         });

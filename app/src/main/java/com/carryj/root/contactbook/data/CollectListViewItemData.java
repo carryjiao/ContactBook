@@ -12,6 +12,7 @@ public class CollectListViewItemData implements Serializable {
 
     private String name;
     private String strPhoneNumber;
+    private String lookUp;
     private int rawContactID;
     private int contactID;
     private int phoneType;
@@ -64,5 +65,13 @@ public class CollectListViewItemData implements Serializable {
 
     public void setPhoneType(int phoneType) {
         this.phoneType = phoneType;
+    }
+
+    public String getLookUp() {
+        return lookUp;
+    }
+
+    public void setLookUp(String lookUp) {
+        this.lookUp = lookUp;
     }
 }

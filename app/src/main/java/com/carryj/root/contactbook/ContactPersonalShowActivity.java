@@ -22,6 +22,7 @@ import com.carryj.root.contactbook.data.ContactListViewItemData;
 import com.carryj.root.contactbook.data.PhoneNumberData;
 import com.carryj.root.contactbook.fragments.ContactBookFragement;
 import com.carryj.root.contactbook.tools.GetStrPhoneType;
+import com.carryj.root.contactbook.tools.PhoneNumberTransformer;
 import com.carryj.root.contactbook.ui.DividerItemDecoration;
 
 import java.util.ArrayList;
@@ -29,12 +30,21 @@ import java.util.ArrayList;
 public class ContactPersonalShowActivity extends SweepBackActivity {
 
 
+    public static final String SELECTOR = "SELECTOR";
+    public static final String FROM_COLLECT_FRAGMENT = "FROM_COLLECT_FRAGMENT";
+    public static final String FROM_CONTACT_BOOK_FRAGMENT = "FROM_CONTACT_BOOK_FRAGMENT";
+    public static final String NAME = "NAME";
+    public static final String LOOKUP = "LOOKUP";
+
     private ContactListViewItemData data;
 
+    private String selector;
     private String lookUp;
     private String name;
     private String email;
     private String remark;
+
+    private String backStr;
 
     private ArrayList<PhoneNumberData> numberDatas = new ArrayList<PhoneNumberData>();
 
@@ -42,6 +52,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     private LinearLayout ll_contact_personal_show_email_block;
     private LinearLayout ll_contact_personal_show_remark_block;
 
+    private TextView tv_back_str;
     private TextView tv_contact_personal_show_edit;
     private TextView tv_contact_personal_show_name;
     private TextView tv_contact_personal_show_email;
@@ -62,9 +73,15 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     @Override
     protected void initData() {
 
-        data = (ContactListViewItemData) getIntent().getSerializableExtra(ContactBookFragement.CONTACT_SHOW);
-        lookUp = data.getLookUp();
-        name = data.getName();
+        selector = getIntent().getStringExtra(SELECTOR);
+        if(selector.equals(FROM_COLLECT_FRAGMENT)){
+            backStr = "个人收藏";
+        }else if(selector.equals(FROM_CONTACT_BOOK_FRAGMENT)) {
+            backStr = "所有联系人";
+        }
+
+        name = getIntent().getStringExtra(NAME);
+        lookUp = getIntent().getStringExtra(LOOKUP);
 
         ContentResolver resolver = getContentResolver();
 
@@ -80,6 +97,9 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                 //获取号码类型
                 String numberType = new GetStrPhoneType().getStrPhoneType(phoneCursor.getInt(0));
                 String number = phoneCursor.getString(1);
+                PhoneNumberTransformer pntf = new PhoneNumberTransformer();
+                pntf.setStrPhoneNumber(number);
+                number = pntf.getStrPhoneNumber();
                 numberData.setNumberType(numberType);
                 numberData.setNumber(number);
                 numberDatas.add(numberData);
@@ -125,6 +145,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     protected void initView() {
 
         ll_contact_personal_show_back = (LinearLayout) findViewById(R.id.ll_contact_personal_show_back);
+        tv_back_str = (TextView) findViewById(R.id.tv_back_str);
         tv_contact_personal_show_edit = (TextView) findViewById(R.id.tv_contact_personal_show_edit);
         im_contact_personal_show_icon = (ImageView) findViewById(R.id.im_contact_personal_show_icon);
         tv_contact_personal_show_name = (TextView) findViewById(R.id.tv_contact_personal_show_name);
@@ -136,6 +157,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         ll_contact_personal_show_remark_block = (LinearLayout) findViewById(R.id.ll_contact_personal_show_remark_block);
         tv_contact_personal_show_remark = (TextView) findViewById(R.id.tv_contact_personal_show_remark);
 
+        tv_back_str.setText(backStr);
         tv_contact_personal_show_name.setText(name);
 
         numberAdapter = new ContactPersonalShowNumberAdapter(this,numberDatas);
