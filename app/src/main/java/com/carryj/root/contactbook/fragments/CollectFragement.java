@@ -60,7 +60,8 @@ public class CollectFragement extends Fragment implements OnClickListener {
             Phone.DISPLAY_NAME,
             Phone.TYPE,
             Phone.RAW_CONTACT_ID,
-            Phone.CONTACT_ID};
+            Phone.CONTACT_ID,
+            Phone.NUMBER};
 
 
     private static final int COLLECT_LOOKUP_INDEX = 0;
@@ -74,6 +75,8 @@ public class CollectFragement extends Fragment implements OnClickListener {
     private static final int COLLECT_RAW_CONTACT_ID_INDEX = 3;
 
     private static final int COLLECT_CONTACT_ID_INDEX = 4;
+
+    private static final int COLLECT_NUMBER_ID_INDEX = 5;
 
     private ArrayList<CollectListViewItemData> mData = new ArrayList<CollectListViewItemData>();
     private ArrayList<CollectListViewItemData> collectData = new ArrayList<CollectListViewItemData>();
@@ -254,12 +257,15 @@ public class CollectFragement extends Fragment implements OnClickListener {
 
                     int contactID = collectCursor.getInt(COLLECT_CONTACT_ID_INDEX);
 
+                    String number = collectCursor.getString(COLLECT_NUMBER_ID_INDEX);
+
                     CollectListViewItemData itemData = new CollectListViewItemData();
                     itemData.setLookUp(lookUp);
                     itemData.setName(cachedName);
                     itemData.setPhoneType(numberType);
                     itemData.setRawContactID(rawContactID);
                     itemData.setContactID(contactID);
+                    itemData.setStrPhoneNumber(number);
 
                     collectInfo.add(itemData);
 

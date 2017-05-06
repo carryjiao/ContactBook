@@ -122,6 +122,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
         recordListView = (SwipeMenuListView) view.findViewById(R.id.record_listview);
         adapter = new RecordAdapter(getContext(), mData);
         recordListView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
 
         SwipeMenuCreator creator = new SwipeMenuCreator() {
 
@@ -270,7 +271,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
                     new String[]{Manifest.permission.READ_CALL_LOG},
                     MY_PERMISSIONS_REQUEST_READ_CALL_LOG);
         } else {
-
+            mData.clear();
             mData = getRecordData(null,null);
 
         }
