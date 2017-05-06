@@ -21,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -34,7 +35,6 @@ import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.RecordItemInDetailActivity;
 import com.carryj.root.contactbook.adapter.RecordAdapter;
 import com.carryj.root.contactbook.data.RecordListViewItemData;
-import com.carryj.root.contactbook.tools.GetStrPhoneType;
 import com.carryj.root.contactbook.tools.PhoneNumberTransformer;
 
 import java.util.ArrayList;
@@ -84,6 +84,8 @@ public class RecordFragement extends Fragment implements OnClickListener {
     private static final int CALLS_CACHED_NUMBER_TYPE_INDEX = 5;
 
     private static final int CALLS_ID_INDEX = 6;
+
+    private boolean isGetData = false;
 
 
 
@@ -188,6 +190,8 @@ public class RecordFragement extends Fragment implements OnClickListener {
                         }
                         adapter.notifyDataSetChanged();
                         break;
+                    default:
+                        break;
                 }
                 // false : close the menu; true : not close the menu
                 return false;
@@ -271,7 +275,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
                     new String[]{Manifest.permission.READ_CALL_LOG},
                     MY_PERMISSIONS_REQUEST_READ_CALL_LOG);
         } else {
-            mData.clear();
+
             mData = getRecordData(null,null);
 
         }
@@ -354,7 +358,6 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
                     //判断联系人姓名是否为空
                     if(cachedName == null){
-                        Log.d("**************", "do updataRecordData");
                         updataRecordData(_id, strNumber);
                     }
 
@@ -456,4 +459,39 @@ public class RecordFragement extends Fragment implements OnClickListener {
         }
 
     }
+
+    /*@Override
+    public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
+
+        //   进入当前Fragment
+        if (enter && !isGetData) {
+            //重新拉取数据
+            mData = getRecordData(null,null);
+            adapter.notifyDataSetChanged();
+            isGetData = true;
+            Log.d("enter && !isGetData", "isGetData = true");
+        } else {
+            isGetData = false;
+            Log.d("enter && !isGetData", "isGetData = false");
+        }
+        return super.onCreateAnimation(transit, enter, nextAnim);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!isGetData) {
+            mData = getRecordData(null,null);
+            adapter.notifyDataSetChanged();
+            isGetData = true;
+            Log.d("onResume", "isGetData = true");
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        isGetData = false;
+        Log.d("onPause", "isGetData = false");
+    }*/
 }

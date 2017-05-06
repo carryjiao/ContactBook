@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.view.View;
@@ -151,7 +152,8 @@ public class AddCollectActivity extends SweepBackActivity {
         values.put(Phone.STARRED,1);
         getContentResolver().update(RawContacts.CONTENT_URI,
                 values, RawContacts.CONTACT_ID+"=?",new String[]{contactID});
-        Toast.makeText(this, "收藏成功", Toast.LENGTH_LONG).show();
+
+        Toast.makeText(this, "收藏成功", Toast.LENGTH_SHORT).show();
         tv_contact_book_add.setText("返回");
     }
 }
