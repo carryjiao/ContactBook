@@ -2,6 +2,7 @@ package com.carryj.root.contactbook.fragments;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -10,9 +11,11 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CallLog;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +34,8 @@ import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.RecordItemInDetailActivity;
 import com.carryj.root.contactbook.adapter.RecordAdapter;
 import com.carryj.root.contactbook.data.RecordListViewItemData;
+import com.carryj.root.contactbook.tools.GetStrPhoneType;
+import com.carryj.root.contactbook.tools.PhoneNumberTransformer;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,6 +47,7 @@ import java.util.Date;
 public class RecordFragement extends Fragment implements OnClickListener {
 
     private static final int MY_PERMISSIONS_REQUEST_READ_CALL_LOG = 3;
+    private static final int MY_PERMISSIONS_REQUEST_WRITE_CALL_LOG = 4;
 
     private static final String FLAG_ALLRECORD = "FLAG_ALLRECORD";
     private static final String FLAG_MISSEDCALL = "FLAG_MISSEDCALL";
@@ -290,6 +296,23 @@ public class RecordFragement extends Fragment implements OnClickListener {
             }
             return;
         }
+
+        if (requestCode == MY_PERMISSIONS_REQUEST_WRITE_CALL_LOG)
+        {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            {
+                mData = getRecordData(null,null);
+                allRcordData.addAll(mData);
+                missedCallRecordData = getRecordData(selection,selectionArgs);
+
+            } else
+            {
+                // Permission Denied
+                Toast.makeText(getContext(), "Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
+
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
@@ -327,6 +350,12 @@ public class RecordFragement extends Fragment implements OnClickListener {
                     int numberType = callLogCursor.getInt(CALLS_CACHED_NUMBER_TYPE_INDEX);
 
                     int _id = callLogCursor.getInt(CALLS_ID_INDEX);
+
+                    //判断联系人姓名是否为空
+                    if(cachedName == null){
+                        Log.d("**************", "do updataRecordData");
+                        updataRecordData(_id, strNumber);
+                    }
 
                     RecordListViewItemData itemData = new RecordListViewItemData();
                     itemData.setStrNumber(strNumber);
@@ -376,5 +405,54 @@ public class RecordFragement extends Fragment implements OnClickListener {
         }catch (SecurityException e){
 
         }
+    }
+
+    private void updataRecordData(int _id, String strNumber) {
+
+        Cursor phoneCursor = getContext().getContentResolver().query(Phone.CONTENT_URI,
+                new String[]{Phone.DISPLAY_NAME, Phone.NUMBER, Phone.TYPE, Phone.LOOKUP_KEY, Phone.CONTACT_ID},
+                null,null,null);
+        if(phoneCursor!=null) {
+            while (phoneCursor.moveToNext()) {
+                String number = phoneCursor.getString(1);
+                PhoneNumberTransformer pntf = new PhoneNumberTransformer();
+                pntf.setStrPhoneNumber(number);
+                number = pntf.getStrPhoneNumber();
+                if (number.equals(strNumber)) {
+                    String name = phoneCursor.getString(0);
+                    String numbertype = phoneCursor.getInt(2)+"";
+                    StringBuilder lookup_uri = new StringBuilder();
+                    lookup_uri.append("content://com.android.contacts/contacts/lookup/");
+                    lookup_uri.append(phoneCursor.getString(3)+"/");
+                    lookup_uri.append(phoneCursor.getString(4));
+
+                    ContentValues values = new ContentValues();
+                    values.put(CallLog.Calls.CACHED_NAME, name);
+                    values.put(CallLog.Calls.CACHED_NUMBER_TYPE, numbertype);
+                    values.put(CallLog.Calls.CACHED_LOOKUP_URI, lookup_uri.toString());
+
+                    //动态获取通话记录写入权限
+                    if (ContextCompat.checkSelfPermission(getContext(),
+                            Manifest.permission.WRITE_CALL_LOG)
+                            != PackageManager.PERMISSION_GRANTED)
+                    {
+
+                        ActivityCompat.requestPermissions(getActivity(),
+                                new String[]{Manifest.permission.WRITE_CALL_LOG},
+                                MY_PERMISSIONS_REQUEST_WRITE_CALL_LOG);
+                    } else {
+
+                        getContext().getContentResolver().update(CallLog.Calls.CONTENT_URI,
+                                values, CallLog.Calls._ID+"=?",new String[]{_id+""});
+
+                    }
+
+                    break;//已找到
+
+                }
+            }
+            phoneCursor.close();
+        }
+
     }
 }
