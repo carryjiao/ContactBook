@@ -127,7 +127,8 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv_contact_personal_show_number"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/contact_personal_show_margin_left">
 
             </android.support.v7.widget.RecyclerView>
 
@@ -155,22 +156,46 @@
 
                 </LinearLayout>
 
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rv_contact_personal_show_emial"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                </android.support.v7.widget.RecyclerView>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_contact_personal_show_im_block"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:gravity="center_vertical">
+                    android:layout_height="20dp"
+                    android:gravity="center_vertical"
+                    android:background="@color/colorTitleBGGray">
 
                     <TextView
-                        android:id="@+id/tv_contact_personal_show_email"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="@dimen/record_item_in_detail_margin_left"
-                        android:text="465938001@qq.com"
-                        android:textSize="20sp"
+                        android:layout_marginLeft="@dimen/contact_personal_show_margin_left"
+                        android:text="即时聊天"
+                        android:textSize="10sp"
                         android:typeface="monospace"
-                        android:textColor="@color/colorCharBlue"/>
+                        android:textColor="@color/colorCharBGGray"/>
 
                 </LinearLayout>
+
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rv_contact_personal_show_im"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                </android.support.v7.widget.RecyclerView>
 
             </LinearLayout>
 

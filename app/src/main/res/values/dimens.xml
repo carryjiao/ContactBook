@@ -38,6 +38,9 @@
     <!--Fragment_Record-->
     <dimen name="record_item_margin_top">5dp</dimen>
 
+    <!--show_orcode_activity-->
+    <dimen name="show_orcode_im_height">250dp</dimen>
+
 
 
 </resources>

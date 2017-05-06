@@ -17,8 +17,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.carryj.root.contactbook.activity.ShowORCodeActivity;
+import com.carryj.root.contactbook.adapter.ContactPersonalShowEmailAdapter;
+import com.carryj.root.contactbook.adapter.ContactPersonalShowImAdapter;
 import com.carryj.root.contactbook.adapter.ContactPersonalShowNumberAdapter;
 import com.carryj.root.contactbook.data.ContactListViewItemData;
+import com.carryj.root.contactbook.data.EmailData;
+import com.carryj.root.contactbook.data.ImData;
 import com.carryj.root.contactbook.data.PhoneNumberData;
 import com.carryj.root.contactbook.fragments.ContactBookFragement;
 import com.carryj.root.contactbook.tools.GetStrPhoneType;
@@ -41,27 +46,35 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     private String selector;
     private String lookUp;
     private String name;
-    private String email;
     private String remark;
 
     private String backStr;
 
-    private ArrayList<PhoneNumberData> numberDatas = new ArrayList<PhoneNumberData>();
-
     private LinearLayout ll_contact_personal_show_back;
     private LinearLayout ll_contact_personal_show_email_block;
+    private LinearLayout ll_contact_personal_show_im_block;
     private LinearLayout ll_contact_personal_show_remark_block;
 
     private TextView tv_back_str;
     private TextView tv_contact_personal_show_edit;
     private TextView tv_contact_personal_show_name;
-    private TextView tv_contact_personal_show_email;
     private TextView tv_contact_personal_show_remark;
 
     private ImageView im_contact_personal_show_icon;
 
     private RecyclerView rv_contact_personal_show_number;
+    private RecyclerView rv_contact_personal_show_emial;
+    private RecyclerView rv_contact_personal_show_im;
+
+
     private ContactPersonalShowNumberAdapter numberAdapter;
+    private ContactPersonalShowEmailAdapter emailAdapter;
+    private ContactPersonalShowImAdapter imAdapter;
+
+
+    private ArrayList<PhoneNumberData> numberDatas = new ArrayList<PhoneNumberData>();
+    private ArrayList<EmailData> emailDatas = new ArrayList<EmailData>();
+    private ArrayList<ImData> imDatas = new ArrayList<ImData>();
 
 
     @Override
@@ -113,16 +126,43 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
 
         //获取E-Mail
         Cursor emailCursor = resolver.query(CommonDataKinds.Email.CONTENT_URI,
-                null, CommonDataKinds.Email.LOOKUP_KEY + "=?",
+                new String[]{CommonDataKinds.Email.TYPE, CommonDataKinds.Email.DATA},
+                CommonDataKinds.Email.LOOKUP_KEY + "=?",
                 new String[]{lookUp}, null);
 
         if (emailCursor != null) {
             while (emailCursor.moveToNext()) {
+                EmailData emailData = new EmailData();
                 //得到email
-                email = emailCursor.getString(emailCursor.getColumnIndex(CommonDataKinds.Email.DATA));
+                String emailType = emailCursor.getString(0);
+                String email = emailCursor.getString(1);
+                emailData.setEmailType(emailType);
+                emailData.setEmail(email);
+
+                emailDatas.add(emailData);
 
             }
             emailCursor.close();
+        }
+
+        //获取IM
+        Cursor imCursor = resolver.query(ContactsContract.Data.CONTENT_URI,
+                new String[]{CommonDataKinds.Im.TYPE, CommonDataKinds.Im.DATA},
+                ContactsContract.Data.LOOKUP_KEY + "=?",
+                new String[]{lookUp}, null);
+
+        if (imCursor != null) {
+            while (imCursor.moveToNext()) {
+                ImData imData = new ImData();
+                //得到email
+                String imType = imCursor.getString(0);
+                String im = imCursor.getString(1);
+                imData.setImType(imType);
+                imData.setIm(im);
+                imDatas.add(imData);
+
+            }
+            imCursor.close();
         }
 
         //获取备注
@@ -152,7 +192,10 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         rv_contact_personal_show_number = (RecyclerView) findViewById(R.id.rv_contact_personal_show_number);
 
         ll_contact_personal_show_email_block = (LinearLayout) findViewById(R.id.ll_contact_personal_show_email_block);
-        tv_contact_personal_show_email = (TextView) findViewById(R.id.tv_contact_personal_show_email);
+        rv_contact_personal_show_emial = (RecyclerView) findViewById(R.id.rv_contact_personal_show_emial);
+
+        ll_contact_personal_show_im_block = (LinearLayout) findViewById(R.id.ll_contact_personal_show_im_block);
+        rv_contact_personal_show_im = (RecyclerView) findViewById(R.id.rv_contact_personal_show_im);
 
         ll_contact_personal_show_remark_block = (LinearLayout) findViewById(R.id.ll_contact_personal_show_remark_block);
         tv_contact_personal_show_remark = (TextView) findViewById(R.id.tv_contact_personal_show_remark);
@@ -167,10 +210,36 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                 DividerItemDecoration.VERTICAL_LIST));
 
 
-        if(email == null)
+        if(emailDatas == null){
+
             ll_contact_personal_show_email_block.setVisibility(View.GONE);
-        else
-            tv_contact_personal_show_email.setText(email);
+
+        }
+        else {
+
+            emailAdapter = new ContactPersonalShowEmailAdapter(this,emailDatas);
+            rv_contact_personal_show_emial.setLayoutManager(new LinearLayoutManager(this));
+            rv_contact_personal_show_emial.setAdapter(emailAdapter);
+            rv_contact_personal_show_emial.addItemDecoration(new DividerItemDecoration(this,
+                    DividerItemDecoration.VERTICAL_LIST));
+
+        }
+
+
+        if(imDatas == null){
+
+            ll_contact_personal_show_im_block.setVisibility(View.GONE);
+
+        }
+        else {
+
+            imAdapter = new ContactPersonalShowImAdapter(this,imDatas);
+            rv_contact_personal_show_im.setLayoutManager(new LinearLayoutManager(this));
+            rv_contact_personal_show_im.setAdapter(imAdapter);
+            rv_contact_personal_show_im.addItemDecoration(new DividerItemDecoration(this,
+                    DividerItemDecoration.VERTICAL_LIST));
+
+        }
 
         if(remark == null)
             ll_contact_personal_show_remark_block.setVisibility(View.GONE);
@@ -186,6 +255,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         ll_contact_personal_show_back.setOnClickListener(this);
         tv_contact_personal_show_edit.setOnClickListener(this);
 
+        //拨号
         numberAdapter.setOnItemClickListener(new ContactPersonalShowNumberAdapter.OnItemClickListener() {
             @Override
             public void onClick(int position) {
@@ -217,6 +287,71 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                 return false;
             }
         });
+
+        //点击跳转到二维码界面
+        numberAdapter.setOnItemClicktoORCodeListenner(new ContactPersonalShowNumberAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int position) {
+                String number = numberDatas.get(position).getNumber();
+                Intent intent = new Intent(ContactPersonalShowActivity.this.getApplicationContext(), ShowORCodeActivity.class);
+                intent.putExtra("ORCODE", number);
+                startActivity(intent);
+            }
+        });
+
+        //长按将电子邮箱号码复制到系统粘贴板上
+        emailAdapter.setOnItemLongClickListener(new ContactPersonalShowEmailAdapter.OnItemLongClickListener() {
+            @Override
+            public boolean onLongClick(View v, int position) {
+                String email = emailDatas.get(position).getEmail();
+                ClipboardManager clip = (ClipboardManager)getApplicationContext().
+                        getSystemService(Context.CLIPBOARD_SERVICE);
+                clip.setText(email);
+                Toast.makeText(getApplicationContext(), "已复制到粘贴板",Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });
+
+        //点击跳转到二维码界面
+        emailAdapter.setOnItemClickListener(new ContactPersonalShowEmailAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int position) {
+                String email = emailDatas.get(position).getEmail();
+                Intent intent = new Intent(ContactPersonalShowActivity.this.getApplicationContext(), ShowORCodeActivity.class);
+                intent.putExtra("ORCODE", email);
+                startActivity(intent);
+            }
+        });
+
+        //长按将即时聊天号码复制到系统粘贴板上
+        imAdapter.setOnItemLongClickListener(new ContactPersonalShowImAdapter.OnItemLongClickListener() {
+            @Override
+            public boolean onLongClick(View v, int position) {
+                String im = imDatas.get(position).getIm();
+                ClipboardManager clip = (ClipboardManager)getApplicationContext().
+                        getSystemService(Context.CLIPBOARD_SERVICE);
+                clip.setText(im);
+                Toast.makeText(getApplicationContext(), "已复制到粘贴板",Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });
+
+        //点击跳转到二维码界面
+        imAdapter.setOnItemClickListener(new ContactPersonalShowImAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int position) {
+                String im = imDatas.get(position).getIm();
+                Intent intent = new Intent(ContactPersonalShowActivity.this.getApplicationContext(), ShowORCodeActivity.class);
+                intent.putExtra("ORCODE", im);
+                startActivity(intent);
+            }
+        });
+
+
+
+
+
+
 
     }
 

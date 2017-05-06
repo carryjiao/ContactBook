@@ -33,7 +33,7 @@ import java.net.URL;
 
 public class ShowORCodeActivity extends SweepBackActivity {
 
-    private String SELECTOR;
+    private String URL;
     private ImageView imageView;
     private Bitmap ORCode;
     private Handler handler;
@@ -41,13 +41,14 @@ public class ShowORCodeActivity extends SweepBackActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_contact_orcode);
+        setContentView(R.layout.activity_show_orcode);
     }
 
     @Override
     protected void initData() {
 
 
+        URL = getIntent().getStringExtra("ORCODE");
 
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.INTERNET)
@@ -62,7 +63,7 @@ public class ShowORCodeActivity extends SweepBackActivity {
                 @Override
                 public void run()
                 {
-                    ORCode = getBitmap("http://qr.liantu.com/api.php?text=焦消13251356557");
+                    ORCode = getBitmap("http://qr.liantu.com/api.php?text="+URL);
                     Message msg = new Message();
                     // 把bm存入消息中,发送到主线程
                     msg.obj = ORCode;
@@ -100,7 +101,7 @@ public class ShowORCodeActivity extends SweepBackActivity {
         handler = new Handler() {
             public void handleMessage(Message msg) {
 
-                imageView = (ImageView) findViewById(R.id.imageView);
+                imageView = (ImageView) findViewById(R.id.im_show_orcode_orcode);
                 imageView.setImageBitmap((Bitmap) msg.obj);
             }
         };
@@ -114,69 +115,6 @@ public class ShowORCodeActivity extends SweepBackActivity {
 
     @Override
     public void onClick(View v) {
-
-    }
-
-    private boolean insert(String name, String phoneNumber, String email, String im_qq) {
-
-        try
-        {
-            ContentValues values = new ContentValues();
-
-            // 下面的操作会根据RawContacts表中已有的rawContactId使用情况自动生成新联系人的rawContactId
-            Uri rawContactUri = getContentResolver().insert(RawContacts.CONTENT_URI, values);
-            long rawContactId = ContentUris.parseId(rawContactUri);
-
-            // 向data表插入姓名数据
-            if (name.length()>0)
-            {
-                values.clear();
-                values.put(Data.RAW_CONTACT_ID, rawContactId);
-                values.put(Data.MIMETYPE, StructuredName.CONTENT_ITEM_TYPE);
-                values.put(StructuredName.GIVEN_NAME, name);
-                getContentResolver().insert(Data.CONTENT_URI, values);
-            }
-
-            // 向data表插入电话数据
-            if (phoneNumber.length()>0)
-            {
-                values.clear();
-                values.put(Data.RAW_CONTACT_ID, rawContactId);
-                values.put(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE);
-                values.put(Phone.NUMBER, phoneNumber);
-                values.put(Phone.TYPE, Phone.TYPE_MOBILE);
-                getContentResolver().insert(Data.CONTENT_URI, values);
-            }
-
-            // 向data表插入Email数据
-            if (email.length()>0)
-            {
-                values.clear();
-                values.put(Data.RAW_CONTACT_ID, rawContactId);
-                values.put(Data.MIMETYPE, Email.CONTENT_ITEM_TYPE);
-                values.put(Email.DATA, email);
-                values.put(Email.TYPE, Email.TYPE_WORK);
-                getContentResolver().insert(Data.CONTENT_URI, values);
-            }
-
-            // 向data表插入QQ数据
-            if (im_qq.length()>0)
-            {
-                values.clear();
-                values.put(Data.RAW_CONTACT_ID, rawContactId);
-                values.put(Data.MIMETYPE, Im.CONTENT_ITEM_TYPE);
-                values.put(Im.DATA, im_qq);
-                values.put(Im.PROTOCOL, Im.PROTOCOL_QQ);
-                getContentResolver().insert(Data.CONTENT_URI, values);
-            }
-        }
-
-        catch (Exception e)
-        {
-            return false;
-        }
-
-        return true;
 
     }
 
