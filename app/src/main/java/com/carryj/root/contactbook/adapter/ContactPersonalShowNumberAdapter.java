@@ -29,7 +29,7 @@ public class ContactPersonalShowNumberAdapter extends RecyclerView.Adapter<Conta
     private Context context;
     private ArrayList<PhoneNumberData> numberData;
     private OnItemClickListener onItemClickListener;
-    private OnItemClickListener clicktoORCodeListener;
+    //private OnItemClicktoORCodeListenner clicktoORCodeListener;
     private OnItemLongClickListener onItemLongClickListener;
 
 
@@ -44,9 +44,9 @@ public class ContactPersonalShowNumberAdapter extends RecyclerView.Adapter<Conta
         this.onItemClickListener = onItemClickListener;
     }
 
-    public void setOnItemClicktoORCodeListenner(OnItemClickListener onItemClickListener) {
+    /*public void setOnItemClicktoORCodeListenner(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
-    }
+    }*/
 
     public void setOnItemLongClickListener(OnItemLongClickListener onItemLongClickListener) {
         this.onItemLongClickListener = onItemLongClickListener;
@@ -59,6 +59,11 @@ public class ContactPersonalShowNumberAdapter extends RecyclerView.Adapter<Conta
     public interface OnItemLongClickListener {
         boolean onLongClick(View v, int position);
     }
+
+    /*public interface OnItemClicktoORCodeListenner {
+        void onClick(int position);
+    }*/
+
 
 
     @Override
@@ -100,14 +105,15 @@ public class ContactPersonalShowNumberAdapter extends RecyclerView.Adapter<Conta
                     }
                 }
             });
-            view.setOnClickListener(new View.OnClickListener() {
+
+            /*view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if(clicktoORCodeListener!=null){
                         clicktoORCodeListener.onClick(getLayoutPosition());
                     }
                 }
-            });
+            });*/
 
             view.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override

@@ -26,6 +26,8 @@ import com.carryj.root.contactbook.data.EmailData;
 import com.carryj.root.contactbook.data.ImData;
 import com.carryj.root.contactbook.data.PhoneNumberData;
 import com.carryj.root.contactbook.fragments.ContactBookFragement;
+import com.carryj.root.contactbook.tools.GetStrEmailType;
+import com.carryj.root.contactbook.tools.GetStrImType;
 import com.carryj.root.contactbook.tools.GetStrPhoneType;
 import com.carryj.root.contactbook.tools.PhoneNumberTransformer;
 import com.carryj.root.contactbook.ui.DividerItemDecoration;
@@ -134,8 +136,9 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
             while (emailCursor.moveToNext()) {
                 EmailData emailData = new EmailData();
                 //得到email
-                String emailType = emailCursor.getString(0);
+                int type = emailCursor.getInt(0);
                 String email = emailCursor.getString(1);
+                String emailType = new GetStrEmailType().getStrPhoneType(type);
                 emailData.setEmailType(emailType);
                 emailData.setEmail(email);
 
@@ -148,15 +151,16 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         //获取IM
         Cursor imCursor = resolver.query(ContactsContract.Data.CONTENT_URI,
                 new String[]{CommonDataKinds.Im.TYPE, CommonDataKinds.Im.DATA},
-                ContactsContract.Data.LOOKUP_KEY + "=?",
-                new String[]{lookUp}, null);
+                ContactsContract.Data.LOOKUP_KEY + "=? AND "+ ContactsContract.Data.MIMETYPE+"=?",
+                new String[]{lookUp, CommonDataKinds.Im.CONTENT_ITEM_TYPE}, null);
 
         if (imCursor != null) {
             while (imCursor.moveToNext()) {
                 ImData imData = new ImData();
                 //得到email
-                String imType = imCursor.getString(0);
+                int type = imCursor.getInt(0);
                 String im = imCursor.getString(1);
+                String imType = new GetStrImType().getStrPhoneType(type);
                 imData.setImType(imType);
                 imData.setIm(im);
                 imDatas.add(imData);
@@ -209,15 +213,15 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         rv_contact_personal_show_number.addItemDecoration(new DividerItemDecoration(this,
                 DividerItemDecoration.VERTICAL_LIST));
 
-
-        if(emailDatas == null){
+        emailAdapter = new ContactPersonalShowEmailAdapter(this,emailDatas);
+        imAdapter = new ContactPersonalShowImAdapter(this,imDatas);
+        if(emailDatas.size()==0){
 
             ll_contact_personal_show_email_block.setVisibility(View.GONE);
 
         }
         else {
 
-            emailAdapter = new ContactPersonalShowEmailAdapter(this,emailDatas);
             rv_contact_personal_show_emial.setLayoutManager(new LinearLayoutManager(this));
             rv_contact_personal_show_emial.setAdapter(emailAdapter);
             rv_contact_personal_show_emial.addItemDecoration(new DividerItemDecoration(this,
@@ -226,14 +230,12 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         }
 
 
-        if(imDatas == null){
+        if(imDatas.size()==0){
 
             ll_contact_personal_show_im_block.setVisibility(View.GONE);
 
         }
         else {
-
-            imAdapter = new ContactPersonalShowImAdapter(this,imDatas);
             rv_contact_personal_show_im.setLayoutManager(new LinearLayoutManager(this));
             rv_contact_personal_show_im.setAdapter(imAdapter);
             rv_contact_personal_show_im.addItemDecoration(new DividerItemDecoration(this,
@@ -288,7 +290,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
             }
         });
 
-        //点击跳转到二维码界面
+        /*//点击跳转到二维码界面
         numberAdapter.setOnItemClicktoORCodeListenner(new ContactPersonalShowNumberAdapter.OnItemClickListener() {
             @Override
             public void onClick(int position) {
@@ -297,7 +299,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                 intent.putExtra("ORCODE", number);
                 startActivity(intent);
             }
-        });
+        });*/
 
         //长按将电子邮箱号码复制到系统粘贴板上
         emailAdapter.setOnItemLongClickListener(new ContactPersonalShowEmailAdapter.OnItemLongClickListener() {

@@ -33,13 +33,13 @@
 
     <string-array name="imtype">
         <item>MSN</item><!--1-->
-        <item>YAHOO</item><!--2-->
-        <item>SKYPE</item><!--3-->
+        <item>雅虎</item><!--2-->
+        <item>Skype</item><!--3-->
         <item>QQ</item><!--4-->
-        <item>GOOGLE TALK</item><!--5-->
+        <item>环聊</item><!--5-->
         <item>ICQ</item><!--6-->
-        <item>JABBER</item><!--7-->
-        <item>NETMEETING</item><!--8-->
+        <item>Jabber</item><!--7-->
+        <item>Windows Live</item><!--8-->
 
 
     </string-array>

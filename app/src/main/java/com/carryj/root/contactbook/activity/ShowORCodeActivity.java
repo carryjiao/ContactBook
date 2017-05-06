@@ -20,6 +20,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.carryj.root.contactbook.R;
@@ -37,6 +38,8 @@ public class ShowORCodeActivity extends SweepBackActivity {
     private ImageView imageView;
     private Bitmap ORCode;
     private Handler handler;
+
+    private LinearLayout ll_show_orcode_back;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +101,7 @@ public class ShowORCodeActivity extends SweepBackActivity {
     @Override
     protected void initView() {
 
+        ll_show_orcode_back = (LinearLayout) findViewById(R.id.ll_show_orcode_back);
         handler = new Handler() {
             public void handleMessage(Message msg) {
 
@@ -110,11 +114,20 @@ public class ShowORCodeActivity extends SweepBackActivity {
 
     @Override
     protected void initEvents() {
+        ll_show_orcode_back.setOnClickListener(this);
 
     }
 
     @Override
     public void onClick(View v) {
+        int id = v.getId();
+        switch (id) {
+            case R.id.ll_show_orcode_back:
+                this.finish();
+                break;
+            default:
+                break;
+        }
 
     }
 
