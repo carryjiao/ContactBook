@@ -7,9 +7,11 @@
         android:id="@+id/im_collect_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="3dp"
+        android:layout_marginLeft="@dimen/record_item_in_detail_margin_left"
+        android:layout_marginTop="@dimen/collect_item_margin_top"
+        android:layout_marginBottom="@dimen/collect_item_margin_top"
         android:layout_centerVertical="true"
-        android:src="@drawable/ic_launcher"/>
+        android:src="@drawable/im_icon"/>
 
     <TextView
         android:id="@+id/tv_collect_display_name"
