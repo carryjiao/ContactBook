@@ -2,10 +2,10 @@ package com.carryj.root.contactbook;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
@@ -41,6 +41,9 @@ public class AddContactActivity extends SweepBackActivity {
     private static final String FROM_DIAL_FRAGEMENT_ADD = "FROM_DIAL_FRAGEMENT_ADD";
     private static final String FROM_RECORD_ITEM_IN_DETAIL_ACTIVITY_NEW = "FROM_RECORD_ITEM_IN_DETAIL_ACTIVITY_NEW";
     private static final String FROM_CONTACT_PERSONAL_SHOW_ACTIVITY_EDIT = "FROM_CONTACT_PERSONAL_SHOW_ACTIVITY_EDIT";
+
+    private static final int REQUEST_CODE = 1;
+    private static final int RESULT_CODE = 100;
 
     private String lookUp;
     private String phoneNumber;
@@ -352,6 +355,14 @@ public class AddContactActivity extends SweepBackActivity {
                 if(updataFlag){
                     updata(name, myNumberData, myEmailData, myImData);
                     Toast.makeText(this,"修改成功",Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent();
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("NUMBER",myNumberData);
+                    bundle.putSerializable("EMAIL",myEmailData);
+                    bundle.putSerializable("IM",myImData);
+                    intent.putExtras(bundle);
+                    intent.putExtra("NAME",name);
+                    this.setResult(RESULT_CODE,intent);
                 }
 
                 this.finish();

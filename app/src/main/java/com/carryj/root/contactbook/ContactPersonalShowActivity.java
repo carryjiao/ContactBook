@@ -44,6 +44,9 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     public static final String LOOKUP = "LOOKUP";
     private static final String FROM_CONTACT_PERSONAL_SHOW_ACTIVITY_EDIT = "FROM_CONTACT_PERSONAL_SHOW_ACTIVITY_EDIT";
 
+    private static final int REQUEST_CODE = 1;
+    private static final int RESULT_CODE = 100;
+
     private ContactListViewItemData data;
 
     private String selector;
@@ -380,11 +383,54 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                 bundle.putSerializable("EMAILDATA", emailDatas);
                 bundle.putSerializable("IMDATA", imDatas);
                 intent.putExtras(bundle);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_CODE);
                 break;
             default:
                 break;
         }
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if(requestCode == REQUEST_CODE && resultCode == RESULT_CODE) {
+            //更新数据
+            name = data.getStringExtra("NAME");
+            tv_contact_personal_show_name.setText(name);
+
+            ArrayList<PhoneNumberData> resultNumberDatas = (ArrayList<PhoneNumberData>) data.getSerializableExtra("NUMBER");
+            ArrayList<EmailData> resultEmailDatas = (ArrayList<EmailData>) data.getSerializableExtra("EMAIL");
+            ArrayList<ImData> resultImDatas = (ArrayList<ImData>) data.getSerializableExtra("IM");
+            //类型数据处理
+            for(PhoneNumberData resultNumberData:resultNumberDatas){
+
+                int intType = Integer.parseInt(resultNumberData.getNumberType());
+                String strType = new GetStrPhoneType().getStrPhoneType(intType);
+                resultNumberData.setNumberType(strType);
+            }
+            for (EmailData resultEmailData:resultEmailDatas){
+                int intType = Integer.parseInt(resultEmailData.getEmailType());
+                String strType = new GetStrEmailType().getStrEmailType(intType);
+                resultEmailData.setEmailType(strType);
+            }
+            for (ImData resultImData:resultImDatas){
+                int intType = Integer.parseInt(resultImData.getImType());
+                String strType = new GetStrImType().getStrImType(intType);
+                resultImData.setImType(strType);
+            }
+            numberDatas.clear();
+            emailDatas.clear();
+            imDatas.clear();
+            numberDatas.addAll(resultNumberDatas);
+            emailDatas.addAll(resultEmailDatas);
+            imDatas.addAll(resultImDatas);
+            numberAdapter.notifyDataSetChanged();
+            emailAdapter.notifyDataSetChanged();
+            imAdapter.notifyDataSetChanged();
+
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

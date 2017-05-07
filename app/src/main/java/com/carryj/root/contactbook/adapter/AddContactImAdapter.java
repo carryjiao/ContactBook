@@ -24,7 +24,6 @@ import java.util.ArrayList;
 
 public class AddContactImAdapter extends RecyclerView.Adapter<AddContactImAdapter.NumberViewHolder> {
 
-
     private Context context;
     private ArrayList<ImData> imData;
     private OnItemListener listener;
