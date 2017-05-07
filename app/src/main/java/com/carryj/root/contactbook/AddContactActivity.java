@@ -116,6 +116,7 @@ public class AddContactActivity extends SweepBackActivity {
             updataFlag = true;
             name = getIntent().getStringExtra("NAME");
             company = getIntent().getStringExtra("COMPANY");
+            remark = getIntent().getStringExtra("REMARK");
             lookUp = getIntent().getStringExtra("LOOKUP");
             myNumberData = (ArrayList<PhoneNumberData>) getIntent().getSerializableExtra("NUMBERDATA");
             myEmailData = (ArrayList<EmailData>) getIntent().getSerializableExtra("EMAILDATA");
@@ -177,6 +178,7 @@ public class AddContactActivity extends SweepBackActivity {
         if(updataFlag) {
             et_add_contact_surname.setText(name);
             et_add_contact_company.setText(company);
+            et_add_contact_remark.setText(remark);
         }
 
 

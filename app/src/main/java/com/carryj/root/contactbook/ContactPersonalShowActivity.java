@@ -398,6 +398,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                 intent.putExtra(SELECTOR, FROM_CONTACT_PERSONAL_SHOW_ACTIVITY_EDIT);
                 intent.putExtra("NAME",name);
                 intent.putExtra("COMPANY",company);
+                intent.putExtra("REMARK",remark);
                 intent.putExtra("LOOKUP",lookUp);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("NUMBERDATA", numberDatas);
