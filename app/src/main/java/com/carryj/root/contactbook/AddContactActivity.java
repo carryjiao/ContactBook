@@ -580,8 +580,16 @@ public class AddContactActivity extends SweepBackActivity {
                 values.clear();
                 values.put(Phone.NUMBER, numberItemData.getNumber());
                 values.put(Phone.TYPE, numberItemData.getNumberType());
-                getContentResolver().update(Data.CONTENT_URI, values,
-                        Data._ID+"=?", new String[]{numberItemData.get_id()});
+                if(numberItemData.get_id() != null){ //不是新增数据
+                    getContentResolver().update(Data.CONTENT_URI, values,
+                            Data._ID+"=?", new String[]{numberItemData.get_id()});
+                }else {//新增数据
+                    values.put(Data.RAW_CONTACT_ID, rawContactId);
+                    values.put(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE);
+                    getContentResolver().insert(Data.CONTENT_URI, values);
+                }
+
+
             }
 
             // 在data表中更新Email数据
@@ -589,8 +597,15 @@ public class AddContactActivity extends SweepBackActivity {
                 values.clear();
                 values.put(Email.DATA, emailItemData.getEmail());
                 values.put(Email.TYPE, emailItemData.getEmailType());
-                getContentResolver().update(Data.CONTENT_URI, values,
-                        Data._ID+"=?", new String[]{emailItemData.get_id()});
+                if(emailItemData.get_id() != null) {
+                    getContentResolver().update(Data.CONTENT_URI, values,
+                            Data._ID+"=?", new String[]{emailItemData.get_id()});
+                }else {
+                    values.put(Data.RAW_CONTACT_ID, rawContactId);
+                    values.put(Data.MIMETYPE, Email.CONTENT_ITEM_TYPE);
+                    getContentResolver().insert(Data.CONTENT_URI, values);
+                }
+
 
 
             }
@@ -600,8 +615,15 @@ public class AddContactActivity extends SweepBackActivity {
                 values.clear();
                 values.put(Im.DATA, imItemData.getIm());
                 values.put(Im.PROTOCOL, imItemData.getImType());
-                getContentResolver().update(Data.CONTENT_URI, values,
-                        Data._ID+"=?", new String[]{imItemData.get_id()});
+                if(imItemData.get_id() != null) {
+                    getContentResolver().update(Data.CONTENT_URI, values,
+                            Data._ID+"=?", new String[]{imItemData.get_id()});
+                }else {
+                    values.put(Data.RAW_CONTACT_ID, rawContactId);
+                    values.put(Data.MIMETYPE, Im.CONTENT_ITEM_TYPE);
+                    getContentResolver().insert(Data.CONTENT_URI, values);
+                }
+
             }
 
 
