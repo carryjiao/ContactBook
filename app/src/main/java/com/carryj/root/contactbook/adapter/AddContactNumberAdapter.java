@@ -12,7 +12,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import com.carryj.root.contactbook.R;
-import com.carryj.root.contactbook.data.AddContactNumberData;
+import com.carryj.root.contactbook.data.PhoneNumberData;
 
 import java.util.ArrayList;
 
@@ -25,15 +25,17 @@ public class AddContactNumberAdapter extends RecyclerView.Adapter<AddContactNumb
 
 
     private Context context;
-    private ArrayList<AddContactNumberData> numberData;
+    private ArrayList<PhoneNumberData> numberData;
     private OnItemListener listener;
     private OnItemSpinnerListener spinnerListener;
     private TextChangeListener textChangeListener;
+    private boolean updataFlag = false;
 
 
-    public AddContactNumberAdapter(Context context, ArrayList<AddContactNumberData> numberData) {
+    public AddContactNumberAdapter(Context context, ArrayList<PhoneNumberData> numberData, boolean updataFlag) {
         this.context = context;
         this.numberData = numberData;
+        this.updataFlag = updataFlag;
     }
 
     //  点击事件
@@ -75,7 +77,97 @@ public class AddContactNumberAdapter extends RecyclerView.Adapter<AddContactNumb
 
     @Override
     public void onBindViewHolder(NumberViewHolder holder, int position) {
-        holder.number.setText(numberData.get(position).getPhoneNumber());
+        holder.number.setText(numberData.get(position).getNumber());
+        if(updataFlag) {
+            int spinnerIndex  = 0;
+
+            switch (numberData.get(position).getNumberType()) {
+
+                case "住宅"://1
+                    spinnerIndex = 0;
+                    break;
+
+                case "手机"://2
+                    spinnerIndex = 1;
+                    break;
+
+                case "单位"://3
+                    spinnerIndex = 2;
+                    break;
+
+                case "单位传真":
+                    spinnerIndex = 3;
+                    break;
+
+                case "住宅传真":
+                    spinnerIndex = 4;
+                    break;
+
+                case "寻呼机":
+                    spinnerIndex = 5;
+                    break;
+
+                case "其他":
+                    spinnerIndex = 6;
+                    break;
+
+                case "回拨号码":
+                    spinnerIndex = 7;
+                    break;
+
+                case "车载电话":
+                    spinnerIndex = 8;
+                    break;
+
+                case "公司总机":
+                    spinnerIndex = 9;
+                    break;
+
+                case "ISDN":
+                    spinnerIndex = 10;
+                    break;
+
+                case "总机":
+                    spinnerIndex = 11;
+                    break;
+
+                case "其他传真":
+                    spinnerIndex = 12;
+                    break;
+
+                case "无线装置":
+                    spinnerIndex = 13;
+                    break;
+
+                case "电报":
+                    spinnerIndex = 14;
+                    break;
+
+                case "TTY TDD":
+                    spinnerIndex = 15;
+                    break;
+
+                case "单位手机":
+                    spinnerIndex = 16;
+                    break;
+
+                case "单位寻呼机":
+                    spinnerIndex = 17;
+                    break;
+
+                case "助理":
+                    spinnerIndex = 18;
+                    break;
+
+                case "彩信":
+                    spinnerIndex = 19;
+                    break;
+                default:
+                    spinnerIndex = 0;
+                    break;
+            }
+            holder.spinner.setSelection(spinnerIndex);
+        }
     }
 
     @Override
@@ -84,7 +176,7 @@ public class AddContactNumberAdapter extends RecyclerView.Adapter<AddContactNumb
     }
 
     public void addNumberData(int position) {
-        numberData.add(position,new AddContactNumberData());
+        numberData.add(position,new PhoneNumberData());
         notifyItemInserted(position);
     }
 

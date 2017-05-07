@@ -13,8 +13,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.carryj.root.contactbook.R;
-import com.carryj.root.contactbook.data.AddContactImData;
-import com.carryj.root.contactbook.data.AddContactNumberData;
+import com.carryj.root.contactbook.data.ImData;
 
 import java.util.ArrayList;
 
@@ -27,15 +26,17 @@ public class AddContactImAdapter extends RecyclerView.Adapter<AddContactImAdapte
 
 
     private Context context;
-    private ArrayList<AddContactImData> imData;
+    private ArrayList<ImData> imData;
     private OnItemListener listener;
     private OnItemSpinnerListener spinnerListener;
     private TextChangeListener textChangeListener;
+    private boolean updataFlag = false;
 
 
-    public AddContactImAdapter(Context context, ArrayList<AddContactImData> imData) {
+    public AddContactImAdapter(Context context, ArrayList<ImData> imData, boolean updataFlag) {
         this.context = context;
         this.imData = imData;
+        this.updataFlag = updataFlag;
     }
 
     //  点击事件
@@ -78,6 +79,40 @@ public class AddContactImAdapter extends RecyclerView.Adapter<AddContactImAdapte
     @Override
     public void onBindViewHolder(NumberViewHolder holder, int position) {
         holder.im.setText(imData.get(position).getIm());
+        if(updataFlag) {
+            int spinnerIndex  = 0;
+
+            switch (imData.get(position).getImType()) {
+                case "MSN":
+                    spinnerIndex = 0;
+                    break;
+                case "雅虎":
+                    spinnerIndex = 1;
+                    break;
+                case "Skype":
+                    spinnerIndex = 2;
+                    break;
+                case "QQ":
+                    spinnerIndex = 3;
+                    break;
+                case "环聊":
+                    spinnerIndex = 4;
+                    break;
+                case "ICQ":
+                    spinnerIndex = 5;
+                    break;
+                case "Jabber":
+                    spinnerIndex = 6;
+                    break;
+                case "Windows Live":
+                    spinnerIndex = 7;
+                    break;
+                default:
+                    spinnerIndex = 0;
+                    break;
+            }
+            holder.spinner.setSelection(spinnerIndex);
+        }
     }
 
     @Override
@@ -86,7 +121,7 @@ public class AddContactImAdapter extends RecyclerView.Adapter<AddContactImAdapte
     }
 
     public void addImData(int position) {
-        imData.add(position,new AddContactImData());
+        imData.add(position,new ImData());
         notifyItemInserted(position);
     }
 

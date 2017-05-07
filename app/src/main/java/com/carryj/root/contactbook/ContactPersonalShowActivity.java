@@ -11,6 +11,7 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -25,7 +26,6 @@ import com.carryj.root.contactbook.data.ContactListViewItemData;
 import com.carryj.root.contactbook.data.EmailData;
 import com.carryj.root.contactbook.data.ImData;
 import com.carryj.root.contactbook.data.PhoneNumberData;
-import com.carryj.root.contactbook.fragments.ContactBookFragement;
 import com.carryj.root.contactbook.tools.GetStrEmailType;
 import com.carryj.root.contactbook.tools.GetStrImType;
 import com.carryj.root.contactbook.tools.GetStrPhoneType;
@@ -42,6 +42,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     public static final String FROM_CONTACT_BOOK_FRAGMENT = "FROM_CONTACT_BOOK_FRAGMENT";
     public static final String NAME = "NAME";
     public static final String LOOKUP = "LOOKUP";
+    private static final String FROM_CONTACT_PERSONAL_SHOW_ACTIVITY_EDIT = "FROM_CONTACT_PERSONAL_SHOW_ACTIVITY_EDIT";
 
     private ContactListViewItemData data;
 
@@ -49,6 +50,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     private String lookUp;
     private String name;
     private String remark;
+    private String company = "";
 
     private String backStr;
 
@@ -138,7 +140,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                 //得到email
                 int type = emailCursor.getInt(0);
                 String email = emailCursor.getString(1);
-                String emailType = new GetStrEmailType().getStrPhoneType(type);
+                String emailType = new GetStrEmailType().getStrEmailType(type);
                 emailData.setEmailType(emailType);
                 emailData.setEmail(email);
 
@@ -150,7 +152,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
 
         //获取IM
         Cursor imCursor = resolver.query(ContactsContract.Data.CONTENT_URI,
-                new String[]{CommonDataKinds.Im.TYPE, CommonDataKinds.Im.DATA},
+                new String[]{CommonDataKinds.Im.PROTOCOL, CommonDataKinds.Im.DATA},
                 ContactsContract.Data.LOOKUP_KEY + "=? AND "+ ContactsContract.Data.MIMETYPE+"=?",
                 new String[]{lookUp, CommonDataKinds.Im.CONTENT_ITEM_TYPE}, null);
 
@@ -160,7 +162,9 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                 //得到email
                 int type = imCursor.getInt(0);
                 String im = imCursor.getString(1);
-                String imType = new GetStrImType().getStrPhoneType(type);
+                Log.d("type = ", type+"");
+                String imType = new GetStrImType().getStrImType(type);
+                Log.d("imType = ",imType);
                 imData.setImType(imType);
                 imData.setIm(im);
                 imDatas.add(imData);
@@ -365,6 +369,18 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                 this.finish();
                 break;
             case R.id.tv_contact_personal_show_edit:
+                Intent intent = new Intent(ContactPersonalShowActivity.this.getApplicationContext(),
+                        AddContactActivity.class);
+                intent.putExtra(SELECTOR, FROM_CONTACT_PERSONAL_SHOW_ACTIVITY_EDIT);
+                intent.putExtra("NAME",name);
+                intent.putExtra("COMPANY",company);
+                intent.putExtra("LOOKUP",lookUp);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("NUMBERDATA", numberDatas);
+                bundle.putSerializable("EMAILDATA", emailDatas);
+                bundle.putSerializable("IMDATA", imDatas);
+                intent.putExtras(bundle);
+                startActivity(intent);
                 break;
             default:
                 break;

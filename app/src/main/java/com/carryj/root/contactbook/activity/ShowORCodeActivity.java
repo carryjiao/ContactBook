@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Im;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
@@ -21,6 +22,7 @@ import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.carryj.root.contactbook.R;
@@ -40,6 +42,7 @@ public class ShowORCodeActivity extends SweepBackActivity {
     private Handler handler;
 
     private LinearLayout ll_show_orcode_back;
+    private TextView tv_show_orcode_share;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +105,7 @@ public class ShowORCodeActivity extends SweepBackActivity {
     protected void initView() {
 
         ll_show_orcode_back = (LinearLayout) findViewById(R.id.ll_show_orcode_back);
+        tv_show_orcode_share = (TextView) findViewById(R.id.tv_show_orcode_share);
         handler = new Handler() {
             public void handleMessage(Message msg) {
 
@@ -115,6 +119,7 @@ public class ShowORCodeActivity extends SweepBackActivity {
     @Override
     protected void initEvents() {
         ll_show_orcode_back.setOnClickListener(this);
+        tv_show_orcode_share.setOnClickListener(this);
 
     }
 
@@ -125,6 +130,45 @@ public class ShowORCodeActivity extends SweepBackActivity {
             case R.id.ll_show_orcode_back:
                 this.finish();
                 break;
+            case R.id.tv_show_orcode_share:
+               /* getContentResolver().delete(Data.CONTENT_URI,
+                        Data._ID+"=?",new String[]{441+""});
+                getContentResolver().delete(Data.CONTENT_URI,
+                        Data._ID+"=?",new String[]{442+""});
+                getContentResolver().delete(Data.CONTENT_URI,
+                        Data._ID+"=?",new String[]{443+""});
+                getContentResolver().delete(Data.CONTENT_URI,
+                        Data._ID+"=?",new String[]{444+""});
+                getContentResolver().delete(Data.CONTENT_URI,
+                        Data._ID+"=?",new String[]{445+""});
+                getContentResolver().delete(Data.CONTENT_URI,
+                        Data._ID+"=?",new String[]{446+""});
+                getContentResolver().delete(Data.CONTENT_URI,
+                        Data._ID+"=?",new String[]{447+""});
+                getContentResolver().delete(Data.CONTENT_URI,
+                        Data._ID+"=?",new String[]{448+""});
+                getContentResolver().delete(Data.CONTENT_URI,
+                        Data._ID+"=?",new String[]{449+""});
+                getContentResolver().delete(Data.CONTENT_URI,
+                        Data._ID+"=?",new String[]{450+""});
+                getContentResolver().delete(Data.CONTENT_URI,
+                        Data._ID+"=?",new String[]{459+""});
+                getContentResolver().delete(Data.CONTENT_URI,
+                        Data._ID+"=?",new String[]{460+""});
+                getContentResolver().delete(Data.CONTENT_URI,
+                        Data._ID+"=?",new String[]{461+""});
+                getContentResolver().delete(Data.CONTENT_URI,
+                        Data._ID+"=?",new String[]{462+""});
+                getContentResolver().delete(Data.CONTENT_URI,
+                        Data._ID+"=?",new String[]{463+""});
+                getContentResolver().delete(Data.CONTENT_URI,
+                        Data._ID+"=?",new String[]{464+""});
+                getContentResolver().delete(Data.CONTENT_URI,
+                        Data._ID+"=?",new String[]{465+""});
+                getContentResolver().delete(Data.CONTENT_URI,
+                        Data._ID+"=?",new String[]{466+""});
+
+                Toast.makeText(this, "删除成功", Toast.LENGTH_SHORT).show();*/
             default:
                 break;
         }

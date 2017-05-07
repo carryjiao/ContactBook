@@ -2,8 +2,10 @@ package com.carryj.root.contactbook;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
@@ -24,9 +26,9 @@ import android.widget.Toast;
 import com.carryj.root.contactbook.adapter.AddContactEmailAdapter;
 import com.carryj.root.contactbook.adapter.AddContactImAdapter;
 import com.carryj.root.contactbook.adapter.AddContactNumberAdapter;
-import com.carryj.root.contactbook.data.AddContactEmailData;
-import com.carryj.root.contactbook.data.AddContactImData;
-import com.carryj.root.contactbook.data.AddContactNumberData;
+import com.carryj.root.contactbook.data.EmailData;
+import com.carryj.root.contactbook.data.ImData;
+import com.carryj.root.contactbook.data.PhoneNumberData;
 import com.carryj.root.contactbook.ui.DividerItemDecoration;
 
 import java.util.ArrayList;
@@ -38,8 +40,14 @@ public class AddContactActivity extends SweepBackActivity {
     private static final String FROM_CONTACT_BOOK_FRAGEMENT_ADD = "FROM_CONTACT_BOOK_FRAGEMENT_ADD";
     private static final String FROM_DIAL_FRAGEMENT_ADD = "FROM_DIAL_FRAGEMENT_ADD";
     private static final String FROM_RECORD_ITEM_IN_DETAIL_ACTIVITY_NEW = "FROM_RECORD_ITEM_IN_DETAIL_ACTIVITY_NEW";
+    private static final String FROM_CONTACT_PERSONAL_SHOW_ACTIVITY_EDIT = "FROM_CONTACT_PERSONAL_SHOW_ACTIVITY_EDIT";
 
+    private String lookUp;
     private String phoneNumber;
+    private String name;
+    private String company;
+
+    private long rawContactId;
 
     private TextView tv_add_contact_done;
     private TextView tv_add_contact_back_str;
@@ -59,14 +67,18 @@ public class AddContactActivity extends SweepBackActivity {
     private LinearLayout ll_add_contact_email_add;
     private LinearLayout ll_add_contact_im_add;
 
-    private  ArrayList<AddContactNumberData> myNumberData = new ArrayList<AddContactNumberData>();
-    private ArrayList<AddContactEmailData> myEmailData = new ArrayList<AddContactEmailData>();
-    private ArrayList<AddContactImData> myImData = new ArrayList<AddContactImData>();
+    private  ArrayList<PhoneNumberData> myNumberData = new ArrayList<PhoneNumberData>();
+    private ArrayList<EmailData> myEmailData = new ArrayList<EmailData>();
+    private ArrayList<ImData> myImData = new ArrayList<ImData>();
 
     private AddContactNumberAdapter numberAdapter;
     private AddContactEmailAdapter emailAdapter;
     private AddContactImAdapter imAdapter;
 
+    private boolean insertFlag = false;
+    private boolean updataFlag = false;
+
+    private ContentValues values;
 
 
 
@@ -81,19 +93,45 @@ public class AddContactActivity extends SweepBackActivity {
 
         SELECTOR = getIntent().getStringExtra("SELECTOR");
         if(SELECTOR.equals(FROM_CONTACT_BOOK_FRAGEMENT_ADD)){
-            phoneNumber = "";
+            insertFlag = true;
+            updataFlag = false;
+
         }else if(SELECTOR.equals(FROM_DIAL_FRAGEMENT_ADD) ||SELECTOR.equals(FROM_RECORD_ITEM_IN_DETAIL_ACTIVITY_NEW)) {
+            insertFlag = true;
+            updataFlag = false;
             phoneNumber = getIntent().getStringExtra("NUMBER");
-            AddContactNumberData numberItemData = new AddContactNumberData();
-            numberItemData.setPhoneNumber(phoneNumber);
+            PhoneNumberData numberItemData = new PhoneNumberData();
+            numberItemData.setNumber(phoneNumber);
             myNumberData.add(numberItemData);
-        }else {
-            phoneNumber = "";
+        }else if(SELECTOR.equals(FROM_CONTACT_PERSONAL_SHOW_ACTIVITY_EDIT)) {
+            insertFlag = false;
+            updataFlag = true;
+            name = getIntent().getStringExtra("NAME");
+            company = getIntent().getStringExtra("COMPANY");
+            lookUp = getIntent().getStringExtra("LOOKUP");
+            myNumberData = (ArrayList<PhoneNumberData>) getIntent().getSerializableExtra("NUMBERDATA");
+            myEmailData = (ArrayList<EmailData>) getIntent().getSerializableExtra("EMAILDATA");
+            myImData = (ArrayList<ImData>) getIntent().getSerializableExtra("IMDATA");
         }
 
+        values = new ContentValues();
 
+        if(insertFlag) {
+            // 下面的操作会根据RawContacts表中已有的rawContactId使用情况自动生成新联系人的rawContactId
+            Uri rawContactUri = getContentResolver().insert(RawContacts.CONTENT_URI, values);
+            rawContactId = ContentUris.parseId(rawContactUri);
 
-
+        }else if(updataFlag) {//查询需要修改的联系人的rawContactId
+            Cursor cursor = getContentResolver().query(Data.CONTENT_URI,
+                    new String[]{Data.RAW_CONTACT_ID},
+                    Data.LOOKUP_KEY+"=?", new String[]{lookUp}, null);
+            if(cursor!=null) {
+                while (cursor.moveToNext()) {
+                    rawContactId = cursor.getLong(0);
+                }
+                cursor.close();
+            }
+        }
 
     }
 
@@ -126,23 +164,29 @@ public class AddContactActivity extends SweepBackActivity {
             tv_add_contact_back_str.setText("通话记录");
         }
 
+        /*个人信息模块*/
+        if(updataFlag) {
+            et_add_contact_surname.setText(name);
+            et_add_contact_company.setText(company);
+        }
+
 
         /*电话号码模块*/
-        numberAdapter = new AddContactNumberAdapter(this, myNumberData);
+        numberAdapter = new AddContactNumberAdapter(this, myNumberData, updataFlag);
         add_contact_number_recyclerview.setLayoutManager(new LinearLayoutManager(this));
         add_contact_number_recyclerview.setAdapter(numberAdapter);
         add_contact_number_recyclerview.addItemDecoration(new DividerItemDecoration(this,
                 DividerItemDecoration.VERTICAL_LIST));
 
         /*电子邮箱模块*/
-        emailAdapter = new AddContactEmailAdapter(this, myEmailData);
+        emailAdapter = new AddContactEmailAdapter(this, myEmailData,updataFlag);
         add_contact_email_recyclerview.setLayoutManager(new LinearLayoutManager(this));
         add_contact_email_recyclerview.setAdapter(emailAdapter);
         add_contact_email_recyclerview.addItemDecoration(new DividerItemDecoration(this,
                 DividerItemDecoration.VERTICAL_LIST));
 
         /*及时通信模块*/
-        imAdapter = new AddContactImAdapter(this, myImData);
+        imAdapter = new AddContactImAdapter(this, myImData,updataFlag);
         add_contact_im_recyclerview.setLayoutManager(new LinearLayoutManager(this));
         add_contact_im_recyclerview.setAdapter(imAdapter);
         add_contact_im_recyclerview.addItemDecoration(new DividerItemDecoration(this,
@@ -177,7 +221,7 @@ public class AddContactActivity extends SweepBackActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id, int listposition) {
                 int type = position+1;
-                myNumberData.get(listposition).setPhoneNumberType(type+"");//设置电话号码类型
+                myNumberData.get(listposition).setNumberType(type+"");//设置电话号码类型
             }
 
             @Override
@@ -195,12 +239,12 @@ public class AddContactActivity extends SweepBackActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count, int listposition) {
-                //myNumberData.get(listposition).setPhoneNumber(s.toString());//设置电话号码
+
             }
 
             @Override
             public void afterTextChanged(Editable s, int listposition) {
-                myNumberData.get(listposition).setPhoneNumber(s.toString());//设置电话号码
+                myNumberData.get(listposition).setNumber(s.toString());//设置电话号码
             }
         });
 
@@ -237,7 +281,7 @@ public class AddContactActivity extends SweepBackActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count, int listposition) {
-                //myNumberData.get(listposition).setPhoneNumber(s.toString());//设置电话号码
+
             }
 
             @Override
@@ -255,7 +299,7 @@ public class AddContactActivity extends SweepBackActivity {
             }
         });
 
-        //电子邮箱类型监听器
+        //即时通信类型监听器
         imAdapter.setOnItemSpinnerListener(new AddContactImAdapter.OnItemSpinnerListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id, int listposition) {
@@ -269,7 +313,7 @@ public class AddContactActivity extends SweepBackActivity {
             }
         });
 
-        //电子邮箱号码监听器
+        //即时通信号码监听器
         imAdapter.myAddTextChangeListener(new AddContactImAdapter.TextChangeListener() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after, int listposition) {
@@ -278,7 +322,7 @@ public class AddContactActivity extends SweepBackActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count, int listposition) {
-                //myNumberData.get(listposition).setPhoneNumber(s.toString());//设置电话号码
+
             }
 
             @Override
@@ -301,8 +345,15 @@ public class AddContactActivity extends SweepBackActivity {
                 sb.append(et_add_contact_surname.getText().toString());
                 sb.append(et_add_contact_given_name.getText().toString());
                 String name = sb.toString();
-                insert(name, myNumberData, myEmailData, myImData);
-                Toast.makeText(this,"添加成功",Toast.LENGTH_SHORT).show();
+                if(insertFlag){
+                    insert(name, myNumberData, myEmailData, myImData);
+                    Toast.makeText(this,"添加成功",Toast.LENGTH_SHORT).show();
+                }
+                if(updataFlag){
+                    updata(name, myNumberData, myEmailData, myImData);
+                    Toast.makeText(this,"修改成功",Toast.LENGTH_SHORT).show();
+                }
+
                 this.finish();
                 break;
             case R.id.ll_add_contact_number_add:
@@ -320,17 +371,12 @@ public class AddContactActivity extends SweepBackActivity {
 
     }
 
-    private boolean insert(String name, ArrayList<AddContactNumberData> numberDatas,
-                           ArrayList<AddContactEmailData> emailDatas,
-                           ArrayList<AddContactImData> imDatas) {
+    private boolean insert(String name, ArrayList<PhoneNumberData> numberDatas,
+                           ArrayList<EmailData> emailDatas,
+                           ArrayList<ImData> imDatas) {
 
         try
         {
-            ContentValues values = new ContentValues();
-
-            // 下面的操作会根据RawContacts表中已有的rawContactId使用情况自动生成新联系人的rawContactId
-            Uri rawContactUri = getContentResolver().insert(RawContacts.CONTENT_URI, values);
-            long rawContactId = ContentUris.parseId(rawContactUri);
 
             // 向data表插入姓名数据
             if (name.length()>0)
@@ -343,17 +389,17 @@ public class AddContactActivity extends SweepBackActivity {
             }
 
             // 向data表插入电话数据
-            for(AddContactNumberData numberItemData:numberDatas) {
+            for(PhoneNumberData numberItemData:numberDatas) {
                 values.clear();
                 values.put(Data.RAW_CONTACT_ID, rawContactId);
                 values.put(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE);
-                values.put(Phone.NUMBER, numberItemData.getPhoneNumber());
-                values.put(Phone.TYPE, numberItemData.getPhoneNumberType());
+                values.put(Phone.NUMBER, numberItemData.getNumber());
+                values.put(Phone.TYPE, numberItemData.getNumberType());
                 getContentResolver().insert(Data.CONTENT_URI, values);
             }
 
             // 向data表插入Email数据
-            for(AddContactEmailData emailItemData:emailDatas) {
+            for(EmailData emailItemData:emailDatas) {
                 values.clear();
                 values.put(Data.RAW_CONTACT_ID, rawContactId);
                 values.put(Data.MIMETYPE, Email.CONTENT_ITEM_TYPE);
@@ -365,7 +411,7 @@ public class AddContactActivity extends SweepBackActivity {
             }
 
             // 向data表插入QQ数据
-            for(AddContactImData imItemData:imDatas) {
+            for(ImData imItemData:imDatas) {
                 values.clear();
                 values.put(Data.RAW_CONTACT_ID, rawContactId);
                 values.put(Data.MIMETYPE, Im.CONTENT_ITEM_TYPE);
@@ -383,6 +429,25 @@ public class AddContactActivity extends SweepBackActivity {
 
         return true;
 
+    }
+
+    private boolean updata(String name, ArrayList<PhoneNumberData> numberDatas,
+                           ArrayList<EmailData> emailDatas,
+                           ArrayList<ImData> imDatas) {
+
+        try {
+            //先删除后插入
+            getContentResolver().delete(Data.CONTENT_URI,
+                    Data.RAW_CONTACT_ID+"=?",new String[]{rawContactId+""});
+
+            getContentResolver().insert(RawContacts.CONTENT_URI, values);
+
+            insert(name,numberDatas,emailDatas,imDatas);
+
+        }catch (Exception e){
+            return false;
+        }
+        return true;
     }
 
 

@@ -166,6 +166,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
                                 //*************************************************************************************************************
 
                             }
+                            cursor.close();
                         }
 
                         allContactData = getPhoneContacts();

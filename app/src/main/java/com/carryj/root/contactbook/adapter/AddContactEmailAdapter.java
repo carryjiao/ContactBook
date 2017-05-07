@@ -13,8 +13,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.carryj.root.contactbook.R;
-import com.carryj.root.contactbook.data.AddContactEmailData;
-import com.carryj.root.contactbook.data.AddContactNumberData;
+import com.carryj.root.contactbook.data.EmailData;
 
 import java.util.ArrayList;
 
@@ -27,15 +26,17 @@ public class AddContactEmailAdapter extends RecyclerView.Adapter<AddContactEmail
 
 
     private Context context;
-    private ArrayList<AddContactEmailData> emailData;
+    private ArrayList<EmailData> emailData;
     private OnItemListener listener;
     private OnItemSpinnerListener spinnerListener;
     private TextChangeListener textChangeListener;
+    private boolean updataFlag = false;
 
 
-    public AddContactEmailAdapter(Context context, ArrayList<AddContactEmailData> emailData) {
+    public AddContactEmailAdapter(Context context, ArrayList<EmailData> emailData, boolean updataFlag) {
         this.context = context;
         this.emailData = emailData;
+        this.updataFlag = updataFlag;
     }
 
     //  点击事件
@@ -78,6 +79,28 @@ public class AddContactEmailAdapter extends RecyclerView.Adapter<AddContactEmail
     @Override
     public void onBindViewHolder(NumberViewHolder holder, int position) {
         holder.email.setText(emailData.get(position).getEmail());
+        if(updataFlag) {
+            int spinnerIndex  = 0;
+
+            switch (emailData.get(position).getEmailType()) {
+                case "个人":
+                    spinnerIndex = 0;
+                    break;
+                case "工作":
+                    spinnerIndex = 1;
+                    break;
+                case "其他":
+                    spinnerIndex = 2;
+                    break;
+                case "手机":
+                    spinnerIndex = 3;
+                    break;
+                default:
+                    spinnerIndex = 0;
+                    break;
+            }
+            holder.spinner.setSelection(spinnerIndex);
+        }
     }
 
     @Override
@@ -86,7 +109,7 @@ public class AddContactEmailAdapter extends RecyclerView.Adapter<AddContactEmail
     }
 
     public void addEmailData(int position) {
-        emailData.add(position,new AddContactEmailData());
+        emailData.add(position,new EmailData());
         notifyItemInserted(position);
     }
 

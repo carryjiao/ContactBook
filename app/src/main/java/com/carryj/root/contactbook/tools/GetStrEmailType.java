@@ -14,7 +14,7 @@ public class GetStrEmailType {
 
     }
 
-    public String getStrPhoneType(int emailType) {
+    public String getStrEmailType(int emailType) {
 
         switch (emailType) {
 

@@ -14,7 +14,7 @@ public class GetStrImType {
 
     }
 
-    public String getStrPhoneType(int imType) {
+    public String getStrImType(int imType) {
 
         switch (imType) {
 

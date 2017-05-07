@@ -127,8 +127,7 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv_contact_personal_show_number"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/contact_personal_show_margin_left">
+                android:layout_height="wrap_content">
 
             </android.support.v7.widget.RecyclerView>
 
