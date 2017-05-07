@@ -53,7 +53,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     private String lookUp;
     private String name;
     private String remark;
-    private String company = "";
+    private String company;
 
     private String backStr;
 
@@ -61,11 +61,13 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     private LinearLayout ll_contact_personal_show_email_block;
     private LinearLayout ll_contact_personal_show_im_block;
     private LinearLayout ll_contact_personal_show_remark_block;
+    private LinearLayout ll_contact_personal_show_company_block;
 
     private TextView tv_back_str;
     private TextView tv_contact_personal_show_edit;
     private TextView tv_contact_personal_show_name;
     private TextView tv_contact_personal_show_remark;
+    private TextView tv_contact_personal_show_company;
 
     private ImageView im_contact_personal_show_icon;
 
@@ -190,6 +192,18 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
             remarkCursor.close();
         }
 
+        //获取公司
+        Cursor companyCursor = resolver.query(ContactsContract.Data.CONTENT_URI, null,
+                ContactsContract.Data.LOOKUP_KEY + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?",
+                new String[]{lookUp, CommonDataKinds.Organization.CONTENT_ITEM_TYPE}, null);
+        if(companyCursor != null) {
+            while (companyCursor.moveToNext()) {
+
+                company = companyCursor.getString(companyCursor.getColumnIndex(CommonDataKinds.Organization.COMPANY));
+            }
+            companyCursor.close();
+        }
+
     }
 
     @Override
@@ -210,6 +224,9 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
 
         ll_contact_personal_show_remark_block = (LinearLayout) findViewById(R.id.ll_contact_personal_show_remark_block);
         tv_contact_personal_show_remark = (TextView) findViewById(R.id.tv_contact_personal_show_remark);
+
+        ll_contact_personal_show_company_block = (LinearLayout) findViewById(R.id.ll_contact_personal_show_company_block);
+        tv_contact_personal_show_company = (TextView) findViewById(R.id.tv_contact_personal_show_company);
 
         tv_back_str.setText(backStr);
         tv_contact_personal_show_name.setText(name);
@@ -256,6 +273,10 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
             tv_contact_personal_show_remark.setText(remark);
 
 
+        if(company == null)
+            ll_contact_personal_show_company_block.setVisibility(View.GONE);
+        else
+            tv_contact_personal_show_company.setText(company);
 
     }
 
@@ -399,6 +420,20 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
             name = data.getStringExtra("NAME");
             tv_contact_personal_show_name.setText(name);
 
+            remark = data.getStringExtra("REMARK");
+            if(remark != null) {
+                ll_contact_personal_show_remark_block.setVisibility(View.VISIBLE);
+                tv_contact_personal_show_remark.setText(remark);
+            }
+
+            company = data.getStringExtra("COMPANY");
+            if(company != null) {
+                ll_contact_personal_show_company_block.setVisibility(View.VISIBLE);
+                tv_contact_personal_show_company.setText(company);
+            }
+
+
+
             ArrayList<PhoneNumberData> resultNumberDatas = (ArrayList<PhoneNumberData>) data.getSerializableExtra("NUMBER");
             ArrayList<EmailData> resultEmailDatas = (ArrayList<EmailData>) data.getSerializableExtra("EMAIL");
             ArrayList<ImData> resultImDatas = (ArrayList<ImData>) data.getSerializableExtra("IM");
@@ -409,16 +444,25 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                 String strType = new GetStrPhoneType().getStrPhoneType(intType);
                 resultNumberData.setNumberType(strType);
             }
-            for (EmailData resultEmailData:resultEmailDatas){
-                int intType = Integer.parseInt(resultEmailData.getEmailType());
-                String strType = new GetStrEmailType().getStrEmailType(intType);
-                resultEmailData.setEmailType(strType);
+
+            if(resultEmailDatas != null) {
+                ll_contact_personal_show_email_block.setVisibility(View.VISIBLE);
+                for (EmailData resultEmailData:resultEmailDatas){
+                    int intType = Integer.parseInt(resultEmailData.getEmailType());
+                    String strType = new GetStrEmailType().getStrEmailType(intType);
+                    resultEmailData.setEmailType(strType);
+                }
             }
-            for (ImData resultImData:resultImDatas){
-                int intType = Integer.parseInt(resultImData.getImType());
-                String strType = new GetStrImType().getStrImType(intType);
-                resultImData.setImType(strType);
+
+            if (resultImDatas != null) {
+                ll_contact_personal_show_im_block.setVisibility(View.VISIBLE);
+                for (ImData resultImData:resultImDatas){
+                    int intType = Integer.parseInt(resultImData.getImType());
+                    String strType = new GetStrImType().getStrImType(intType);
+                    resultImData.setImType(strType);
+                }
             }
+
             numberDatas.clear();
             emailDatas.clear();
             imDatas.clear();

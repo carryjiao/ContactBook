@@ -60,7 +60,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <!--姓名模块-->
@@ -144,7 +144,7 @@
             <LinearLayout
                 android:id="@+id/add_contact_number_block"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -205,7 +205,7 @@
             <LinearLayout
                 android:id="@+id/add_contact_email_block"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -266,7 +266,7 @@
             <LinearLayout
                 android:id="@+id/add_contact_im_block"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -324,6 +324,40 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/ll_add_contact_remark_block"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+                    android:gravity="center_vertical"
+                    android:background="@color/colorTitleBGGray">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/contact_personal_show_margin_left"
+                        android:text="备注"
+                        android:textSize="10sp"
+                        android:typeface="monospace"
+                        android:textColor="@color/colorCharBGGray"/>
+
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/et_add_contact_remark"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/add_contact_margin_left"
+                    android:layout_marginRight="@dimen/add_contact_margin_left"
+                    android:textSize="@dimen/add_contact_text_size"
+                    android:textColor="@color/colorBlack"/>
+
+
+            </LinearLayout>
 
 
         </LinearLayout>

@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract.RawContacts;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
+import android.provider.ContactsContract.CommonDataKinds.Organization;
+import android.provider.ContactsContract.CommonDataKinds.Note;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Im;
@@ -15,6 +17,7 @@ import android.provider.ContactsContract.Data;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -49,6 +52,7 @@ public class AddContactActivity extends SweepBackActivity {
     private String phoneNumber;
     private String name;
     private String company;
+    private String remark;
 
     private long rawContactId;
 
@@ -60,6 +64,7 @@ public class AddContactActivity extends SweepBackActivity {
     private EditText et_add_contact_surname;
     private EditText et_add_contact_given_name;
     private EditText et_add_contact_company;
+    private EditText et_add_contact_remark;
 
     private RecyclerView add_contact_number_recyclerview;
     private RecyclerView add_contact_email_recyclerview;
@@ -150,6 +155,7 @@ public class AddContactActivity extends SweepBackActivity {
         et_add_contact_surname = (EditText) findViewById(R.id.et_add_contact_surname);
         et_add_contact_given_name = (EditText) findViewById(R.id.et_add_contact_given_name);
         et_add_contact_company = (EditText) findViewById(R.id.et_add_contact_company);
+        et_add_contact_remark = (EditText) findViewById(R.id.et_add_contact_remark);
 
         add_contact_number_recyclerview = (RecyclerView) findViewById(R.id.add_contact_number_recyclerview);
         ll_add_contact_number_add = (LinearLayout) findViewById(R.id.ll_add_contact_number_add);
@@ -333,6 +339,23 @@ public class AddContactActivity extends SweepBackActivity {
                 myImData.get(listposition).setIm(s.toString());//设置电子邮箱号
             }
         });
+
+        et_add_contact_remark.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                remark = s.toString();
+            }
+        });
     }
 
     @Override
@@ -347,13 +370,21 @@ public class AddContactActivity extends SweepBackActivity {
                 StringBuilder sb = new StringBuilder();
                 sb.append(et_add_contact_surname.getText().toString());
                 sb.append(et_add_contact_given_name.getText().toString());
-                String name = sb.toString();
+                name = sb.toString();
+
+                //获取备注
+                remark = et_add_contact_remark.getText().toString();
+
+                //获取公司名称
+                company = et_add_contact_company.getText().toString();
+
+
                 if(insertFlag){
-                    insert(name, myNumberData, myEmailData, myImData);
+                    insert(name, company, myNumberData, myEmailData, myImData, remark);
                     Toast.makeText(this,"添加成功",Toast.LENGTH_SHORT).show();
                 }
                 if(updataFlag){
-                    updata(name, myNumberData, myEmailData, myImData);
+                    updata(name, company, myNumberData, myEmailData, myImData, remark);
                     Toast.makeText(this,"修改成功",Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent();
                     Bundle bundle = new Bundle();
@@ -362,6 +393,8 @@ public class AddContactActivity extends SweepBackActivity {
                     bundle.putSerializable("IM",myImData);
                     intent.putExtras(bundle);
                     intent.putExtra("NAME",name);
+                    intent.putExtra("COMPANY",company);
+                    intent.putExtra("REMARK",remark);
                     this.setResult(RESULT_CODE,intent);
                 }
 
@@ -382,9 +415,8 @@ public class AddContactActivity extends SweepBackActivity {
 
     }
 
-    private boolean insert(String name, ArrayList<PhoneNumberData> numberDatas,
-                           ArrayList<EmailData> emailDatas,
-                           ArrayList<ImData> imDatas) {
+    private boolean insert(String name, String company, ArrayList<PhoneNumberData> numberDatas,
+                           ArrayList<EmailData> emailDatas, ArrayList<ImData> imDatas, String remark) {
 
         try
         {
@@ -396,6 +428,16 @@ public class AddContactActivity extends SweepBackActivity {
                 values.put(Data.RAW_CONTACT_ID, rawContactId);
                 values.put(Data.MIMETYPE, StructuredName.CONTENT_ITEM_TYPE);
                 values.put(StructuredName.GIVEN_NAME, name);
+                getContentResolver().insert(Data.CONTENT_URI, values);
+            }
+
+            // 向data表插入公司数据
+            if (company.length()>0)
+            {
+                values.clear();
+                values.put(Data.RAW_CONTACT_ID, rawContactId);
+                values.put(Data.MIMETYPE, Organization.CONTENT_ITEM_TYPE);
+                values.put(Organization.COMPANY, company);
                 getContentResolver().insert(Data.CONTENT_URI, values);
             }
 
@@ -431,6 +473,16 @@ public class AddContactActivity extends SweepBackActivity {
                 getContentResolver().insert(Data.CONTENT_URI, values);
             }
 
+            // 向data表插入备注数据
+            if (remark.length()>0)
+            {
+                values.clear();
+                values.put(Data.RAW_CONTACT_ID, rawContactId);
+                values.put(Data.MIMETYPE, Note.CONTENT_ITEM_TYPE);
+                values.put(Note.NOTE, remark);
+                getContentResolver().insert(Data.CONTENT_URI, values);
+            }
+
         }
 
         catch (Exception e)
@@ -442,9 +494,9 @@ public class AddContactActivity extends SweepBackActivity {
 
     }
 
-    private boolean updata(String name, ArrayList<PhoneNumberData> numberDatas,
+    private boolean updata(String name, String company, ArrayList<PhoneNumberData> numberDatas,
                            ArrayList<EmailData> emailDatas,
-                           ArrayList<ImData> imDatas) {
+                           ArrayList<ImData> imDatas, String remark) {
 
         try {
             //先删除后插入
@@ -453,7 +505,7 @@ public class AddContactActivity extends SweepBackActivity {
 
             getContentResolver().insert(RawContacts.CONTENT_URI, values);
 
-            insert(name,numberDatas,emailDatas,imDatas);
+            insert(name,company,numberDatas,emailDatas,imDatas,remark);
 
         }catch (Exception e){
             return false;
