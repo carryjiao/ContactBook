@@ -10,6 +10,7 @@ public class PhoneNumberData implements Serializable {
 
     private String number;
     private String numberType;
+    private String _id;
 
     public PhoneNumberData(){
 
@@ -29,5 +30,13 @@ public class PhoneNumberData implements Serializable {
 
     public void setNumberType(String numberType) {
         this.numberType = numberType;
+    }
+
+    public String get_id() {
+        return _id;
+    }
+
+    public void set_id(String _id) {
+        this._id = _id;
     }
 }

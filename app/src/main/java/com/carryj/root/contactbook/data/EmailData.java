@@ -10,6 +10,7 @@ public class EmailData implements Serializable {
 
     private String email;
     private String emailType;
+    private String _id;
 
     public EmailData(){
 
@@ -29,5 +30,13 @@ public class EmailData implements Serializable {
 
     public void setEmailType(String emailType) {
         this.emailType = emailType;
+    }
+
+    public String get_id() {
+        return _id;
+    }
+
+    public void set_id(String _id) {
+        this._id = _id;
     }
 }

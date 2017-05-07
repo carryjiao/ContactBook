@@ -181,11 +181,8 @@ public class AddContactNumberAdapter extends RecyclerView.Adapter<AddContactNumb
     }
 
     public void addNumberData(int position) {
-        Log.d("addNumberData--- ","numberData add before");
         numberData.add(position,new PhoneNumberData());
-        Log.d("addNumberData--- ","numberData add after");
         notifyItemInserted(position);
-        Log.d("notifyItemInserted--- ","changed");
     }
 
     public void  deleteNumberData(int position) {

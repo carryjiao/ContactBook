@@ -18,6 +18,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -223,7 +224,16 @@ public class AddContactActivity extends SweepBackActivity {
         numberAdapter.setOnItemListener(new AddContactNumberAdapter.OnItemListener() {
             @Override
             public void onClick(int position) {
+                if(myNumberData != null && myNumberData.get(position) != null) {
+                    String strNumber = myNumberData.get(position).getNumber();
+                    if(strNumber != null && strNumber.length()>0) {
+                        String _id = myNumberData.get(position).get_id();
+                        getContentResolver().delete(Data.CONTENT_URI,
+                                Data._ID+"=?", new String[]{_id});
+                    }
+                }
                 numberAdapter.deleteNumberData(position);
+
             }
         });
 
@@ -265,7 +275,16 @@ public class AddContactActivity extends SweepBackActivity {
         emailAdapter.setOnItemListener(new AddContactEmailAdapter.OnItemListener() {
             @Override
             public void onClick(int position) {
+                if(myEmailData != null && myEmailData.get(position) != null) {
+                    String email = myEmailData.get(position).getEmail();
+                    if(email != null && email.length()>0) {
+                        String _id = myEmailData.get(position).get_id();
+                        getContentResolver().delete(Data.CONTENT_URI,
+                                Data._ID+"=?", new String[]{_id});
+                    }
+                }
                 emailAdapter.deleteEmailData(position);
+
             }
         });
 
@@ -306,7 +325,16 @@ public class AddContactActivity extends SweepBackActivity {
         imAdapter.setOnItemListener(new AddContactImAdapter.OnItemListener() {
             @Override
             public void onClick(int position) {
+                if(myImData != null && myImData.get(position) != null) {
+                    String im = myImData.get(position).getIm();
+                    if(im != null && im.length()>0) {
+                        String _id = myImData.get(position).get_id();
+                        getContentResolver().delete(Data.CONTENT_URI,
+                                Data._ID+"=?", new String[]{_id});
+                    }
+                }
                 imAdapter.deleteImData(position);
+
             }
         });
 
@@ -465,7 +493,7 @@ public class AddContactActivity extends SweepBackActivity {
 
             }
 
-            // 向data表插入QQ数据
+            // 向data表插入IM数据
             for(ImData imItemData:imDatas) {
                 values.clear();
                 values.put(Data.RAW_CONTACT_ID, rawContactId);
@@ -501,13 +529,81 @@ public class AddContactActivity extends SweepBackActivity {
                            ArrayList<ImData> imDatas, String remark) {
 
         try {
-            //先删除后插入
-            getContentResolver().delete(Data.CONTENT_URI,
-                    Data.RAW_CONTACT_ID+"=?",new String[]{rawContactId+""});
 
-            getContentResolver().insert(RawContacts.CONTENT_URI, values);
+            /*最新思路:每条记录都有一个ID,让每个data保存自己的ID*/
 
-            insert(name,company,numberDatas,emailDatas,imDatas,remark);
+            // 在data表中更新姓名数据
+            if (name.length()>0)
+            {
+                values.clear();
+                values.put(StructuredName.GIVEN_NAME, name);
+                getContentResolver().update(Data.CONTENT_URI, values,
+                        Data.RAW_CONTACT_ID+"=? AND "+Data.MIMETYPE+"=?",
+                        new String[]{rawContactId+"", StructuredName.CONTENT_ITEM_TYPE});
+            }else {
+                getContentResolver().delete(Data.CONTENT_URI,
+                        Data.RAW_CONTACT_ID+"=? AND "+Data.MIMETYPE+"=?",
+                        new String[]{rawContactId+"", StructuredName.CONTENT_ITEM_TYPE});
+            }
+
+            // 在data表中更新公司数据
+            if (company.length()>0)
+            {
+                values.clear();
+                values.put(Organization.COMPANY, company);
+                getContentResolver().update(Data.CONTENT_URI, values,
+                        Data.RAW_CONTACT_ID+"=? AND "+Data.MIMETYPE+"=?",
+                        new String[]{rawContactId+"", Organization.CONTENT_ITEM_TYPE});
+            }else {
+                getContentResolver().delete(Data.CONTENT_URI,
+                        Data.RAW_CONTACT_ID+"=? AND "+Data.MIMETYPE+"=?",
+                        new String[]{rawContactId+"", Organization.CONTENT_ITEM_TYPE});
+            }
+
+            // 在data表中更新备注数据
+            if (remark.length()>0)
+            {
+                values.clear();
+                values.put(Note.NOTE, remark);
+                getContentResolver().update(Data.CONTENT_URI, values,
+                        Data.RAW_CONTACT_ID+"=? AND "+Data.MIMETYPE+"=?",
+                        new String[]{rawContactId+"", Note.CONTENT_ITEM_TYPE});
+            }else {
+                getContentResolver().delete(Data.CONTENT_URI,
+                        Data.RAW_CONTACT_ID+"=? AND "+Data.MIMETYPE+"=?",
+                        new String[]{rawContactId+"", Note.CONTENT_ITEM_TYPE});
+            }
+
+
+            // 在data表中更新电话数据
+            for(PhoneNumberData numberItemData:numberDatas) {
+                values.clear();
+                values.put(Phone.NUMBER, numberItemData.getNumber());
+                values.put(Phone.TYPE, numberItemData.getNumberType());
+                getContentResolver().update(Data.CONTENT_URI, values,
+                        Data._ID+"=?", new String[]{numberItemData.get_id()});
+            }
+
+            // 在data表中更新Email数据
+            for(EmailData emailItemData:emailDatas) {
+                values.clear();
+                values.put(Email.DATA, emailItemData.getEmail());
+                values.put(Email.TYPE, emailItemData.getEmailType());
+                getContentResolver().update(Data.CONTENT_URI, values,
+                        Data._ID+"=?", new String[]{emailItemData.get_id()});
+
+
+            }
+
+            // 在data表中更新IM数据
+            for(ImData imItemData:imDatas) {
+                values.clear();
+                values.put(Im.DATA, imItemData.getIm());
+                values.put(Im.PROTOCOL, imItemData.getImType());
+                getContentResolver().update(Data.CONTENT_URI, values,
+                        Data._ID+"=?", new String[]{imItemData.get_id()});
+            }
+
 
         }catch (Exception e){
             return false;
