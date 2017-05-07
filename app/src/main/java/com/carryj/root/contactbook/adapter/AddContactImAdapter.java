@@ -81,35 +81,38 @@ public class AddContactImAdapter extends RecyclerView.Adapter<AddContactImAdapte
         holder.im.setText(imData.get(position).getIm());
         if(updataFlag) {
             int spinnerIndex  = 0;
-
-            switch (imData.get(position).getImType()) {
-                case "MSN":
-                    spinnerIndex = 0;
-                    break;
-                case "雅虎":
-                    spinnerIndex = 1;
-                    break;
-                case "Skype":
-                    spinnerIndex = 2;
-                    break;
-                case "QQ":
-                    spinnerIndex = 3;
-                    break;
-                case "环聊":
-                    spinnerIndex = 4;
-                    break;
-                case "ICQ":
-                    spinnerIndex = 5;
-                    break;
-                case "Jabber":
-                    spinnerIndex = 6;
-                    break;
-                case "Windows Live":
-                    spinnerIndex = 7;
-                    break;
-                default:
-                    spinnerIndex = 0;
-                    break;
+            if(imData.get(position).getImType()!=null) {
+                switch (imData.get(position).getImType()) {
+                    case "MSN":
+                        spinnerIndex = 0;
+                        break;
+                    case "雅虎":
+                        spinnerIndex = 1;
+                        break;
+                    case "Skype":
+                        spinnerIndex = 2;
+                        break;
+                    case "QQ":
+                        spinnerIndex = 3;
+                        break;
+                    case "环聊":
+                        spinnerIndex = 4;
+                        break;
+                    case "ICQ":
+                        spinnerIndex = 5;
+                        break;
+                    case "Jabber":
+                        spinnerIndex = 6;
+                        break;
+                    case "Windows Live":
+                        spinnerIndex = 7;
+                        break;
+                    default:
+                        spinnerIndex = 0;
+                        break;
+                }
+            }else {
+                spinnerIndex = 0;
             }
             holder.spinner.setSelection(spinnerIndex);
         }

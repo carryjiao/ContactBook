@@ -357,13 +357,13 @@ public class AddContactActivity extends SweepBackActivity {
                 this.finish();
                 break;
             case R.id.ll_add_contact_number_add:
-                numberAdapter.addNumberData(0);
+                numberAdapter.addNumberData(numberAdapter.getItemCount());
                 break;
             case R.id.ll_add_contact_email_add:
-                emailAdapter.addEmailData(0);
+                emailAdapter.addEmailData(emailAdapter.getItemCount());
                 break;
             case R.id.ll_add_contact_im_add:
-                imAdapter.addImData(0);
+                imAdapter.addImData(imAdapter.getItemCount());
                 break;
             default:
                 break;

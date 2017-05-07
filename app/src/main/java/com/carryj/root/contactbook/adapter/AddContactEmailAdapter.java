@@ -81,23 +81,26 @@ public class AddContactEmailAdapter extends RecyclerView.Adapter<AddContactEmail
         holder.email.setText(emailData.get(position).getEmail());
         if(updataFlag) {
             int spinnerIndex  = 0;
-
-            switch (emailData.get(position).getEmailType()) {
-                case "个人":
-                    spinnerIndex = 0;
-                    break;
-                case "工作":
-                    spinnerIndex = 1;
-                    break;
-                case "其他":
-                    spinnerIndex = 2;
-                    break;
-                case "手机":
-                    spinnerIndex = 3;
-                    break;
-                default:
-                    spinnerIndex = 0;
-                    break;
+            if(emailData.get(position).getEmailType()!=null) {
+                switch (emailData.get(position).getEmailType()) {
+                    case "个人":
+                        spinnerIndex = 0;
+                        break;
+                    case "工作":
+                        spinnerIndex = 1;
+                        break;
+                    case "其他":
+                        spinnerIndex = 2;
+                        break;
+                    case "手机":
+                        spinnerIndex = 3;
+                        break;
+                    default:
+                        spinnerIndex = 0;
+                        break;
+                }
+            }else {
+                spinnerIndex = 0;
             }
             holder.spinner.setSelection(spinnerIndex);
         }
