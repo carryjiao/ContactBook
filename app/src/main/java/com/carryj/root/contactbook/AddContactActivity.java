@@ -18,7 +18,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -126,22 +125,7 @@ public class AddContactActivity extends SweepBackActivity {
 
         values = new ContentValues();
 
-        if(insertFlag) {
-            // 下面的操作会根据RawContacts表中已有的rawContactId使用情况自动生成新联系人的rawContactId
-            Uri rawContactUri = getContentResolver().insert(RawContacts.CONTENT_URI, values);
-            rawContactId = ContentUris.parseId(rawContactUri);
 
-        }else if(updataFlag) {//查询需要修改的联系人的rawContactId
-            Cursor cursor = getContentResolver().query(Data.CONTENT_URI,
-                    new String[]{Data.RAW_CONTACT_ID},
-                    Data.LOOKUP_KEY+"=?", new String[]{lookUp}, null);
-            if(cursor!=null) {
-                while (cursor.moveToNext()) {
-                    rawContactId = cursor.getLong(0);
-                }
-                cursor.close();
-            }
-        }
 
     }
 
@@ -450,6 +434,9 @@ public class AddContactActivity extends SweepBackActivity {
 
         try
         {
+            // 下面的操作会根据RawContacts表中已有的rawContactId使用情况自动生成新联系人的rawContactId
+            Uri rawContactUri = getContentResolver().insert(RawContacts.CONTENT_URI, values);
+            rawContactId = ContentUris.parseId(rawContactUri);
 
             // 向data表插入姓名数据
             if (name.length()>0)
@@ -457,7 +444,7 @@ public class AddContactActivity extends SweepBackActivity {
                 values.clear();
                 values.put(Data.RAW_CONTACT_ID, rawContactId);
                 values.put(Data.MIMETYPE, StructuredName.CONTENT_ITEM_TYPE);
-                values.put(StructuredName.GIVEN_NAME, name);
+                values.put(StructuredName.DISPLAY_NAME, name);
                 getContentResolver().insert(Data.CONTENT_URI, values);
             }
 
@@ -532,11 +519,22 @@ public class AddContactActivity extends SweepBackActivity {
 
             /*最新思路:每条记录都有一个ID,让每个data保存自己的ID*/
 
+            //查询需要修改的联系人的rawContactId
+            Cursor cursor = getContentResolver().query(Data.CONTENT_URI,
+                    new String[]{Data.RAW_CONTACT_ID},
+                    Data.LOOKUP_KEY+"=?", new String[]{lookUp}, null);
+            if(cursor!=null) {
+                while (cursor.moveToNext()) {
+                    rawContactId = cursor.getLong(0);
+                }
+                cursor.close();
+            }
+
             // 在data表中更新姓名数据
             if (name.length()>0)
             {
                 values.clear();
-                values.put(StructuredName.GIVEN_NAME, name);
+                values.put(StructuredName.DISPLAY_NAME, name);
                 getContentResolver().update(Data.CONTENT_URI, values,
                         Data.RAW_CONTACT_ID+"=? AND "+Data.MIMETYPE+"=?",
                         new String[]{rawContactId+"", StructuredName.CONTENT_ITEM_TYPE});

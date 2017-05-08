@@ -2,11 +2,13 @@ package com.carryj.root.contactbook;
 
 import android.content.ClipboardManager;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.CommonDataKinds.Organization;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
@@ -67,6 +69,8 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     private LinearLayout ll_contact_personal_show_im_block;
     private LinearLayout ll_contact_personal_show_remark_block;
     private LinearLayout ll_contact_personal_show_company_block;
+    private LinearLayout ll_contact_personal_show_orcode;
+    private LinearLayout ll_contact_personal_show_delete;
 
     private TextView tv_back_str;
     private TextView tv_contact_personal_show_edit;
@@ -226,6 +230,8 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         tv_contact_personal_show_name = (TextView) findViewById(R.id.tv_contact_personal_show_name);
         ll_contact_personal_show_number_block = (LinearLayout) findViewById(R.id.ll_contact_personal_show_number_block);
         rv_contact_personal_show_number = (RecyclerView) findViewById(R.id.rv_contact_personal_show_number);
+        ll_contact_personal_show_orcode = (LinearLayout) findViewById(R.id.ll_contact_personal_show_orcode);
+        ll_contact_personal_show_delete = (LinearLayout) findViewById(R.id.ll_contact_personal_show_delete);
 
         ll_contact_personal_show_email_block = (LinearLayout) findViewById(R.id.ll_contact_personal_show_email_block);
         rv_contact_personal_show_emial = (RecyclerView) findViewById(R.id.rv_contact_personal_show_emial);
@@ -308,6 +314,8 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     protected void initEvents() {
         ll_contact_personal_show_back.setOnClickListener(this);
         tv_contact_personal_show_edit.setOnClickListener(this);
+        ll_contact_personal_show_orcode.setOnClickListener(this);
+        ll_contact_personal_show_delete.setOnClickListener(this);
 
         //拨号
         numberAdapter.setOnItemClickListener(new ContactPersonalShowNumberAdapter.OnItemClickListener() {
@@ -431,6 +439,27 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                 intent.putExtras(bundle);
                 startActivityForResult(intent, REQUEST_CODE);
                 break;
+            case R.id.ll_contact_personal_show_orcode:
+                turnToORCode();
+                break;
+            case R.id.ll_contact_personal_show_delete:
+                Cursor cursor = getContentResolver().query(Phone.CONTENT_URI,
+                        new String[]{Phone.RAW_CONTACT_ID},Phone.LOOKUP_KEY+"=?",
+                        new String[]{lookUp},null);
+                if(cursor!=null){
+                    while (cursor.moveToNext()){
+                        int rawContactID = cursor.getInt(0);
+                        getContentResolver().delete(
+                                ContentUris.withAppendedId(
+                                ContactsContract.RawContacts.CONTENT_URI,
+                                        rawContactID), null, null);
+                        //*************************************************************************************************************
+
+                    }
+                    cursor.close();
+                }
+                this.finish();
+                break;
             default:
                 break;
         }
@@ -500,18 +529,69 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                 ll_contact_personal_show_im_block.setVisibility(View.GONE);
             }
 
-            numberDatas.clear();
-            emailDatas.clear();
-            imDatas.clear();
-            numberDatas.addAll(resultNumberDatas);
-            emailDatas.addAll(resultEmailDatas);
-            imDatas.addAll(resultImDatas);
-            numberAdapter.notifyDataSetChanged();
-            emailAdapter.notifyDataSetChanged();
-            imAdapter.notifyDataSetChanged();
+            if(numberDatas.size()>0) {//原本有数据
+                numberDatas.clear();
+                numberDatas.addAll(resultNumberDatas);
+                numberAdapter.notifyDataSetChanged();
+            }else {//原本没有数据
+                for (PhoneNumberData resultNumberData:resultNumberDatas) {
+                    numberDatas.add(resultNumberData);
+                    numberAdapter.notifyItemInserted(numberAdapter.getItemCount());
+                }
+            }
+
+
+            if(emailDatas.size()>0) {
+                emailDatas.clear();
+                emailDatas.addAll(resultEmailDatas);
+                emailAdapter.notifyDataSetChanged();
+            }else {
+                for (EmailData resultEmailData:resultEmailDatas) {
+                    emailDatas.add(resultEmailData);
+                    emailAdapter.notifyItemInserted(emailAdapter.getItemCount());
+                }
+            }
+
+
+
+            if(imDatas.size()>0) {
+                imDatas.clear();
+                imDatas.addAll(resultImDatas);
+                imAdapter.notifyDataSetChanged();
+            }else {
+                for (ImData resultImData:resultImDatas) {
+                    imDatas.add(resultImData);
+                    imAdapter.notifyItemInserted(imAdapter.getItemCount());
+                }
+            }
+
+
+
+
+
+
+
 
         }
 
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void turnToORCode() {
+
+        Intent orCodeIntent = new Intent(ContactPersonalShowActivity.this.getApplicationContext(),
+                ShowORCodeActivity.class);
+        StringBuilder sb = new StringBuilder();
+
+        /*for(PhoneNumberData numberData:numberDatas) {
+            sb.append(numberData.getNumber());
+            sb.append(" ");
+        }*/
+        sb.append(numberDatas.get(0).getNumber());
+
+        orCodeIntent.putExtra("ORCODE", sb.toString());
+        Log.d("===========ORCODE=",sb.toString());
+        startActivity(orCodeIntent);
+
     }
 }

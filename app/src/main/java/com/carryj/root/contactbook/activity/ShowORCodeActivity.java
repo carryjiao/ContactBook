@@ -19,6 +19,7 @@ import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -44,6 +45,8 @@ public class ShowORCodeActivity extends SweepBackActivity {
     private LinearLayout ll_show_orcode_back;
     private TextView tv_show_orcode_share;
 
+    private static boolean FLAG = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +58,7 @@ public class ShowORCodeActivity extends SweepBackActivity {
 
 
         URL = getIntent().getStringExtra("ORCODE");
+        Log.d("==========URL=","*******************************"+URL+"*******************************");
 
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.INTERNET)
@@ -90,7 +94,17 @@ public class ShowORCodeActivity extends SweepBackActivity {
         {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
-                ORCode = getBitmap("http://qr.liantu.com/api.php?text=焦消13251356557");
+                new Thread(){
+                    @Override
+                    public void run()
+                    {
+                        ORCode = getBitmap("http://qr.liantu.com/api.php?text="+URL);
+                        Message msg = new Message();
+                        // 把bm存入消息中,发送到主线程
+                        msg.obj = ORCode;
+                        handler.sendMessage(msg);
+                    }
+                }.start();
             } else
             {
                 // Permission Denied
@@ -131,44 +145,7 @@ public class ShowORCodeActivity extends SweepBackActivity {
                 this.finish();
                 break;
             case R.id.tv_show_orcode_share:
-               /* getContentResolver().delete(Data.CONTENT_URI,
-                        Data._ID+"=?",new String[]{441+""});
-                getContentResolver().delete(Data.CONTENT_URI,
-                        Data._ID+"=?",new String[]{442+""});
-                getContentResolver().delete(Data.CONTENT_URI,
-                        Data._ID+"=?",new String[]{443+""});
-                getContentResolver().delete(Data.CONTENT_URI,
-                        Data._ID+"=?",new String[]{444+""});
-                getContentResolver().delete(Data.CONTENT_URI,
-                        Data._ID+"=?",new String[]{445+""});
-                getContentResolver().delete(Data.CONTENT_URI,
-                        Data._ID+"=?",new String[]{446+""});
-                getContentResolver().delete(Data.CONTENT_URI,
-                        Data._ID+"=?",new String[]{447+""});
-                getContentResolver().delete(Data.CONTENT_URI,
-                        Data._ID+"=?",new String[]{448+""});
-                getContentResolver().delete(Data.CONTENT_URI,
-                        Data._ID+"=?",new String[]{449+""});
-                getContentResolver().delete(Data.CONTENT_URI,
-                        Data._ID+"=?",new String[]{450+""});
-                getContentResolver().delete(Data.CONTENT_URI,
-                        Data._ID+"=?",new String[]{459+""});
-                getContentResolver().delete(Data.CONTENT_URI,
-                        Data._ID+"=?",new String[]{460+""});
-                getContentResolver().delete(Data.CONTENT_URI,
-                        Data._ID+"=?",new String[]{461+""});
-                getContentResolver().delete(Data.CONTENT_URI,
-                        Data._ID+"=?",new String[]{462+""});
-                getContentResolver().delete(Data.CONTENT_URI,
-                        Data._ID+"=?",new String[]{463+""});
-                getContentResolver().delete(Data.CONTENT_URI,
-                        Data._ID+"=?",new String[]{464+""});
-                getContentResolver().delete(Data.CONTENT_URI,
-                        Data._ID+"=?",new String[]{465+""});
-                getContentResolver().delete(Data.CONTENT_URI,
-                        Data._ID+"=?",new String[]{466+""});
 
-                Toast.makeText(this, "删除成功", Toast.LENGTH_SHORT).show();*/
             default:
                 break;
         }
@@ -187,11 +164,17 @@ public class ShowORCodeActivity extends SweepBackActivity {
             if (conn.getResponseCode() == 200){
                 InputStream inputStream = conn.getInputStream();
                 Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                FLAG = true;
                 return bitmap;
-            }else
-                System.out.println("失败");
+            }else {
+                Log.d("***************","获取图片失败****************************");
+                FLAG = false;
+            }
+
 
         }catch (IOException e){
+            FLAG = false;
+            Log.d("***************","getIOException****************************");
             e.printStackTrace();
         }finally {
             conn.disconnect();//断开连接
