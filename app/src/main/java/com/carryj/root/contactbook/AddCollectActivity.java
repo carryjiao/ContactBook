@@ -3,13 +3,22 @@ package com.carryj.root.contactbook;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,14 +32,20 @@ public class AddCollectActivity extends SweepBackActivity {
 
 
 
+    private RelativeLayout contact_book_view;
+    private RelativeLayout contact_book_title_bar;
     private TextView tv_contact_book_add;
     private ImageView iv_contact_book_box;
     private ContactBookAdapter adapter;
     private SwipeMenuListView listView;
 
+    private Button cancel;
+    private Button confirm;
+
+
     /**获取库Phone表字段**/
     private static final String[] PHONES_PROJECTION = new String[] {
-            Phone.DISPLAY_NAME, Phone.RAW_CONTACT_ID, Phone.CONTACT_ID};
+            Contacts.DISPLAY_NAME, Contacts.NAME_RAW_CONTACT_ID, Contacts._ID};
 
     /**联系人显示名称**/
     private static final int PHONES_DISPLAY_NAME_INDEX = 0;
@@ -60,6 +75,8 @@ public class AddCollectActivity extends SweepBackActivity {
     @Override
     protected void initView() {
 
+        contact_book_view = (RelativeLayout) findViewById(R.id.contact_book_view);
+        contact_book_title_bar = (RelativeLayout) findViewById(R.id.contact_book_title_bar);
         tv_contact_book_add = (TextView) findViewById(R.id.tv_contact_book_add);
         iv_contact_book_box = (ImageView) findViewById(R.id.iv_contact_book_box);
         listView = (SwipeMenuListView) findViewById(R.id.contact_book_listview);
@@ -74,7 +91,49 @@ public class AddCollectActivity extends SweepBackActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                addCollect(mData.get(position).getContactID());
+
+                final int index = position;
+                View popupWindowView = getLayoutInflater().inflate(R.layout.add_collect_popupwindow, null);
+                cancel = (Button) popupWindowView.findViewById(R.id.btn_add_collect_popupwindow_cancel);
+                confirm = (Button) popupWindowView.findViewById(R.id.btn_add_collect_popupwindow_confirm);
+
+                final PopupWindow popupWindow = new PopupWindow(popupWindowView,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                //设置背景透明
+                WindowManager.LayoutParams lp = getWindow().getAttributes();
+                lp.alpha = 0.7f; //0.0-1.0
+                getWindow().setAttributes(lp);
+
+                popupWindow.setAnimationStyle(R.style.popup_window_anim);
+                popupWindow.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#F8F8F8")));
+                popupWindow.setFocusable(true);
+                popupWindow.setOutsideTouchable(true);
+                popupWindow.update();
+                popupWindow.showAtLocation(parent, Gravity.CENTER, 0, 0);
+
+                popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+                    @Override
+                    public void onDismiss() {
+                        WindowManager.LayoutParams lp = getWindow().getAttributes();
+                        lp.alpha = 1f; //0.0-1.0
+                        getWindow().setAttributes(lp);
+                    }
+                });
+                cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        popupWindow.dismiss();
+                    }
+                });
+
+                confirm.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        addCollect(mData.get(index).getContactID());
+                        popupWindow.dismiss();
+                    }
+                });
+
             }
         });
 
@@ -109,9 +168,9 @@ public class AddCollectActivity extends SweepBackActivity {
 
         ContentResolver resolver = getContentResolver();
 
-        Cursor phoneCursor = resolver.query(Phone.CONTENT_URI,
-                PHONES_PROJECTION, Phone.STARRED+"=?", new String[]{"0"},
-                Phone.RAW_CONTACT_ID+" ASC");
+        Cursor phoneCursor = resolver.query(Contacts.CONTENT_URI,
+                PHONES_PROJECTION, Contacts.STARRED+"=?", new String[]{"0"},
+                Contacts.SORT_KEY_PRIMARY+" ASC");
 
         if (phoneCursor != null) {
 
@@ -155,5 +214,14 @@ public class AddCollectActivity extends SweepBackActivity {
 
         Toast.makeText(this, "收藏成功", Toast.LENGTH_SHORT).show();
         tv_contact_book_add.setText("返回");
+    }
+
+    //设置背景透明度
+    public void setBackgroundAlpha(float bgAlpha)
+    {
+        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        lp.alpha = bgAlpha; //0.0-1.0
+        getWindow().setAttributes(lp);
+
     }
 }

@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -38,7 +39,6 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
     private List<Fragment> fragments;
     private NavigationView navigationView;
     private DrawerLayout drawer;
-    private ImageView iv_box;
 
 
     @Override
@@ -47,7 +47,7 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
         setContentView(R.layout.activity_main);
         setCurrentPage(2);
 
-        iv_box = (ImageView) findViewById(R.id.iv_contact_book_box);
+
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
         //navigationView.setItemIconTintList(null);
@@ -75,7 +75,6 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
                         break;
                 }
 
-                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                 drawer.closeDrawer(GravityCompat.START);
                 return true;
             }
@@ -119,10 +118,7 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
         main_pagerAdapter = new MainFragmentPagerAdapter(getSupportFragmentManager(),fragments);
         //main_viewpager.setOffscreenPageLimit(1);//++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         main_viewpager.setAdapter(main_pagerAdapter);
-        ll_collect.setOnClickListener(this);
-        ll_record.setOnClickListener(this);
-        ll_contact.setOnClickListener(this);
-        ll_dial.setOnClickListener(this);
+
 
     }
 
@@ -130,6 +126,10 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
     @Override
     protected void initEvents() {
 
+        ll_collect.setOnClickListener(this);
+        ll_record.setOnClickListener(this);
+        ll_contact.setOnClickListener(this);
+        ll_dial.setOnClickListener(this);
     }
 
     @Override
@@ -185,7 +185,7 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
 
     }
 
-  /*  @Override
+   @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -202,7 +202,7 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
         return true;
     }
 
-    @Override
+    /*@Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long

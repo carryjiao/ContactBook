@@ -181,4 +181,6 @@ public class ShowORCodeActivity extends SweepBackActivity {
         }
         return null;
     }
+
+
 }

@@ -105,8 +105,14 @@ public class AddContactActivity extends SweepBackActivity {
             updataFlag = false;
 
         }else if(SELECTOR.equals(FROM_DIAL_FRAGEMENT_ADD) ||SELECTOR.equals(FROM_RECORD_ITEM_IN_DETAIL_ACTIVITY_NEW)) {
-            insertFlag = true;
-            updataFlag = false;
+            if(SELECTOR.equals(FROM_DIAL_FRAGEMENT_ADD)) {
+                insertFlag = true;
+                updataFlag = false;
+            }else {
+                insertFlag = false;
+                updataFlag = true;
+            }
+
             phoneNumber = getIntent().getStringExtra("NUMBER");
             PhoneNumberData numberItemData = new PhoneNumberData();
             numberItemData.setNumber(phoneNumber);

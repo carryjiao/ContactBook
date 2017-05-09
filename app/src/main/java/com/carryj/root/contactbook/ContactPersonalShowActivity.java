@@ -111,11 +111,20 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
             backStr = "所有联系人";
         }
 
-        name = getIntent().getStringExtra(NAME);
         lookUp = getIntent().getStringExtra(LOOKUP);
 
         ContentResolver resolver = getContentResolver();
 
+        //查询联系人姓名
+        Cursor nameCursor = resolver.query(Phone.CONTENT_URI, new String[]{Phone.DISPLAY_NAME},
+                Phone.LOOKUP_KEY+"=?",new String[]{lookUp},null);
+        if (nameCursor != null) {
+            while (nameCursor.moveToNext()) {
+                name = nameCursor.getString(0);
+            }
+        }
+
+        //查询联系人电话号码
         Cursor phoneCursor = resolver.query(Data.CONTENT_URI,
                 new String[]{Phone.TYPE, Phone.NUMBER, Data._ID},
                 Data.LOOKUP_KEY + "=? AND "+Data.MIMETYPE+"=?",

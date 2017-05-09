@@ -287,7 +287,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
         ContentResolver resolver = getContext().getContentResolver();
 
         Cursor contactsCursor = resolver.query(Contacts.CONTENT_URI, CONTACTS_PROJECTION,
-                null, null, Contacts.NAME_RAW_CONTACT_ID+" ASC");
+                null, null, Contacts.SORT_KEY_PRIMARY+" ASC");
 
         if (contactsCursor != null) {
 
