@@ -41,6 +41,8 @@ import com.carryj.root.contactbook.tools.PhoneNumberTransformer;
 import com.carryj.root.contactbook.ui.DividerItemDecoration;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
@@ -64,6 +66,9 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     private String name;
     private String remark;
     private String company;
+
+    private boolean remarkFlag;
+    private boolean companyFlag;
 
     private String backStr;
 
@@ -103,6 +108,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_personal_show);
+        EventBus.getDefault().register(this);
     }
 
     @Override
@@ -129,81 +135,13 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         }
 
         //查询联系人电话号码
-        Cursor phoneCursor = resolver.query(Data.CONTENT_URI,
-                new String[]{Phone.TYPE, Phone.NUMBER, Data._ID},
-                Data.LOOKUP_KEY + "=? AND "+Data.MIMETYPE+"=?",
-                new String[]{lookUp,Phone.CONTENT_ITEM_TYPE}, null);
-
-        if (phoneCursor != null) {
-            while (phoneCursor.moveToNext()) {
-                PhoneNumberData numberData = new PhoneNumberData();
-
-                //获取号码类型
-                String numberType = new GetStrPhoneType().getStrPhoneType(phoneCursor.getInt(0));
-                String number = phoneCursor.getString(1);
-                String _id = phoneCursor.getString(2);
-                PhoneNumberTransformer pntf = new PhoneNumberTransformer();
-                pntf.setStrPhoneNumber(number);
-                number = pntf.getStrPhoneNumber();
-                numberData.setNumberType(numberType);
-                numberData.setNumber(number);
-                numberData.set_id(_id);
-                numberDatas.add(numberData);
-
-            }
-            phoneCursor.close();
-
-        }
-
-
+        numberDatas = getNumberData();
 
         //获取E-Mail
-        Cursor emailCursor = resolver.query(Data.CONTENT_URI,
-                new String[]{Email.TYPE, Email.DATA, Data._ID},
-                Data.LOOKUP_KEY + "=? AND "+Data.MIMETYPE+"=?",
-                new String[]{lookUp,Email.CONTENT_ITEM_TYPE}, null);
-
-        if (emailCursor != null) {
-            while (emailCursor.moveToNext()) {
-                EmailData emailData = new EmailData();
-                //得到email
-                int type = emailCursor.getInt(0);
-                String email = emailCursor.getString(1);
-                String _id = emailCursor.getString(2);
-                String emailType = new GetStrEmailType().getStrEmailType(type);
-                emailData.setEmailType(emailType);
-                emailData.setEmail(email);
-                emailData.set_id(_id);
-                emailDatas.add(emailData);
-
-            }
-            emailCursor.close();
-        }
+        emailDatas = getEmailData();
 
         //获取IM
-        Cursor imCursor = resolver.query(Data.CONTENT_URI,
-                new String[]{Im.PROTOCOL, Im.DATA, Data._ID},
-                Data.LOOKUP_KEY + "=? AND "+ Data.MIMETYPE+"=?",
-                new String[]{lookUp, Im.CONTENT_ITEM_TYPE}, null);
-
-        if (imCursor != null) {
-            while (imCursor.moveToNext()) {
-                ImData imData = new ImData();
-                //得到email
-                int type = imCursor.getInt(0);
-                String im = imCursor.getString(1);
-                String _id = imCursor.getString(2);
-                Log.d("type = ", type+"");
-                String imType = new GetStrImType().getStrImType(type);
-                Log.d("imType = ",imType);
-                imData.setImType(imType);
-                imData.setIm(im);
-                imData.set_id(_id);
-                imDatas.add(imData);
-
-            }
-            imCursor.close();
-        }
+        imDatas = getImData();
 
         //获取备注
         Cursor remarkCursor = resolver.query(Data.CONTENT_URI, null,
@@ -219,6 +157,12 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
             remarkCursor.close();
         }
 
+        if(remark != null) {
+            remarkFlag = true;
+        }else {
+            remarkFlag = false;
+        }
+
         //获取公司
         Cursor companyCursor = resolver.query(Data.CONTENT_URI, null,
                 Data.LOOKUP_KEY + " = ? AND " + Data.MIMETYPE + " = ?",
@@ -229,6 +173,12 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                 company = companyCursor.getString(companyCursor.getColumnIndex(Organization.COMPANY));
             }
             companyCursor.close();
+        }
+
+        if(company != null) {
+            companyFlag = true;
+        }else {
+            companyFlag = false;
         }
 
     }
@@ -439,7 +389,9 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                 intent.putExtra(SELECTOR, FROM_CONTACT_PERSONAL_SHOW_ACTIVITY_EDIT);
                 intent.putExtra("NAME",name);
                 intent.putExtra("COMPANY",company);
+                intent.putExtra("COMPANYFLAG",companyFlag);
                 intent.putExtra("REMARK",remark);
+                intent.putExtra("REMARKFLAG",remarkFlag);
                 intent.putExtra("LOOKUP",lookUp);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("NUMBERDATA", numberDatas);
@@ -489,21 +441,25 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
             if(remark != null && remark.length()>0) {
                 ll_contact_personal_show_remark_block.setVisibility(View.VISIBLE);
                 tv_contact_personal_show_remark.setText(remark);
+                remarkFlag = true;
             }else {
                 ll_contact_personal_show_remark_block.setVisibility(View.GONE);
+                remarkFlag = false;
             }
 
             company = data.getStringExtra("COMPANY");
             if(company != null && company.length()>0) {
                 ll_contact_personal_show_company_block.setVisibility(View.VISIBLE);
                 tv_contact_personal_show_company.setText(company);
+                companyFlag = true;
             }else {
                 ll_contact_personal_show_company_block.setVisibility(View.GONE);
+                companyFlag = false;
             }
 
 
 
-            ArrayList<PhoneNumberData> resultNumberDatas = (ArrayList<PhoneNumberData>) data.getSerializableExtra("NUMBER");
+            /*ArrayList<PhoneNumberData> resultNumberDatas = (ArrayList<PhoneNumberData>) data.getSerializableExtra("NUMBER");
             ArrayList<EmailData> resultEmailDatas = (ArrayList<EmailData>) data.getSerializableExtra("EMAIL");
             ArrayList<ImData> resultImDatas = (ArrayList<ImData>) data.getSerializableExtra("IM");
             //类型数据处理
@@ -574,18 +530,17 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                     imDatas.add(resultImData);
                     imAdapter.notifyItemInserted(imAdapter.getItemCount());
                 }
-            }
-
-
-
-
-
-
-
+            }*/
 
         }
 
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
     }
 
     private void turnToORCode() {
@@ -605,4 +560,146 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         startActivity(orCodeIntent);
 
     }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onDealDataEditChange(NumberChangeEvent numberChangeEvent){
+        if(numberChangeEvent.isNumberChangeFlag()) {
+            ArrayList<PhoneNumberData> resultNumberDatas = getNumberData();
+            ArrayList<EmailData> resultEmailDatas = getEmailData();
+            ArrayList<ImData> resultImDatas = getImData();
+            //类型数据处理
+            if(resultNumberDatas.size()>0) {
+                ll_contact_personal_show_number_block.setVisibility(View.VISIBLE);
+                if(numberDatas.size()>0) {//原本有数据
+                    numberDatas.clear();
+                    numberDatas.addAll(resultNumberDatas);
+                    numberAdapter.notifyDataSetChanged();
+                }else {//原本没有数据
+                    for (PhoneNumberData resultNumberData:resultNumberDatas) {
+                        numberDatas.add(resultNumberData);
+                        numberAdapter.notifyItemInserted(numberAdapter.getItemCount());
+                    }
+                }
+            }else {
+                ll_contact_personal_show_number_block.setVisibility(View.GONE);
+            }
+
+            if(resultEmailDatas.size()>0) {
+                ll_contact_personal_show_email_block.setVisibility(View.VISIBLE);
+                if(emailDatas.size()>0) {
+                    emailDatas.clear();
+                    emailDatas.addAll(resultEmailDatas);
+                    emailAdapter.notifyDataSetChanged();
+                }else {
+                    for (EmailData resultEmailData:resultEmailDatas) {
+                        emailDatas.add(resultEmailData);
+                        emailAdapter.notifyItemInserted(emailAdapter.getItemCount());
+                    }
+                }
+            }else {
+                ll_contact_personal_show_email_block.setVisibility(View.GONE);
+            }
+
+            if (resultImDatas.size()>0) {
+                ll_contact_personal_show_im_block.setVisibility(View.VISIBLE);
+                if(imDatas.size()>0) {
+                    imDatas.clear();
+                    imDatas.addAll(resultImDatas);
+                    imAdapter.notifyDataSetChanged();
+                }else {
+                    for (ImData resultImData:resultImDatas) {
+                        imDatas.add(resultImData);
+                        imAdapter.notifyItemInserted(imAdapter.getItemCount());
+                    }
+                }
+            }else {
+                ll_contact_personal_show_im_block.setVisibility(View.GONE);
+            }
+
+        }
+
+    }
+
+    private ArrayList<PhoneNumberData> getNumberData() {
+        ArrayList<PhoneNumberData> datas = new ArrayList<PhoneNumberData>();
+        Cursor phoneCursor = getContentResolver().query(Data.CONTENT_URI,
+                new String[]{Phone.TYPE, Phone.NUMBER, Data._ID},
+                Data.LOOKUP_KEY + "=? AND "+Data.MIMETYPE+"=?",
+                new String[]{lookUp,Phone.CONTENT_ITEM_TYPE}, null);
+
+        if (phoneCursor != null) {
+            while (phoneCursor.moveToNext()) {
+                PhoneNumberData numberData = new PhoneNumberData();
+
+                //获取号码类型
+                String numberType = new GetStrPhoneType().getStrPhoneType(phoneCursor.getInt(0));
+                String number = phoneCursor.getString(1);
+                String _id = phoneCursor.getString(2);
+                PhoneNumberTransformer pntf = new PhoneNumberTransformer();
+                pntf.setStrPhoneNumber(number);
+                number = pntf.getStrPhoneNumber();
+                numberData.setNumberType(numberType);
+                numberData.setNumber(number);
+                numberData.set_id(_id);
+                datas.add(numberData);
+
+            }
+            phoneCursor.close();
+
+        }
+        return datas;
+    }
+
+    private ArrayList<EmailData> getEmailData() {
+        ArrayList<EmailData> datas = new ArrayList<EmailData>();
+        Cursor emailCursor = getContentResolver().query(Data.CONTENT_URI,
+                new String[]{Email.TYPE, Email.DATA, Data._ID},
+                Data.LOOKUP_KEY + "=? AND "+Data.MIMETYPE+"=?",
+                new String[]{lookUp,Email.CONTENT_ITEM_TYPE}, null);
+
+        if (emailCursor != null) {
+            while (emailCursor.moveToNext()) {
+                EmailData emailData = new EmailData();
+                //得到email
+                int type = emailCursor.getInt(0);
+                String email = emailCursor.getString(1);
+                String _id = emailCursor.getString(2);
+                String emailType = new GetStrEmailType().getStrEmailType(type);
+                emailData.setEmailType(emailType);
+                emailData.setEmail(email);
+                emailData.set_id(_id);
+                datas.add(emailData);
+
+            }
+            emailCursor.close();
+        }
+        return datas;
+    }
+
+    private ArrayList<ImData> getImData() {
+        ArrayList<ImData> datas = new ArrayList<ImData>();
+        Cursor imCursor = getContentResolver().query(Data.CONTENT_URI,
+                new String[]{Im.PROTOCOL, Im.DATA, Data._ID},
+                Data.LOOKUP_KEY + "=? AND "+ Data.MIMETYPE+"=?",
+                new String[]{lookUp, Im.CONTENT_ITEM_TYPE}, null);
+
+        if (imCursor != null) {
+            while (imCursor.moveToNext()) {
+                ImData imData = new ImData();
+                //得到email
+                int type = imCursor.getInt(0);
+                String im = imCursor.getString(1);
+                String _id = imCursor.getString(2);
+                String imType = new GetStrImType().getStrImType(type);
+                imData.setImType(imType);
+                imData.setIm(im);
+                imData.set_id(_id);
+                datas.add(imData);
+
+            }
+            imCursor.close();
+        }
+        return datas;
+    }
+
 }

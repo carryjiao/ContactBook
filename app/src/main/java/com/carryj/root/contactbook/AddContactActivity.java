@@ -18,6 +18,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -36,6 +37,7 @@ import com.carryj.root.contactbook.event.NumberChangeEvent;
 import com.carryj.root.contactbook.ui.DividerItemDecoration;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 
@@ -88,6 +90,8 @@ public class AddContactActivity extends SweepBackActivity {
 
     private boolean insertFlag = false;
     private boolean updataFlag = false;
+    private boolean remarkFlag;
+    private boolean companyFlag;
 
     private ContentValues values;
 
@@ -125,7 +129,9 @@ public class AddContactActivity extends SweepBackActivity {
             updataFlag = true;
             name = getIntent().getStringExtra("NAME");
             company = getIntent().getStringExtra("COMPANY");
+            getIntent().getBooleanExtra("COMPANYFLAG", companyFlag);
             remark = getIntent().getStringExtra("REMARK");
+            getIntent().getBooleanExtra("REMARKFLAG", remarkFlag);
             lookUp = getIntent().getStringExtra("LOOKUP");
             myNumberData = (ArrayList<PhoneNumberData>) getIntent().getSerializableExtra("NUMBERDATA");
             myEmailData = (ArrayList<EmailData>) getIntent().getSerializableExtra("EMAILDATA");
@@ -451,63 +457,34 @@ public class AddContactActivity extends SweepBackActivity {
             // 向data表插入姓名数据
             if (name.length()>0)
             {
-                values.clear();
-                values.put(Data.RAW_CONTACT_ID, rawContactId);
-                values.put(Data.MIMETYPE, StructuredName.CONTENT_ITEM_TYPE);
-                values.put(StructuredName.DISPLAY_NAME, name);
-                getContentResolver().insert(Data.CONTENT_URI, values);
+                insertName(name);
             }
 
             // 向data表插入公司数据
             if (company.length()>0)
             {
-                values.clear();
-                values.put(Data.RAW_CONTACT_ID, rawContactId);
-                values.put(Data.MIMETYPE, Organization.CONTENT_ITEM_TYPE);
-                values.put(Organization.COMPANY, company);
-                getContentResolver().insert(Data.CONTENT_URI, values);
+                insertCompany(company);
             }
 
             // 向data表插入电话数据
             for(PhoneNumberData numberItemData:numberDatas) {
-                values.clear();
-                values.put(Data.RAW_CONTACT_ID, rawContactId);
-                values.put(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE);
-                values.put(Phone.NUMBER, numberItemData.getNumber());
-                values.put(Phone.TYPE, numberItemData.getNumberType());
-                getContentResolver().insert(Data.CONTENT_URI, values);
+                insertPhoneNumber(numberItemData);
             }
 
             // 向data表插入Email数据
             for(EmailData emailItemData:emailDatas) {
-                values.clear();
-                values.put(Data.RAW_CONTACT_ID, rawContactId);
-                values.put(Data.MIMETYPE, Email.CONTENT_ITEM_TYPE);
-                values.put(Email.DATA, emailItemData.getEmail());
-                values.put(Email.TYPE, emailItemData.getEmailType());
-                getContentResolver().insert(Data.CONTENT_URI, values);
-
-
+                insertEmailData(emailItemData);
             }
 
             // 向data表插入IM数据
             for(ImData imItemData:imDatas) {
-                values.clear();
-                values.put(Data.RAW_CONTACT_ID, rawContactId);
-                values.put(Data.MIMETYPE, Im.CONTENT_ITEM_TYPE);
-                values.put(Im.DATA, imItemData.getIm());
-                values.put(Im.PROTOCOL, imItemData.getImType());
-                getContentResolver().insert(Data.CONTENT_URI, values);
+                insertImData(imItemData);
             }
 
             // 向data表插入备注数据
             if (remark.length()>0)
             {
-                values.clear();
-                values.put(Data.RAW_CONTACT_ID, rawContactId);
-                values.put(Data.MIMETYPE, Note.CONTENT_ITEM_TYPE);
-                values.put(Note.NOTE, remark);
-                getContentResolver().insert(Data.CONTENT_URI, values);
+                insertNote(remark);
             }
 
         }
@@ -516,9 +493,7 @@ public class AddContactActivity extends SweepBackActivity {
         {
             return false;
         }
-
         return true;
-
     }
 
     private boolean updata(String name, String company, ArrayList<PhoneNumberData> numberDatas,
@@ -543,11 +518,20 @@ public class AddContactActivity extends SweepBackActivity {
             // 在data表中更新姓名数据
             if (name.length()>0)
             {
-                values.clear();
-                values.put(StructuredName.DISPLAY_NAME, name);
-                getContentResolver().update(Data.CONTENT_URI, values,
+                //先查询原来有无姓名数据
+                Cursor nameCursor = getContentResolver().query(Data.CONTENT_URI,null,
                         Data.RAW_CONTACT_ID+"=? AND "+Data.MIMETYPE+"=?",
-                        new String[]{rawContactId+"", StructuredName.CONTENT_ITEM_TYPE});
+                        new String[]{rawContactId+"", StructuredName.CONTENT_ITEM_TYPE}, null);
+                if(nameCursor != null) {
+                    values.clear();
+                    values.put(StructuredName.DISPLAY_NAME, name);
+                    getContentResolver().update(Data.CONTENT_URI, values,
+                            Data.RAW_CONTACT_ID+"=? AND "+Data.MIMETYPE+"=?",
+                            new String[]{rawContactId+"", StructuredName.CONTENT_ITEM_TYPE});
+                }else {
+                    insertName(name);
+                }
+
             }else {
                 getContentResolver().delete(Data.CONTENT_URI,
                         Data.RAW_CONTACT_ID+"=? AND "+Data.MIMETYPE+"=?",
@@ -557,25 +541,48 @@ public class AddContactActivity extends SweepBackActivity {
             // 在data表中更新公司数据
             if (company.length()>0)
             {
-                values.clear();
-                values.put(Organization.COMPANY, company);
-                getContentResolver().update(Data.CONTENT_URI, values,
-                        Data.RAW_CONTACT_ID+"=? AND "+Data.MIMETYPE+"=?",
-                        new String[]{rawContactId+"", Organization.CONTENT_ITEM_TYPE});
+                if(companyFlag) {
+                    Log.d("=======companyIsNull"," false++++++++++++++++++++++++++");
+                    values.clear();
+                    values.put(Organization.COMPANY, company);
+                    getContentResolver().update(Data.CONTENT_URI, values,
+                            Data.RAW_CONTACT_ID+"=? AND "+Data.MIMETYPE+"=?",
+                            new String[]{rawContactId+"", Organization.CONTENT_ITEM_TYPE});
+                    Log.d("=======company"," updata into db++++++++++++++++++++++++++");
+                }else {
+
+                    Log.d("=======companyIsNull"," true++++++++++++++++++++++++++");
+                    insertCompany(company);
+                    Log.d("=======company"," insert into db++++++++++++++++++++++++++");
+
+                }
+
             }else {
+                Log.d("=======company"," delete++++++++++++++++++++++++++");
                 getContentResolver().delete(Data.CONTENT_URI,
                         Data.RAW_CONTACT_ID+"=? AND "+Data.MIMETYPE+"=?",
                         new String[]{rawContactId+"", Organization.CONTENT_ITEM_TYPE});
+                Log.d("=======company"," delete done++++++++++++++++++++++++++");
             }
 
             // 在data表中更新备注数据
             if (remark.length()>0)
             {
-                values.clear();
-                values.put(Note.NOTE, remark);
-                getContentResolver().update(Data.CONTENT_URI, values,
-                        Data.RAW_CONTACT_ID+"=? AND "+Data.MIMETYPE+"=?",
-                        new String[]{rawContactId+"", Note.CONTENT_ITEM_TYPE});
+                if (remarkFlag) {
+                    Log.d("=======noteIsNull"," false++++++++++++++++++++++++++");
+                    values.clear();
+                    values.put(Note.NOTE, remark);
+                    getContentResolver().update(Data.CONTENT_URI, values,
+                            Data.RAW_CONTACT_ID+"=? AND "+Data.MIMETYPE+"=?",
+                            new String[]{rawContactId+"", Note.CONTENT_ITEM_TYPE});
+                    Log.d("=======note"," updata into db++++++++++++++++++++++++++");
+                }else {
+
+                    Log.d("=======noteIsNull"," true++++++++++++++++++++++++++");
+                    insertNote(remark);
+                    Log.d("=======note"," insert into db++++++++++++++++++++++++++");
+                }
+
             }else {
                 getContentResolver().delete(Data.CONTENT_URI,
                         Data.RAW_CONTACT_ID+"=? AND "+Data.MIMETYPE+"=?",
@@ -585,16 +592,14 @@ public class AddContactActivity extends SweepBackActivity {
 
             // 在data表中更新电话数据
             for(PhoneNumberData numberItemData:numberDatas) {
-                values.clear();
-                values.put(Phone.NUMBER, numberItemData.getNumber());
-                values.put(Phone.TYPE, numberItemData.getNumberType());
                 if(numberItemData.get_id() != null){ //不是新增数据
+                    values.clear();
+                    values.put(Phone.NUMBER, numberItemData.getNumber());
+                    values.put(Phone.TYPE, numberItemData.getNumberType());
                     getContentResolver().update(Data.CONTENT_URI, values,
                             Data._ID+"=?", new String[]{numberItemData.get_id()});
                 }else {//新增数据
-                    values.put(Data.RAW_CONTACT_ID, rawContactId);
-                    values.put(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE);
-                    getContentResolver().insert(Data.CONTENT_URI, values);
+                    insertPhoneNumber(numberItemData);
                 }
 
 
@@ -602,16 +607,14 @@ public class AddContactActivity extends SweepBackActivity {
 
             // 在data表中更新Email数据
             for(EmailData emailItemData:emailDatas) {
-                values.clear();
-                values.put(Email.DATA, emailItemData.getEmail());
-                values.put(Email.TYPE, emailItemData.getEmailType());
                 if(emailItemData.get_id() != null) {
+                    values.clear();
+                    values.put(Email.DATA, emailItemData.getEmail());
+                    values.put(Email.TYPE, emailItemData.getEmailType());
                     getContentResolver().update(Data.CONTENT_URI, values,
                             Data._ID+"=?", new String[]{emailItemData.get_id()});
                 }else {
-                    values.put(Data.RAW_CONTACT_ID, rawContactId);
-                    values.put(Data.MIMETYPE, Email.CONTENT_ITEM_TYPE);
-                    getContentResolver().insert(Data.CONTENT_URI, values);
+                    insertEmailData(emailItemData);
                 }
 
 
@@ -620,25 +623,73 @@ public class AddContactActivity extends SweepBackActivity {
 
             // 在data表中更新IM数据
             for(ImData imItemData:imDatas) {
-                values.clear();
-                values.put(Im.DATA, imItemData.getIm());
-                values.put(Im.PROTOCOL, imItemData.getImType());
                 if(imItemData.get_id() != null) {
+                    values.clear();
+                    values.put(Im.DATA, imItemData.getIm());
+                    values.put(Im.PROTOCOL, imItemData.getImType());
                     getContentResolver().update(Data.CONTENT_URI, values,
                             Data._ID+"=?", new String[]{imItemData.get_id()});
                 }else {
-                    values.put(Data.RAW_CONTACT_ID, rawContactId);
-                    values.put(Data.MIMETYPE, Im.CONTENT_ITEM_TYPE);
-                    getContentResolver().insert(Data.CONTENT_URI, values);
+                    insertImData(imItemData);
                 }
 
             }
-
 
         }catch (Exception e){
             return false;
         }
         return true;
+    }
+
+    private void insertName(String name) {
+        values.clear();
+        values.put(Data.RAW_CONTACT_ID, rawContactId);
+        values.put(Data.MIMETYPE, StructuredName.CONTENT_ITEM_TYPE);
+        values.put(StructuredName.DISPLAY_NAME, name);
+        getContentResolver().insert(Data.CONTENT_URI, values);
+    }
+
+    private void insertCompany(String company) {
+        values.clear();
+        values.put(Data.RAW_CONTACT_ID, rawContactId);
+        values.put(Data.MIMETYPE, Organization.CONTENT_ITEM_TYPE);
+        values.put(Organization.COMPANY, company);
+        getContentResolver().insert(Data.CONTENT_URI, values);
+    }
+
+    private void insertNote(String note) {
+        values.clear();
+        values.put(Data.RAW_CONTACT_ID, rawContactId);
+        values.put(Data.MIMETYPE, Note.CONTENT_ITEM_TYPE);
+        values.put(Note.NOTE, note);
+        getContentResolver().insert(Data.CONTENT_URI, values);
+    }
+
+    private void insertPhoneNumber(PhoneNumberData numberItemData) {
+        values.clear();
+        values.put(Data.RAW_CONTACT_ID, rawContactId);
+        values.put(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE);
+        values.put(Phone.NUMBER, numberItemData.getNumber());
+        values.put(Phone.TYPE, numberItemData.getNumberType());
+        getContentResolver().insert(Data.CONTENT_URI, values);
+    }
+
+    private void insertEmailData(EmailData emailItemData) {
+        values.clear();
+        values.put(Data.RAW_CONTACT_ID, rawContactId);
+        values.put(Data.MIMETYPE, Email.CONTENT_ITEM_TYPE);
+        values.put(Email.DATA, emailItemData.getEmail());
+        values.put(Email.TYPE, emailItemData.getEmailType());
+        getContentResolver().insert(Data.CONTENT_URI, values);
+    }
+
+    private void insertImData(ImData imItemData) {
+        values.clear();
+        values.put(Data.RAW_CONTACT_ID, rawContactId);
+        values.put(Data.MIMETYPE, Im.CONTENT_ITEM_TYPE);
+        values.put(Im.DATA, imItemData.getIm());
+        values.put(Im.PROTOCOL, imItemData.getImType());
+        getContentResolver().insert(Data.CONTENT_URI, values);
     }
 
 
