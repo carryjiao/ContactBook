@@ -36,7 +36,7 @@ import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.RecordItemInDetailActivity;
 import com.carryj.root.contactbook.adapter.RecordAdapter;
 import com.carryj.root.contactbook.data.RecordListViewItemData;
-import com.carryj.root.contactbook.event.DailEvent;
+import com.carryj.root.contactbook.event.DialEvent;
 import com.carryj.root.contactbook.tools.PhoneNumberTransformer;
 
 import org.greenrobot.eventbus.EventBus;
@@ -92,6 +92,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
     private static final int CALLS_ID_INDEX = 6;
 
     private boolean isGetData = false;
+    public boolean dialFlag;
 
 
 
@@ -116,6 +117,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FLAG = FLAG_ALLRECORD;
+        dialFlag = false;
         initData();
         EventBus.getDefault().register(this);//注册订阅事件
     }
@@ -127,6 +129,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
         initView(view);
         return view;
     }
+
 
     private void initView(View view) {
         tv_record_all = (TextView) view.findViewById(R.id.tv_record_all);
@@ -191,7 +194,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
                         // delete
                         deleteRecord(mData.get(position).get_id());
-                        mData.clear();
+                        /*mData.clear();
                         if(FLAG == FLAG_ALLRECORD) {
                             allRcordData = getRecordData(null, null);
                             mData.addAll(allRcordData);
@@ -199,7 +202,8 @@ public class RecordFragement extends Fragment implements OnClickListener {
                         else {
                             missedCallRecordData = getRecordData(selection, selectionArgs);
                             mData.addAll(missedCallRecordData);
-                        }
+                        }*/
+                        mData.remove(position);
                         adapter.notifyDataSetChanged();
                         break;
                     default:
@@ -215,6 +219,8 @@ public class RecordFragement extends Fragment implements OnClickListener {
         recordListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                dialFlag = true;
 
                 callPhone(mData.get(position).getStrNumber());
 
@@ -399,7 +405,11 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
                     //判断联系人姓名是否为空
                     if(cachedName == null){
-                        updataRecordData(_id, strNumber);//补全通话记录数据表中的空字段
+                        ArrayList<String> returnData = updataRecordData(_id, strNumber);//补全通话记录数据表中的空字段
+                        if(returnData != null) {
+                            cachedName = returnData.get(0);
+                            numberType = Integer.parseInt(returnData.get(1));
+                        }
                     }
 
                     RecordListViewItemData itemData = new RecordListViewItemData();
@@ -453,8 +463,9 @@ public class RecordFragement extends Fragment implements OnClickListener {
     }
 
     //补全通话记录数据表内空字段
-    private void updataRecordData(int _id, String strNumber) {
+    private ArrayList<String> updataRecordData(int _id, String strNumber) {
 
+        ArrayList<String> retrunData = new ArrayList<String>();
         Cursor phoneCursor = getContext().getContentResolver().query(Phone.CONTENT_URI,
                 new String[]{Phone.DISPLAY_NAME, Phone.NUMBER, Phone.TYPE, Phone.LOOKUP_KEY, Phone.CONTACT_ID},
                 null,null,null);
@@ -493,21 +504,24 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
                     }
 
-                    break;//已找到
+                    retrunData.add(0,name);
+                    retrunData.add(1,numbertype);
+                    return retrunData;//已找到
 
                 }
             }
             phoneCursor.close();
         }
+        return null;
 
     }
 
 
     //用于消息处理,更新数据
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onChangeRecordDataDailEvent(DailEvent dailEvent) {
+    public void onChangeRecordDataDialEvent(DialEvent dialEvent) {
         Log.d("onChangeRecordDataDail","++++++++++++++++++++++++++++回调函数已启动");
-        if(dailEvent.isDailFlag()){
+        if(dialEvent.isDialFlag()){
             ArrayList<RecordListViewItemData> recordDatas = new ArrayList<RecordListViewItemData>();
             if(FLAG == FLAG_ALLRECORD){
                 recordDatas = getRecordData(null,null);

@@ -15,11 +15,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.carryj.root.contactbook.adapter.MainFragmentPagerAdapter;
+import com.carryj.root.contactbook.event.DialEvent;
 import com.carryj.root.contactbook.fragments.CollectFragement;
 import com.carryj.root.contactbook.fragments.ContactBookFragement;
 import com.carryj.root.contactbook.fragments.DialFragement;
 import com.carryj.root.contactbook.fragments.RecordFragement;
 
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -140,6 +143,11 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
                 setCurrentPage(0);
                 break;
             case R.id.ll_record:
+                //通知刷新数据
+                if(recordFragment.dialFlag){
+                    EventBus.getDefault().post(new DialEvent(true));
+                    recordFragment.dialFlag = false;
+                }
                 setCurrentPage(1);
                 break;
             case R.id.ll_contact:
