@@ -111,7 +111,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_personal_show);
-        EventBus.getDefault().register(this);
+        //EventBus.getDefault().register(this);
     }
 
     @Override
@@ -447,12 +447,14 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                     tv_contact_personal_show_name.setTextColor(Color.parseColor("#030303"));
                 }
                 nameFlag = true;
+                Log.d("onActivityResult", "==============nameFlag = true;");
             }else {
                 if(nameFlag) {
                     tv_contact_personal_show_name.setTextColor(Color.parseColor("#A3A3A3"));
                 }
                 name = "(无姓名)";
                 nameFlag = false;
+                Log.d("onActivityResult", "==============nameFlag = false;");
             }
             tv_contact_personal_show_name.setText(name);
 
@@ -479,6 +481,81 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                 companyFlag = false;
                 Log.d("onActivityResult", "==============companyFlag = false;");
             }
+
+            ArrayList<PhoneNumberData> resultNumberDatas = (ArrayList<PhoneNumberData>) data.getSerializableExtra("NUMBER");
+            ArrayList<EmailData> resultEmailDatas = (ArrayList<EmailData>) data.getSerializableExtra("EMAIL");
+            ArrayList<ImData> resultImDatas = (ArrayList<ImData>) data.getSerializableExtra("IM");
+
+            //类型数据处理
+            Log.d("resultNumberDatas","size= "+resultNumberDatas.size());
+            if(resultNumberDatas.size()>0) {
+
+                for (PhoneNumberData resultNumberData:resultNumberDatas) {
+                    String type = resultNumberData.getNumberType();
+                    resultNumberData.setNumberType(new GetStrPhoneType().getStrPhoneType(Integer.parseInt(type)));
+                }
+
+                if(numberDatas.size()>0) {//原本有数据
+                    numberDatas.clear();
+                    numberDatas.addAll(resultNumberDatas);
+                    numberAdapter.notifyDataSetChanged();
+                }else {//原本没有数据
+                    ll_contact_personal_show_number_block.setVisibility(View.VISIBLE);
+                    for (PhoneNumberData resultNumberData:resultNumberDatas) {
+                        numberDatas.add(resultNumberData);
+                        numberAdapter.notifyItemInserted(0);
+                    }
+                }
+            }else {
+                ll_contact_personal_show_number_block.setVisibility(View.GONE);
+                numberDatas.clear();
+            }
+
+            Log.d("resultEmailDatas","size= "+resultEmailDatas.size());
+            if(resultEmailDatas.size()>0) {
+
+                for (EmailData resultEmailData:resultEmailDatas) {
+                    String type = resultEmailData.getEmailType();
+                    resultEmailData.setEmailType(new GetStrEmailType().getStrEmailType(Integer.parseInt(type)));
+                }
+                if(emailDatas.size()>0) {
+                    emailDatas.clear();
+                    emailDatas.addAll(resultEmailDatas);
+                    emailAdapter.notifyDataSetChanged();
+                }else {
+                    ll_contact_personal_show_email_block.setVisibility(View.VISIBLE);
+                    for (EmailData resultEmailData:resultEmailDatas) {
+                        emailDatas.add(resultEmailData);
+                        emailAdapter.notifyItemInserted(0);
+                    }
+                }
+            }else {
+                ll_contact_personal_show_email_block.setVisibility(View.GONE);
+                emailDatas.clear();
+            }
+
+            Log.d("resultImDatas","size= "+resultImDatas.size());
+            if (resultImDatas.size()>0) {
+
+                for (ImData resultImData:resultImDatas) {
+                    String type = resultImData.getImType();
+                    resultImData.setImType(new GetStrImType().getStrImType(Integer.parseInt(type)));
+                }
+                if(imDatas.size()>0) {
+                    imDatas.clear();
+                    imDatas.addAll(resultImDatas);
+                    imAdapter.notifyDataSetChanged();
+                }else {
+                    ll_contact_personal_show_im_block.setVisibility(View.VISIBLE);
+                    for (ImData resultImData:resultImDatas) {
+                        imDatas.add(resultImData);
+                        imAdapter.notifyItemInserted(0);
+                    }
+                }
+            }else {
+                ll_contact_personal_show_im_block.setVisibility(View.GONE);
+                imDatas.clear();
+            }
         }
 
         super.onActivityResult(requestCode, resultCode, data);
@@ -486,7 +563,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
 
     @Override
     protected void onDestroy() {
-        EventBus.getDefault().unregister(this);
+        //EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
 
@@ -501,7 +578,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
 
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    /*@Subscribe(threadMode = ThreadMode.MAIN)
     public void onDealDataEditChange(NumberChangeEvent numberChangeEvent){
         if(numberChangeEvent.isNumberChangeFlag()) {
             ArrayList<PhoneNumberData> resultNumberDatas = getNumberData();
@@ -567,7 +644,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
 
         }
 
-    }
+    }*/
 
     private ArrayList<PhoneNumberData> getNumberData() {
         ArrayList<PhoneNumberData> datas = new ArrayList<PhoneNumberData>();

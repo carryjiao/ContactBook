@@ -17,7 +17,6 @@ import android.provider.ContactsContract.Data;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -88,7 +87,7 @@ public class AddContactActivity extends SweepBackActivity {
     private AddContactImAdapter imAdapter;
 
     private boolean insertFlag = false;
-    private boolean updataFlag = false;
+    private boolean updateFlag = false;
     private boolean nameFlag;
     private boolean remarkFlag;
     private boolean companyFlag;
@@ -109,15 +108,15 @@ public class AddContactActivity extends SweepBackActivity {
         SELECTOR = getIntent().getStringExtra("SELECTOR");
         if(SELECTOR.equals(FROM_CONTACT_BOOK_FRAGEMENT_ADD)){
             insertFlag = true;
-            updataFlag = false;
+            updateFlag = false;
 
         }else if(SELECTOR.equals(FROM_DIAL_FRAGEMENT_ADD) ||SELECTOR.equals(FROM_RECORD_ITEM_IN_DETAIL_ACTIVITY_NEW)) {
             if(SELECTOR.equals(FROM_DIAL_FRAGEMENT_ADD)) {
                 insertFlag = true;
-                updataFlag = false;
+                updateFlag = false;
             }else {
                 insertFlag = false;
-                updataFlag = true;
+                updateFlag = true;
             }
 
             phoneNumber = getIntent().getStringExtra("NUMBER");
@@ -126,7 +125,7 @@ public class AddContactActivity extends SweepBackActivity {
             myNumberData.add(numberItemData);
         }else if(SELECTOR.equals(FROM_CONTACT_PERSONAL_SHOW_ACTIVITY_EDIT)) {
             insertFlag = false;
-            updataFlag = true;
+            updateFlag = true;
 
             name = getIntent().getStringExtra("NAME");
             nameFlag = getIntent().getBooleanExtra("NAMEFLAG",false);
@@ -180,32 +179,32 @@ public class AddContactActivity extends SweepBackActivity {
         }
 
         /*个人信息模块*/
-        if(updataFlag) {
+        if(updateFlag) {
             if(nameFlag) {
                 et_add_contact_surname.setText(name);
-            }
 
+            }
             et_add_contact_company.setText(company);
             et_add_contact_remark.setText(remark);
         }
 
 
         /*电话号码模块*/
-        numberAdapter = new AddContactNumberAdapter(this, myNumberData, updataFlag);
+        numberAdapter = new AddContactNumberAdapter(this, myNumberData, updateFlag);
         add_contact_number_recyclerview.setLayoutManager(new LinearLayoutManager(this));
         add_contact_number_recyclerview.setAdapter(numberAdapter);
         add_contact_number_recyclerview.addItemDecoration(new DividerItemDecoration(this,
                 DividerItemDecoration.VERTICAL_LIST));
 
         /*电子邮箱模块*/
-        emailAdapter = new AddContactEmailAdapter(this, myEmailData,updataFlag);
+        emailAdapter = new AddContactEmailAdapter(this, myEmailData, updateFlag);
         add_contact_email_recyclerview.setLayoutManager(new LinearLayoutManager(this));
         add_contact_email_recyclerview.setAdapter(emailAdapter);
         add_contact_email_recyclerview.addItemDecoration(new DividerItemDecoration(this,
                 DividerItemDecoration.VERTICAL_LIST));
 
         /*即时聊天模块*/
-        imAdapter = new AddContactImAdapter(this, myImData,updataFlag);
+        imAdapter = new AddContactImAdapter(this, myImData, updateFlag);
         add_contact_im_recyclerview.setLayoutManager(new LinearLayoutManager(this));
         add_contact_im_recyclerview.setAdapter(imAdapter);
         add_contact_im_recyclerview.addItemDecoration(new DividerItemDecoration(this,
@@ -377,22 +376,6 @@ public class AddContactActivity extends SweepBackActivity {
             }
         });
 
-        et_add_contact_remark.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                remark = s.toString();
-            }
-        });
     }
 
     @Override
@@ -420,8 +403,8 @@ public class AddContactActivity extends SweepBackActivity {
                     insert(name, company, myNumberData, myEmailData, myImData, remark);
                     Toast.makeText(this,"添加成功",Toast.LENGTH_SHORT).show();
                 }
-                if(updataFlag){
-                    updata(name, company, myNumberData, myEmailData, myImData, remark);
+                if(updateFlag){
+                    update(name, company, myNumberData, myEmailData, myImData, remark);
                     Toast.makeText(this,"修改成功",Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent();
                     Bundle bundle = new Bundle();
@@ -504,7 +487,7 @@ public class AddContactActivity extends SweepBackActivity {
         return true;
     }
 
-    private boolean updata(String name, String company, ArrayList<PhoneNumberData> numberDatas,
+    private boolean update(String name, String company, ArrayList<PhoneNumberData> numberDatas,
                            ArrayList<EmailData> emailDatas,
                            ArrayList<ImData> imDatas, String remark) {
 
@@ -528,19 +511,23 @@ public class AddContactActivity extends SweepBackActivity {
             {
                 if(nameFlag) {
                     values.clear();
-                    values.put(StructuredName.DISPLAY_NAME, name);
+                    values.put("data1", name);
                     getContentResolver().update(Data.CONTENT_URI, values,
                             Data.RAW_CONTACT_ID+"=? AND "+Data.MIMETYPE+"=?",
                             new String[]{rawContactId+"", StructuredName.CONTENT_ITEM_TYPE});
+
                 }else {
+
                     insertName(name);
+
                 }
 
-            }else {
+            }/*else {
                 getContentResolver().delete(Data.CONTENT_URI,
                         Data.RAW_CONTACT_ID+"=? AND "+Data.MIMETYPE+"=?",
                         new String[]{rawContactId+"", StructuredName.CONTENT_ITEM_TYPE});
-            }
+                Log.d("update_nameFlag","===============deleteName");
+            }*/
 
             // 在data表中更新公司数据
             if (company.length()>0)
@@ -594,8 +581,10 @@ public class AddContactActivity extends SweepBackActivity {
                     values.put(Phone.TYPE, numberItemData.getNumberType());
                     getContentResolver().update(Data.CONTENT_URI, values,
                             Data._ID+"=?", new String[]{numberItemData.get_id()});
+
                 }else {//新增数据
                     insertPhoneNumber(numberItemData);
+
                 }
 
 
@@ -609,8 +598,10 @@ public class AddContactActivity extends SweepBackActivity {
                     values.put(Email.TYPE, emailItemData.getEmailType());
                     getContentResolver().update(Data.CONTENT_URI, values,
                             Data._ID+"=?", new String[]{emailItemData.get_id()});
+
                 }else {
                     insertEmailData(emailItemData);
+
                 }
 
 
@@ -625,8 +616,10 @@ public class AddContactActivity extends SweepBackActivity {
                     values.put(Im.PROTOCOL, imItemData.getImType());
                     getContentResolver().update(Data.CONTENT_URI, values,
                             Data._ID+"=?", new String[]{imItemData.get_id()});
+
                 }else {
                     insertImData(imItemData);
+
                 }
 
             }
