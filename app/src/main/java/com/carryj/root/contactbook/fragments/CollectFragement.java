@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
@@ -31,6 +32,7 @@ import com.carryj.root.contactbook.ContactPersonalShowActivity;
 import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.adapter.CollectAdapter;
 import com.carryj.root.contactbook.data.CollectListViewItemData;
+import com.carryj.root.contactbook.data.ContactListViewItemData;
 
 
 import java.util.ArrayList;
@@ -95,7 +97,20 @@ public class CollectFragement extends Fragment implements OnClickListener {
     }
 
     private void initData() {
-        mData = getCollectData();
+        //异步加载联系人数据
+        new AsyncTask<Void, Void, ArrayList<CollectListViewItemData>>() {
+            @Override
+            protected ArrayList<CollectListViewItemData> doInBackground(Void... params) {
+                ArrayList<CollectListViewItemData> datas = getCollectData();
+                return datas;
+            }
+
+            @Override
+            protected void onPostExecute(ArrayList<CollectListViewItemData> datas) {
+                mData.addAll(datas);
+                adapter.notifyDataSetChanged();
+            }
+        }.execute();
     }
 
     private void initView(View view) {

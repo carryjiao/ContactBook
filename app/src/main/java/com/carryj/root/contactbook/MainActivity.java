@@ -116,7 +116,7 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
         ll_dial = (LinearLayout)findViewById(R.id.ll_dial);
 
         main_pagerAdapter = new MainFragmentPagerAdapter(getSupportFragmentManager(),fragments);
-        //main_viewpager.setOffscreenPageLimit(1);//++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        main_viewpager.setOffscreenPageLimit(4);
         main_viewpager.setAdapter(main_pagerAdapter);
 
 

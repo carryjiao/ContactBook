@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
@@ -43,6 +44,7 @@ import com.carryj.root.contactbook.tools.GetStrPhoneType;
 import com.carryj.root.contactbook.tools.PhoneNumberTransformer;
 
 import java.util.ArrayList;
+import java.util.logging.Handler;
 
 /**
  * Created by root on 17/4/10.
@@ -69,6 +71,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
     private ImageView iv_contact_book_box;
     private ContactBookAdapter adapter;
     private SwipeMenuListView listView;
+    private View view;
 
 
     private static final String[] CONTACTS_PROJECTION = new String[] {
@@ -101,7 +104,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_contact_book,null);
+        view = inflater.inflate(R.layout.fragment_contact_book,null);
         testReadContact();
         initView(view);
         return view;
@@ -255,7 +258,20 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
                     MY_PERMISSIONS_REQUEST_READ_CONTACTS);
         } else {
 
-            mData = getPhoneContacts();
+            //异步加载联系人数据
+            new AsyncTask<Void, Void, ArrayList<ContactListViewItemData>>() {
+                @Override
+                protected ArrayList<ContactListViewItemData> doInBackground(Void... params) {
+                    ArrayList<ContactListViewItemData> datas = getPhoneContacts();
+                    return datas;
+                }
+
+                @Override
+                protected void onPostExecute(ArrayList<ContactListViewItemData> datas) {
+                    mData.addAll(datas);
+                    adapter.notifyDataSetChanged();
+                }
+            }.execute();
 
         }
     }
@@ -268,7 +284,20 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
         {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
-                mData = getPhoneContacts();
+                //异步加载联系人数据
+                new AsyncTask<Void, Void, ArrayList<ContactListViewItemData>>() {
+                    @Override
+                    protected ArrayList<ContactListViewItemData> doInBackground(Void... params) {
+                        ArrayList<ContactListViewItemData> datas = getPhoneContacts();
+                        return datas;
+                    }
+
+                    @Override
+                    protected void onPostExecute(ArrayList<ContactListViewItemData> datas) {
+                        mData.addAll(datas);
+                        adapter.notifyDataSetChanged();
+                    }
+                }.execute();
 
             } else
             {

@@ -9,9 +9,11 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.CallLog;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -21,7 +23,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -35,7 +36,12 @@ import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.RecordItemInDetailActivity;
 import com.carryj.root.contactbook.adapter.RecordAdapter;
 import com.carryj.root.contactbook.data.RecordListViewItemData;
+import com.carryj.root.contactbook.event.DailEvent;
 import com.carryj.root.contactbook.tools.PhoneNumberTransformer;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -107,12 +113,18 @@ public class RecordFragement extends Fragment implements OnClickListener {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         FLAG = FLAG_ALLRECORD;
         initData();
+        EventBus.getDefault().register(this);//注册订阅事件
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_record,null);
         initView(view);
-
         return view;
     }
 
@@ -218,6 +230,11 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
     }
 
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);//取消订阅事件
+        super.onDestroy();
+    }
 
     @Override
     public void onClick(View v) {
@@ -276,7 +293,20 @@ public class RecordFragement extends Fragment implements OnClickListener {
                     MY_PERMISSIONS_REQUEST_READ_CALL_LOG);
         } else {
 
-            mData = getRecordData(null,null);
+            //异步加载联系人数据
+            new AsyncTask<Void, Void, ArrayList<RecordListViewItemData>>() {
+                @Override
+                protected ArrayList<RecordListViewItemData> doInBackground(Void... params) {
+                    ArrayList<RecordListViewItemData> datas = getRecordData(null,null);
+                    return datas;
+                }
+
+                @Override
+                protected void onPostExecute(ArrayList<RecordListViewItemData> datas) {
+                    mData.addAll(datas);
+                    adapter.notifyDataSetChanged();
+                }
+            }.execute();
 
         }
 
@@ -290,9 +320,20 @@ public class RecordFragement extends Fragment implements OnClickListener {
         {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
-                mData = getRecordData(null,null);
-                allRcordData.addAll(mData);
-                missedCallRecordData = getRecordData(selection,selectionArgs);
+                //异步加载联系人数据
+                new AsyncTask<Void, Void, ArrayList<RecordListViewItemData>>() {
+                    @Override
+                    protected ArrayList<RecordListViewItemData> doInBackground(Void... params) {
+                        ArrayList<RecordListViewItemData> datas = getRecordData(null,null);
+                        return datas;
+                    }
+
+                    @Override
+                    protected void onPostExecute(ArrayList<RecordListViewItemData> datas) {
+                        mData.addAll(datas);
+                        adapter.notifyDataSetChanged();
+                    }
+                }.execute();
 
             } else
             {
@@ -358,7 +399,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
                     //判断联系人姓名是否为空
                     if(cachedName == null){
-                        updataRecordData(_id, strNumber);
+                        updataRecordData(_id, strNumber);//补全通话记录数据表中的空字段
                     }
 
                     RecordListViewItemData itemData = new RecordListViewItemData();
@@ -411,6 +452,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
         }
     }
 
+    //补全通话记录数据表内空字段
     private void updataRecordData(int _id, String strNumber) {
 
         Cursor phoneCursor = getContext().getContentResolver().query(Phone.CONTENT_URI,
@@ -460,38 +502,25 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
     }
 
-    /*@Override
-    public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
 
-        //   进入当前Fragment
-        if (enter && !isGetData) {
-            //重新拉取数据
-            mData = getRecordData(null,null);
+    //用于消息处理,更新数据
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onChangeRecordDataDailEvent(DailEvent dailEvent) {
+        Log.d("onChangeRecordDataDail","++++++++++++++++++++++++++++回调函数已启动");
+        if(dailEvent.isDailFlag()){
+            ArrayList<RecordListViewItemData> recordDatas = new ArrayList<RecordListViewItemData>();
+            if(FLAG == FLAG_ALLRECORD){
+                recordDatas = getRecordData(null,null);
+            }else if(FLAG == FLAG_MISSEDCALL){
+                recordDatas = getRecordData(selection,selectionArgs);
+            }
+
+            mData.clear();
+            mData.addAll(recordDatas);
             adapter.notifyDataSetChanged();
-            isGetData = true;
-            Log.d("enter && !isGetData", "isGetData = true");
-        } else {
-            isGetData = false;
-            Log.d("enter && !isGetData", "isGetData = false");
+            Log.d("onChangeRecordDataDail","++++++++++++++++++++++++++++data have changed");
         }
-        return super.onCreateAnimation(transit, enter, nextAnim);
+
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (!isGetData) {
-            mData = getRecordData(null,null);
-            adapter.notifyDataSetChanged();
-            isGetData = true;
-            Log.d("onResume", "isGetData = true");
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        isGetData = false;
-        Log.d("onPause", "isGetData = false");
-    }*/
 }

@@ -32,11 +32,14 @@ import com.carryj.root.contactbook.data.ContactListViewItemData;
 import com.carryj.root.contactbook.data.EmailData;
 import com.carryj.root.contactbook.data.ImData;
 import com.carryj.root.contactbook.data.PhoneNumberData;
+import com.carryj.root.contactbook.event.DailEvent;
 import com.carryj.root.contactbook.tools.GetStrEmailType;
 import com.carryj.root.contactbook.tools.GetStrImType;
 import com.carryj.root.contactbook.tools.GetStrPhoneType;
 import com.carryj.root.contactbook.tools.PhoneNumberTransformer;
 import com.carryj.root.contactbook.ui.DividerItemDecoration;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 
@@ -52,6 +55,8 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
 
     private static final int REQUEST_CODE = 1;
     private static final int RESULT_CODE = 100;
+
+    private boolean dailFlag;
 
     private ContactListViewItemData data;
 
@@ -104,6 +109,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     @Override
     protected void initData() {
 
+        dailFlag = false;//dailFlag初始化:没有拨号
         selector = getIntent().getStringExtra(SELECTOR);
         if(selector.equals(FROM_COLLECT_FRAGMENT)){
             backStr = "个人收藏";
@@ -331,11 +337,13 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
             @Override
             public void onClick(int position) {
                 try {
+                    dailFlag = true;//已拨号
                     String number = numberDatas.get(position).getNumber();
                     Intent intent = new Intent(Intent.ACTION_CALL);
                     Uri data = Uri.parse("tel:" + number);
                     intent.setData(data);
                     startActivity(intent);
+
                 }catch (SecurityException e){
 
                 }finally {
@@ -418,12 +426,6 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
             }
         });
 
-
-
-
-
-
-
     }
 
     @Override
@@ -431,6 +433,9 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         int id = v.getId();
         switch (id) {
             case R.id.ll_contact_personal_show_back:
+                if(dailFlag){
+                    EventBus.getDefault().post(new DailEvent(dailFlag));//发布消息:已拨号
+                }
                 this.finish();
                 break;
             case R.id.tv_contact_personal_show_edit:

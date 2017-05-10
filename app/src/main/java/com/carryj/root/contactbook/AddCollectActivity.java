@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Data;
@@ -68,7 +69,20 @@ public class AddCollectActivity extends SweepBackActivity {
     @Override
     protected void initData() {
 
-        mData = getPhoneContacts();
+        //异步加载联系人数据
+        new AsyncTask<Void, Void, ArrayList<ContactListViewItemData>>() {
+            @Override
+            protected ArrayList<ContactListViewItemData> doInBackground(Void... params) {
+                ArrayList<ContactListViewItemData> datas = getPhoneContacts();
+                return datas;
+            }
+
+            @Override
+            protected void onPostExecute(ArrayList<ContactListViewItemData> datas) {
+                mData.addAll(datas);
+                adapter.notifyDataSetChanged();
+            }
+        }.execute();
 
     }
 
@@ -138,14 +152,14 @@ public class AddCollectActivity extends SweepBackActivity {
         });
 
 
-        tv_contact_book_add.setOnClickListener(this);
-        iv_contact_book_box.setOnClickListener(this);
+
 
     }
 
     @Override
     protected void initEvents() {
-
+        tv_contact_book_add.setOnClickListener(this);
+        iv_contact_book_box.setOnClickListener(this);
     }
 
     @Override
