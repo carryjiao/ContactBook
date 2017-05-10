@@ -56,8 +56,6 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     private static final int REQUEST_CODE = 1;
     private static final int RESULT_CODE = 100;
 
-    private boolean dialFlag;
-
     private ContactListViewItemData data;
 
     private String selector;
@@ -109,7 +107,6 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     @Override
     protected void initData() {
 
-        dialFlag = false;//dailFlag初始化:没有拨号
         selector = getIntent().getStringExtra(SELECTOR);
         if(selector.equals(FROM_COLLECT_FRAGMENT)){
             backStr = "个人收藏";
@@ -337,7 +334,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
             @Override
             public void onClick(int position) {
                 try {
-                    dialFlag = true;//已拨号
+                    EventBus.getDefault().post(new DialEvent(false,true));
                     String number = numberDatas.get(position).getNumber();
                     Intent intent = new Intent(Intent.ACTION_CALL);
                     Uri data = Uri.parse("tel:" + number);
@@ -433,9 +430,6 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         int id = v.getId();
         switch (id) {
             case R.id.ll_contact_personal_show_back:
-                if(dialFlag){
-                    EventBus.getDefault().post(new DialEvent(dialFlag));//发布消息:已拨号
-                }
                 this.finish();
                 break;
             case R.id.tv_contact_personal_show_edit:

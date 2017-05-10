@@ -20,6 +20,9 @@ import android.widget.Toast;
 
 import com.carryj.root.contactbook.AddContactActivity;
 import com.carryj.root.contactbook.R;
+import com.carryj.root.contactbook.event.DialEvent;
+
+import org.greenrobot.eventbus.EventBus;
 
 
 /**
@@ -160,6 +163,7 @@ public class DialFragement extends Fragment implements OnClickListener,OnLongCli
                 tv_show_dial_number.append("#");
                 break;
             case R.id.btn_dial_number_call:
+                EventBus.getDefault().post(new DialEvent(false,true));
                 //调用系统方法拨打电话
                 testCall(v);
                 break;

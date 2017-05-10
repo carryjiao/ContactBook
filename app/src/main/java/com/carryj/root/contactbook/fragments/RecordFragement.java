@@ -521,7 +521,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onChangeRecordDataDialEvent(DialEvent dialEvent) {
         Log.d("onChangeRecordDataDail","++++++++++++++++++++++++++++回调函数已启动");
-        if(dialEvent.isDialFlag()){
+        if(dialEvent.isDialFlag() && !dialEvent.isAfterDialFlag()){
             ArrayList<RecordListViewItemData> recordDatas = new ArrayList<RecordListViewItemData>();
             if(FLAG == FLAG_ALLRECORD){
                 recordDatas = getRecordData(null,null);
@@ -533,6 +533,8 @@ public class RecordFragement extends Fragment implements OnClickListener {
             mData.addAll(recordDatas);
             adapter.notifyDataSetChanged();
             Log.d("onChangeRecordDataDail","++++++++++++++++++++++++++++data have changed");
+        }else if(!dialEvent.isDialFlag() && dialEvent.isAfterDialFlag()) {
+            dialFlag = true;
         }
 
     }

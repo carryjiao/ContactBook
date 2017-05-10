@@ -8,9 +8,11 @@ package com.carryj.root.contactbook.event;
 public class DialEvent {
 
     private boolean dialFlag;
+    private boolean afterDialFlag;
 
-    public DialEvent(boolean dialFlag) {
+    public DialEvent(boolean dialFlag, boolean afterDialFlag) {
         this.dialFlag = dialFlag;
+        this.afterDialFlag = afterDialFlag;
     }
 
     public boolean isDialFlag() {
@@ -19,5 +21,13 @@ public class DialEvent {
 
     public void setDialFlag(boolean dialFlag) {
         this.dialFlag = dialFlag;
+    }
+
+    public boolean isAfterDialFlag() {
+        return afterDialFlag;
+    }
+
+    public void setAfterDialFlag(boolean afterDialFlag) {
+        this.afterDialFlag = afterDialFlag;
     }
 }

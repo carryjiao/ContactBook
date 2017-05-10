@@ -145,7 +145,7 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
             case R.id.ll_record:
                 //通知刷新数据
                 if(recordFragment.dialFlag){
-                    EventBus.getDefault().post(new DialEvent(true));
+                    EventBus.getDefault().post(new DialEvent(true,false));
                     recordFragment.dialFlag = false;
                 }
                 setCurrentPage(1);

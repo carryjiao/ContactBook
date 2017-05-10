@@ -27,13 +27,14 @@ import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.carryj.root.contactbook.AddCollectActivity;
-import com.carryj.root.contactbook.CollectPersonalShowActivity;
 import com.carryj.root.contactbook.ContactPersonalShowActivity;
 import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.adapter.CollectAdapter;
 import com.carryj.root.contactbook.data.CollectListViewItemData;
-import com.carryj.root.contactbook.data.ContactListViewItemData;
+import com.carryj.root.contactbook.event.DialEvent;
 
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 
@@ -55,6 +56,8 @@ public class CollectFragement extends Fragment implements OnClickListener {
     private ImageView iv_collect_box;
     private CollectAdapter adapter;
     private SwipeMenuListView listView;
+
+    private boolean dialFlag;
 
     /**获取库contact表字段**/
     private static final String[] Collect_PROJECTION = new String[] {
@@ -97,6 +100,7 @@ public class CollectFragement extends Fragment implements OnClickListener {
     }
 
     private void initData() {
+        dialFlag = false;
         //异步加载联系人数据
         new AsyncTask<Void, Void, ArrayList<CollectListViewItemData>>() {
             @Override
@@ -192,6 +196,7 @@ public class CollectFragement extends Fragment implements OnClickListener {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+                EventBus.getDefault().post(new DialEvent(false,true));//设置通话记录数据更新
                 callPhone(mData.get(position).getStrPhoneNumber());
 
             }
