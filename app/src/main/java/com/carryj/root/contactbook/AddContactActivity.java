@@ -32,7 +32,10 @@ import com.carryj.root.contactbook.adapter.AddContactNumberAdapter;
 import com.carryj.root.contactbook.data.EmailData;
 import com.carryj.root.contactbook.data.ImData;
 import com.carryj.root.contactbook.data.PhoneNumberData;
+import com.carryj.root.contactbook.event.NumberChangeEvent;
 import com.carryj.root.contactbook.ui.DividerItemDecoration;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 
@@ -418,6 +421,7 @@ public class AddContactActivity extends SweepBackActivity {
                     this.setResult(RESULT_CODE,intent);
                 }
 
+                EventBus.getDefault().post(new NumberChangeEvent(true));//通知ContactBook刷新数据
                 this.finish();
                 break;
             case R.id.ll_add_contact_number_add:

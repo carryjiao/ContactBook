@@ -33,6 +33,7 @@ import com.carryj.root.contactbook.data.EmailData;
 import com.carryj.root.contactbook.data.ImData;
 import com.carryj.root.contactbook.data.PhoneNumberData;
 import com.carryj.root.contactbook.event.DialEvent;
+import com.carryj.root.contactbook.event.NumberChangeEvent;
 import com.carryj.root.contactbook.tools.GetStrEmailType;
 import com.carryj.root.contactbook.tools.GetStrImType;
 import com.carryj.root.contactbook.tools.GetStrPhoneType;
@@ -466,6 +467,8 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                     }
                     cursor.close();
                 }
+
+                EventBus.getDefault().post(new NumberChangeEvent(true));//发布消息:联系人数据更新
                 this.finish();
                 break;
             default:

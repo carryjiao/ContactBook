@@ -520,7 +520,6 @@ public class RecordFragement extends Fragment implements OnClickListener {
     //用于消息处理,更新数据
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onChangeRecordDataDialEvent(DialEvent dialEvent) {
-        Log.d("onChangeRecordDataDail","++++++++++++++++++++++++++++回调函数已启动");
         if(dialEvent.isDialFlag() && !dialEvent.isAfterDialFlag()){
             ArrayList<RecordListViewItemData> recordDatas = new ArrayList<RecordListViewItemData>();
             if(FLAG == FLAG_ALLRECORD){
@@ -532,7 +531,6 @@ public class RecordFragement extends Fragment implements OnClickListener {
             mData.clear();
             mData.addAll(recordDatas);
             adapter.notifyDataSetChanged();
-            Log.d("onChangeRecordDataDail","++++++++++++++++++++++++++++data have changed");
         }else if(!dialEvent.isDialFlag() && dialEvent.isAfterDialFlag()) {
             dialFlag = true;
         }

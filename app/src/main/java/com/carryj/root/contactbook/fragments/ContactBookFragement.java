@@ -10,6 +10,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
@@ -39,9 +40,14 @@ import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.adapter.ContactBookAdapter;
 import com.carryj.root.contactbook.data.ContactListViewItemData;
 import com.carryj.root.contactbook.data.PhoneNumberData;
+import com.carryj.root.contactbook.event.NumberChangeEvent;
 import com.carryj.root.contactbook.tools.ContactBookSearch;
 import com.carryj.root.contactbook.tools.GetStrPhoneType;
 import com.carryj.root.contactbook.tools.PhoneNumberTransformer;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.logging.Handler;
@@ -101,11 +107,16 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+        testReadContact();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_contact_book,null);
-        testReadContact();
         initView(view);
         return view;
     }
@@ -172,9 +183,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
                             cursor.close();
                         }
 
-                        allContactData = getPhoneContacts();
-                        mData.clear();
-                        mData.addAll(allContactData);
+                        mData.remove(position);
                         adapter.notifyDataSetChanged();
                         break;
                     case 1:
@@ -238,7 +247,14 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
     @Override
     public void onDestroyView() {
+
         super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);//取消订阅事件
+        super.onDestroy();
     }
 
     private int dp2px(int dp) {
@@ -374,6 +390,17 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
         @Override
         public void afterTextChanged(Editable s) {
 
+        }
+    }
+
+    //处理数据更新事件
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onDealNumberChangeEvent(NumberChangeEvent numberChangeEvent) {
+        if (numberChangeEvent.isNumberChangeFlag()) {
+            ArrayList<ContactListViewItemData> contactDatas = getPhoneContacts();
+            mData.clear();
+            mData.addAll(contactDatas);
+            adapter.notifyDataSetChanged();
         }
     }
 }
