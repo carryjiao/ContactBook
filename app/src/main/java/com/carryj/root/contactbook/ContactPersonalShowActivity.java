@@ -6,10 +6,12 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Data;
+import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.CommonDataKinds.Organization;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.CommonDataKinds.Email;
@@ -67,6 +69,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     private String remark;
     private String company;
 
+    private boolean nameFlag;
     private boolean remarkFlag;
     private boolean companyFlag;
 
@@ -126,12 +129,18 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         ContentResolver resolver = getContentResolver();
 
         //查询联系人姓名
-        Cursor nameCursor = resolver.query(Phone.CONTENT_URI, new String[]{Phone.DISPLAY_NAME},
-                Phone.LOOKUP_KEY+"=?",new String[]{lookUp},null);
+        Cursor nameCursor = resolver.query(Data.CONTENT_URI, new String[]{Data.DISPLAY_NAME},
+                Phone.LOOKUP_KEY+"=? AND " + Data.MIMETYPE + " = ?",
+                new String[]{lookUp, StructuredName.CONTENT_ITEM_TYPE},null);
         if (nameCursor != null) {
             while (nameCursor.moveToNext()) {
                 name = nameCursor.getString(0);
             }
+        }
+        if(name != null && name.length()>0) {
+            nameFlag = true;
+        }else {
+            nameFlag = false;
         }
 
         //查询联系人电话号码
@@ -157,10 +166,12 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
             remarkCursor.close();
         }
 
-        if(remark != null) {
+        if(remark != null && remark.length()>0) {
             remarkFlag = true;
+
         }else {
             remarkFlag = false;
+
         }
 
         //获取公司
@@ -175,10 +186,12 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
             companyCursor.close();
         }
 
-        if(company != null) {
+        if(company != null && company.length()>0) {
             companyFlag = true;
+
         }else {
             companyFlag = false;
+
         }
 
     }
@@ -209,7 +222,12 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         tv_contact_personal_show_company = (TextView) findViewById(R.id.tv_contact_personal_show_company);
 
         tv_back_str.setText(backStr);
+        if(!nameFlag) {
+            name = "(无姓名)";
+            tv_contact_personal_show_name.setTextColor(Color.parseColor("#A3A3A3"));
+        }
         tv_contact_personal_show_name.setText(name);
+
 
         numberAdapter = new ContactPersonalShowNumberAdapter(this,numberDatas);
         emailAdapter = new ContactPersonalShowEmailAdapter(this,emailDatas);
@@ -315,17 +333,6 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
             }
         });
 
-        /*//点击跳转到二维码界面
-        numberAdapter.setOnItemClicktoORCodeListenner(new ContactPersonalShowNumberAdapter.OnItemClickListener() {
-            @Override
-            public void onClick(int position) {
-                String number = numberDatas.get(position).getNumber();
-                Intent intent = new Intent(ContactPersonalShowActivity.this.getApplicationContext(), ShowORCodeActivity.class);
-                intent.putExtra("ORCODE", number);
-                startActivity(intent);
-            }
-        });*/
-
         //长按将电子邮箱号码复制到系统粘贴板上
         emailAdapter.setOnItemLongClickListener(new ContactPersonalShowEmailAdapter.OnItemLongClickListener() {
             @Override
@@ -388,6 +395,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                         AddContactActivity.class);
                 intent.putExtra(SELECTOR, FROM_CONTACT_PERSONAL_SHOW_ACTIVITY_EDIT);
                 intent.putExtra("NAME",name);
+                intent.putExtra("NAMEFLAG",nameFlag);
                 intent.putExtra("COMPANY",company);
                 intent.putExtra("COMPANYFLAG",companyFlag);
                 intent.putExtra("REMARK",remark);
@@ -414,7 +422,6 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                                 ContentUris.withAppendedId(
                                 ContactsContract.RawContacts.CONTENT_URI,
                                         rawContactID), null, null);
-                        //*************************************************************************************************************
 
                     }
                     cursor.close();
@@ -435,103 +442,43 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         if(requestCode == REQUEST_CODE && resultCode == RESULT_CODE) {
             //更新数据
             name = data.getStringExtra("NAME");
+            if(name != null && name.length()>0) {
+                if(!nameFlag) {//之前是无姓名,颜色为灰色,现在有姓名,需将颜色设为黑色
+                    tv_contact_personal_show_name.setTextColor(Color.parseColor("#030303"));
+                }
+                nameFlag = true;
+            }else {
+                if(nameFlag) {
+                    tv_contact_personal_show_name.setTextColor(Color.parseColor("#A3A3A3"));
+                }
+                name = "(无姓名)";
+                nameFlag = false;
+            }
             tv_contact_personal_show_name.setText(name);
 
             remark = data.getStringExtra("REMARK");
-            if(remark != null && remark.length()>0) {
+            if (remark != null && remark.length() > 0) {
                 ll_contact_personal_show_remark_block.setVisibility(View.VISIBLE);
                 tv_contact_personal_show_remark.setText(remark);
                 remarkFlag = true;
-            }else {
+                Log.d("onActivityResult", "==============remarkFlag = true;");
+            } else {
                 ll_contact_personal_show_remark_block.setVisibility(View.GONE);
                 remarkFlag = false;
+                Log.d("onActivityResult", "==============remarkFlag = false;");
             }
 
             company = data.getStringExtra("COMPANY");
-            if(company != null && company.length()>0) {
+            if (company != null && company.length() > 0) {
                 ll_contact_personal_show_company_block.setVisibility(View.VISIBLE);
                 tv_contact_personal_show_company.setText(company);
                 companyFlag = true;
-            }else {
+                Log.d("onActivityResult", "==============companyFlag = true;");
+            } else {
                 ll_contact_personal_show_company_block.setVisibility(View.GONE);
                 companyFlag = false;
+                Log.d("onActivityResult", "==============companyFlag = false;");
             }
-
-
-
-            /*ArrayList<PhoneNumberData> resultNumberDatas = (ArrayList<PhoneNumberData>) data.getSerializableExtra("NUMBER");
-            ArrayList<EmailData> resultEmailDatas = (ArrayList<EmailData>) data.getSerializableExtra("EMAIL");
-            ArrayList<ImData> resultImDatas = (ArrayList<ImData>) data.getSerializableExtra("IM");
-            //类型数据处理
-            if(resultNumberDatas.size()>0) {
-                ll_contact_personal_show_number_block.setVisibility(View.VISIBLE);
-                for(PhoneNumberData resultNumberData:resultNumberDatas){
-                    int intType = Integer.parseInt(resultNumberData.getNumberType());
-                    String strType = new GetStrPhoneType().getStrPhoneType(intType);
-                    resultNumberData.setNumberType(strType);
-                }
-            }else {
-                ll_contact_personal_show_number_block.setVisibility(View.GONE);
-            }
-
-            if(resultEmailDatas.size()>0) {
-                ll_contact_personal_show_email_block.setVisibility(View.VISIBLE);
-                for (EmailData resultEmailData:resultEmailDatas){
-                    int intType = Integer.parseInt(resultEmailData.getEmailType());
-                    String strType = new GetStrEmailType().getStrEmailType(intType);
-                    resultEmailData.setEmailType(strType);
-                }
-            }else {
-                ll_contact_personal_show_email_block.setVisibility(View.GONE);
-            }
-
-            if (resultImDatas.size()>0) {
-                ll_contact_personal_show_im_block.setVisibility(View.VISIBLE);
-                for (ImData resultImData:resultImDatas){
-                    int intType = Integer.parseInt(resultImData.getImType());
-                    String strType = new GetStrImType().getStrImType(intType);
-                    resultImData.setImType(strType);
-                }
-            }else {
-                ll_contact_personal_show_im_block.setVisibility(View.GONE);
-            }
-
-            if(numberDatas.size()>0) {//原本有数据
-                numberDatas.clear();
-                numberDatas.addAll(resultNumberDatas);
-                numberAdapter.notifyDataSetChanged();
-            }else {//原本没有数据
-                for (PhoneNumberData resultNumberData:resultNumberDatas) {
-                    numberDatas.add(resultNumberData);
-                    numberAdapter.notifyItemInserted(numberAdapter.getItemCount());
-                }
-            }
-
-
-            if(emailDatas.size()>0) {
-                emailDatas.clear();
-                emailDatas.addAll(resultEmailDatas);
-                emailAdapter.notifyDataSetChanged();
-            }else {
-                for (EmailData resultEmailData:resultEmailDatas) {
-                    emailDatas.add(resultEmailData);
-                    emailAdapter.notifyItemInserted(emailAdapter.getItemCount());
-                }
-            }
-
-
-
-            if(imDatas.size()>0) {
-                imDatas.clear();
-                imDatas.addAll(resultImDatas);
-                imAdapter.notifyDataSetChanged();
-            }else {
-                for (ImData resultImData:resultImDatas) {
-                    imDatas.add(resultImData);
-                    imAdapter.notifyItemInserted(imAdapter.getItemCount());
-                }
-            }*/
-
         }
 
         super.onActivityResult(requestCode, resultCode, data);
@@ -548,15 +495,8 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         Intent orCodeIntent = new Intent(ContactPersonalShowActivity.this.getApplicationContext(),
                 ShowORCodeActivity.class);
         StringBuilder sb = new StringBuilder();
-
-        /*for(PhoneNumberData numberData:numberDatas) {
-            sb.append(numberData.getNumber());
-            sb.append(" ");
-        }*/
         sb.append(numberDatas.get(0).getNumber());
-
         orCodeIntent.putExtra("ORCODE", sb.toString());
-        Log.d("===========ORCODE=",sb.toString());
         startActivity(orCodeIntent);
 
     }
@@ -568,52 +508,61 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
             ArrayList<EmailData> resultEmailDatas = getEmailData();
             ArrayList<ImData> resultImDatas = getImData();
             //类型数据处理
+            Log.d("resultNumberDatas","size= "+resultNumberDatas.size());
             if(resultNumberDatas.size()>0) {
-                ll_contact_personal_show_number_block.setVisibility(View.VISIBLE);
+
                 if(numberDatas.size()>0) {//原本有数据
                     numberDatas.clear();
                     numberDatas.addAll(resultNumberDatas);
                     numberAdapter.notifyDataSetChanged();
                 }else {//原本没有数据
+                    ll_contact_personal_show_number_block.setVisibility(View.VISIBLE);
                     for (PhoneNumberData resultNumberData:resultNumberDatas) {
                         numberDatas.add(resultNumberData);
-                        numberAdapter.notifyItemInserted(numberAdapter.getItemCount());
+                        numberAdapter.notifyItemInserted(0);
                     }
                 }
             }else {
                 ll_contact_personal_show_number_block.setVisibility(View.GONE);
+                //numberDatas.clear();
             }
 
+            Log.d("resultEmailDatas","size= "+resultEmailDatas.size());
             if(resultEmailDatas.size()>0) {
-                ll_contact_personal_show_email_block.setVisibility(View.VISIBLE);
+
                 if(emailDatas.size()>0) {
                     emailDatas.clear();
                     emailDatas.addAll(resultEmailDatas);
                     emailAdapter.notifyDataSetChanged();
                 }else {
+                    ll_contact_personal_show_email_block.setVisibility(View.VISIBLE);
                     for (EmailData resultEmailData:resultEmailDatas) {
                         emailDatas.add(resultEmailData);
-                        emailAdapter.notifyItemInserted(emailAdapter.getItemCount());
+                        emailAdapter.notifyItemInserted(0);
                     }
                 }
             }else {
                 ll_contact_personal_show_email_block.setVisibility(View.GONE);
+                //emailDatas.clear();
             }
 
+            Log.d("resultImDatas","size= "+resultImDatas.size());
             if (resultImDatas.size()>0) {
-                ll_contact_personal_show_im_block.setVisibility(View.VISIBLE);
+
                 if(imDatas.size()>0) {
                     imDatas.clear();
                     imDatas.addAll(resultImDatas);
                     imAdapter.notifyDataSetChanged();
                 }else {
+                    ll_contact_personal_show_im_block.setVisibility(View.VISIBLE);
                     for (ImData resultImData:resultImDatas) {
                         imDatas.add(resultImData);
-                        imAdapter.notifyItemInserted(imAdapter.getItemCount());
+                        imAdapter.notifyItemInserted(0);
                     }
                 }
             }else {
                 ll_contact_personal_show_im_block.setVisibility(View.GONE);
+                //imDatas.clear();
             }
 
         }

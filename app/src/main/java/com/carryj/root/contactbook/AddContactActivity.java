@@ -37,7 +37,6 @@ import com.carryj.root.contactbook.event.NumberChangeEvent;
 import com.carryj.root.contactbook.ui.DividerItemDecoration;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 
@@ -90,6 +89,7 @@ public class AddContactActivity extends SweepBackActivity {
 
     private boolean insertFlag = false;
     private boolean updataFlag = false;
+    private boolean nameFlag;
     private boolean remarkFlag;
     private boolean companyFlag;
 
@@ -127,11 +127,16 @@ public class AddContactActivity extends SweepBackActivity {
         }else if(SELECTOR.equals(FROM_CONTACT_PERSONAL_SHOW_ACTIVITY_EDIT)) {
             insertFlag = false;
             updataFlag = true;
+
             name = getIntent().getStringExtra("NAME");
+            nameFlag = getIntent().getBooleanExtra("NAMEFLAG",false);
+
             company = getIntent().getStringExtra("COMPANY");
-            getIntent().getBooleanExtra("COMPANYFLAG", companyFlag);
+            companyFlag = getIntent().getBooleanExtra("COMPANYFLAG", false);
+
             remark = getIntent().getStringExtra("REMARK");
-            getIntent().getBooleanExtra("REMARKFLAG", remarkFlag);
+            remarkFlag = getIntent().getBooleanExtra("REMARKFLAG", false);
+
             lookUp = getIntent().getStringExtra("LOOKUP");
             myNumberData = (ArrayList<PhoneNumberData>) getIntent().getSerializableExtra("NUMBERDATA");
             myEmailData = (ArrayList<EmailData>) getIntent().getSerializableExtra("EMAILDATA");
@@ -176,7 +181,10 @@ public class AddContactActivity extends SweepBackActivity {
 
         /*个人信息模块*/
         if(updataFlag) {
-            et_add_contact_surname.setText(name);
+            if(nameFlag) {
+                et_add_contact_surname.setText(name);
+            }
+
             et_add_contact_company.setText(company);
             et_add_contact_remark.setText(remark);
         }
@@ -196,7 +204,7 @@ public class AddContactActivity extends SweepBackActivity {
         add_contact_email_recyclerview.addItemDecoration(new DividerItemDecoration(this,
                 DividerItemDecoration.VERTICAL_LIST));
 
-        /*及时通信模块*/
+        /*即时聊天模块*/
         imAdapter = new AddContactImAdapter(this, myImData,updataFlag);
         add_contact_im_recyclerview.setLayoutManager(new LinearLayoutManager(this));
         add_contact_im_recyclerview.setAdapter(imAdapter);
@@ -518,11 +526,7 @@ public class AddContactActivity extends SweepBackActivity {
             // 在data表中更新姓名数据
             if (name.length()>0)
             {
-                //先查询原来有无姓名数据
-                Cursor nameCursor = getContentResolver().query(Data.CONTENT_URI,null,
-                        Data.RAW_CONTACT_ID+"=? AND "+Data.MIMETYPE+"=?",
-                        new String[]{rawContactId+"", StructuredName.CONTENT_ITEM_TYPE}, null);
-                if(nameCursor != null) {
+                if(nameFlag) {
                     values.clear();
                     values.put(StructuredName.DISPLAY_NAME, name);
                     getContentResolver().update(Data.CONTENT_URI, values,
@@ -542,45 +546,37 @@ public class AddContactActivity extends SweepBackActivity {
             if (company.length()>0)
             {
                 if(companyFlag) {
-                    Log.d("=======companyIsNull"," false++++++++++++++++++++++++++");
+
                     values.clear();
                     values.put(Organization.COMPANY, company);
                     getContentResolver().update(Data.CONTENT_URI, values,
                             Data.RAW_CONTACT_ID+"=? AND "+Data.MIMETYPE+"=?",
                             new String[]{rawContactId+"", Organization.CONTENT_ITEM_TYPE});
-                    Log.d("=======company"," updata into db++++++++++++++++++++++++++");
                 }else {
 
-                    Log.d("=======companyIsNull"," true++++++++++++++++++++++++++");
                     insertCompany(company);
-                    Log.d("=======company"," insert into db++++++++++++++++++++++++++");
 
                 }
 
             }else {
-                Log.d("=======company"," delete++++++++++++++++++++++++++");
+
                 getContentResolver().delete(Data.CONTENT_URI,
                         Data.RAW_CONTACT_ID+"=? AND "+Data.MIMETYPE+"=?",
                         new String[]{rawContactId+"", Organization.CONTENT_ITEM_TYPE});
-                Log.d("=======company"," delete done++++++++++++++++++++++++++");
+
             }
 
             // 在data表中更新备注数据
             if (remark.length()>0)
             {
                 if (remarkFlag) {
-                    Log.d("=======noteIsNull"," false++++++++++++++++++++++++++");
                     values.clear();
                     values.put(Note.NOTE, remark);
                     getContentResolver().update(Data.CONTENT_URI, values,
                             Data.RAW_CONTACT_ID+"=? AND "+Data.MIMETYPE+"=?",
                             new String[]{rawContactId+"", Note.CONTENT_ITEM_TYPE});
-                    Log.d("=======note"," updata into db++++++++++++++++++++++++++");
-                }else {
-
-                    Log.d("=======noteIsNull"," true++++++++++++++++++++++++++");
+                 }else {
                     insertNote(remark);
-                    Log.d("=======note"," insert into db++++++++++++++++++++++++++");
                 }
 
             }else {
