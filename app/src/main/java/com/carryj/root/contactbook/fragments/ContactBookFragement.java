@@ -58,7 +58,7 @@ import java.util.logging.Handler;
 
 public class ContactBookFragement extends Fragment implements OnClickListener {
 
-    private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 2;
+    private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1001;
     public static final String CONTACT_SHOW = "CONTACT_SHOW";
     public static final String SELECTOR = "SELECTOR";
     private static final String FROM_CONTACT_BOOK_FRAGEMENT_ADD = "FROM_CONTACT_BOOK_FRAGEMENT_ADD";
@@ -66,8 +66,6 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
     public static final String FROM_CONTACT_BOOK_FRAGMENT = "FROM_CONTACT_BOOK_FRAGMENT";
     public static final String NAME = "NAME";
     public static final String LOOKUP = "LOOKUP";
-
-
 
 
     private TextView tv_contact_book_add;
@@ -80,18 +78,24 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
     private View view;
 
 
-    private static final String[] CONTACTS_PROJECTION = new String[] {
+    private static final String[] CONTACTS_PROJECTION = new String[]{
             Contacts.DISPLAY_NAME, Contacts.LOOKUP_KEY};
 
-    /**获取库Phone表字段**/
-    private static final String[] PHONES_PROJECTION = new String[] {
+    /**
+     * 获取库Phone表字段
+     **/
+    private static final String[] PHONES_PROJECTION = new String[]{
             Phone.DISPLAY_NAME, Phone.RAW_CONTACT_ID, Phone.CONTACT_ID};
 
 
-    /**联系人显示名称**/
+    /**
+     * 联系人显示名称
+     **/
     private static final int PHONES_DISPLAY_NAME_INDEX = 0;
 
-    /**联系人的ID**/
+    /**
+     * 联系人的ID
+     **/
     private static final int PHONES_RAW_CONTACT_ID_INDEX = 1;
 
     private static final int PHONES_CONTACT_ID_INDEX = 2;
@@ -111,14 +115,47 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
-        testReadContact();
+        initData();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_contact_book,null);
+        view = inflater.inflate(R.layout.fragment_contact_book, null);
         initView(view);
         return view;
+    }
+
+    private void initData() {
+        //异步加载联系人数据
+        new AsyncTask<Void, Void, ArrayList<ContactListViewItemData>>() {
+            @Override
+            protected ArrayList<ContactListViewItemData> doInBackground(Void... params) {
+
+                ArrayList<ContactListViewItemData> datas = new ArrayList<ContactListViewItemData>();
+                //获取 READ_CONTACTS 权限
+
+                if (ContextCompat.checkSelfPermission(getContext(),
+                        Manifest.permission.READ_CONTACTS)
+                        != PackageManager.PERMISSION_GRANTED) {
+
+                    ActivityCompat.requestPermissions(getActivity(),
+                            new String[]{Manifest.permission.READ_CONTACTS},
+                            MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+                } else {
+
+                    datas = getPhoneContacts();
+
+                }
+                return datas;
+            }
+
+
+            @Override
+            protected void onPostExecute(ArrayList<ContactListViewItemData> datas) {
+                mData.addAll(datas);
+                adapter.notifyDataSetChanged();
+            }
+        }.execute();
     }
 
     private void initView(View view) {
@@ -169,10 +206,10 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
                         // delete   先查后删
                         String lookUp = mData.get(position).getLookUp();
                         Cursor cursor = getContext().getContentResolver().query(Phone.CONTENT_URI,
-                                new String[]{Phone.RAW_CONTACT_ID},Phone.LOOKUP_KEY+"=?",
-                                new String[]{lookUp},null);
-                        if(cursor!=null){
-                            while (cursor.moveToNext()){
+                                new String[]{Phone.RAW_CONTACT_ID}, Phone.LOOKUP_KEY + "=?",
+                                new String[]{lookUp}, null);
+                        if (cursor != null) {
+                            while (cursor.moveToNext()) {
                                 int rawContactID = cursor.getInt(0);
                                 getContext().getContentResolver().delete(
                                         ContentUris.withAppendedId(ContactsContract.RawContacts.CONTENT_URI,
@@ -203,9 +240,9 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
                 String name = mData.get(position).getName();
                 String lookUp = mData.get(position).getLookUp();
                 Intent intent = new Intent(ContactBookFragement.this.getContext(), ContactPersonalShowActivity.class);
-                intent.putExtra(SELECTOR,FROM_CONTACT_BOOK_FRAGMENT);
-                intent.putExtra(NAME,name);
-                intent.putExtra(LOOKUP,lookUp);
+                intent.putExtra(SELECTOR, FROM_CONTACT_BOOK_FRAGMENT);
+                intent.putExtra(NAME, name);
+                intent.putExtra(LOOKUP, lookUp);
                 startActivity(intent);
             }
         });
@@ -218,15 +255,13 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
     }
 
 
-
-
     @Override
     public void onClick(View v) {
         int id = v.getId();
         switch (id) {
             case R.id.tv_contact_book_add:
                 Intent intent = new Intent(ContactBookFragement.this.getContext(), AddContactActivity.class);
-                intent.putExtra(SELECTOR,FROM_CONTACT_BOOK_FRAGEMENT_ADD);
+                intent.putExtra(SELECTOR, FROM_CONTACT_BOOK_FRAGEMENT_ADD);
                 startActivity(intent);
 
                 break;
@@ -262,61 +297,15 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
     }
 
 
-    //获取 READ_CONTACTS 权限
-    public void testReadContact() {
-        if (ContextCompat.checkSelfPermission(getContext(),
-                Manifest.permission.READ_CONTACTS)
-                != PackageManager.PERMISSION_GRANTED)
-        {
-
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.READ_CONTACTS},
-                    MY_PERMISSIONS_REQUEST_READ_CONTACTS);
-        } else {
-
-            //异步加载联系人数据
-            new AsyncTask<Void, Void, ArrayList<ContactListViewItemData>>() {
-                @Override
-                protected ArrayList<ContactListViewItemData> doInBackground(Void... params) {
-                    ArrayList<ContactListViewItemData> datas = getPhoneContacts();
-                    return datas;
-                }
-
-                @Override
-                protected void onPostExecute(ArrayList<ContactListViewItemData> datas) {
-                    mData.addAll(datas);
-                    adapter.notifyDataSetChanged();
-                }
-            }.execute();
-
-        }
-    }
-
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 
-        if (requestCode == MY_PERMISSIONS_REQUEST_READ_CONTACTS)
-        {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
-            {
-                //异步加载联系人数据
-                new AsyncTask<Void, Void, ArrayList<ContactListViewItemData>>() {
-                    @Override
-                    protected ArrayList<ContactListViewItemData> doInBackground(Void... params) {
-                        ArrayList<ContactListViewItemData> datas = getPhoneContacts();
-                        return datas;
-                    }
+        if (requestCode == MY_PERMISSIONS_REQUEST_READ_CONTACTS) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //提示刷新联系人数据
+                EventBus.getDefault().post(new NumberChangeEvent(true));
 
-                    @Override
-                    protected void onPostExecute(ArrayList<ContactListViewItemData> datas) {
-                        mData.addAll(datas);
-                        adapter.notifyDataSetChanged();
-                    }
-                }.execute();
-
-            } else
-            {
+            } else {
                 // Permission Denied
                 Toast.makeText(getContext(), "Permission Denied", Toast.LENGTH_SHORT).show();
             }
@@ -325,14 +314,16 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    /**得到手机通讯录联系人信息**/
+    /**
+     * 得到手机通讯录联系人信息
+     **/
     private ArrayList<ContactListViewItemData> getPhoneContacts() {
         ArrayList<ContactListViewItemData> contactInfo = new ArrayList<ContactListViewItemData>();
 
         ContentResolver resolver = getContext().getContentResolver();
 
         Cursor contactsCursor = resolver.query(Contacts.CONTENT_URI, CONTACTS_PROJECTION,
-                null, null, Contacts.SORT_KEY_PRIMARY+" ASC");
+                null, null, Contacts.SORT_KEY_PRIMARY + " ASC");
 
         if (contactsCursor != null) {
 
@@ -376,7 +367,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
                 mData.clear();
                 mData.addAll(searchResultData);
                 adapter.notifyDataSetChanged();
-            }else {
+            } else {
                 tv_contact_book_search.setVisibility(View.VISIBLE);
                 iv_contact_book_search.setVisibility(View.VISIBLE);
                 allContactData = getPhoneContacts();

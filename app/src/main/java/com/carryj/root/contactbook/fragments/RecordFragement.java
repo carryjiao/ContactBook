@@ -62,39 +62,51 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
     public static final String RECORD_IN_DETAIL = "RECORD_IN_DETAIL";
 
-    private static final String selection = CallLog.Calls.TYPE+"=?";
-    private static final String[] selectionArgs = new String[]{CallLog.Calls.MISSED_TYPE+""};
+    private static final String selection = CallLog.Calls.TYPE + "=?";
+    private static final String[] selectionArgs = new String[]{CallLog.Calls.MISSED_TYPE + ""};
 
-    /**获取库Call表字段**/
-    private static final String[] CALL_LOG_PROJECTION = new String[] {
+    /**
+     * 获取库Call表字段
+     **/
+    private static final String[] CALL_LOG_PROJECTION = new String[]{
             CallLog.Calls.NUMBER, CallLog.Calls.CACHED_NAME, CallLog.Calls.TYPE,
             CallLog.Calls.DATE, CallLog.Calls.DURATION,
             CallLog.Calls.CACHED_NUMBER_TYPE, CallLog.Calls._ID};
 
-    /**电话号码**/
+    /**
+     * 电话号码
+     **/
     private static final int CALLS_NUMBER_INDEX = 0;
 
-    /**姓名**/
+    /**
+     * 姓名
+     **/
     private static final int CALLS_CACHED_NAME_INDEX = 1;
 
-    /**通话类型**/
+    /**
+     * 通话类型
+     **/
     private static final int CALLS_TYPE_INDEX = 2;
 
-    /**通话日期**/
+    /**
+     * 通话日期
+     **/
     private static final int CALLS_DATE_INDEX = 3;
 
-    /**通话时长**/
+    /**
+     * 通话时长
+     **/
     private static final int CALLS_DURATION_INDEX = 4;
 
-    /**号码类型**/
+    /**
+     * 号码类型
+     **/
     private static final int CALLS_CACHED_NUMBER_TYPE_INDEX = 5;
 
     private static final int CALLS_ID_INDEX = 6;
 
     private boolean isGetData = false;
     public boolean dialFlag;
-
-
 
 
     private TextView tv_record_all;
@@ -106,7 +118,6 @@ public class RecordFragement extends Fragment implements OnClickListener {
     private ArrayList<RecordListViewItemData> mData = new ArrayList<RecordListViewItemData>();
     private ArrayList<RecordListViewItemData> allRcordData = new ArrayList<RecordListViewItemData>();
     private ArrayList<RecordListViewItemData> missedCallRecordData = new ArrayList<RecordListViewItemData>();
-
 
 
     public RecordFragement() {
@@ -125,7 +136,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_record,null);
+        View view = inflater.inflate(R.layout.fragment_record, null);
         initView(view);
         return view;
     }
@@ -228,7 +239,6 @@ public class RecordFragement extends Fragment implements OnClickListener {
         });
 
 
-
         tv_record_all.setOnClickListener(this);
         tv_record_missed_call.setOnClickListener(this);
         iv_record_box.setOnClickListener(this);
@@ -250,7 +260,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
                 FLAG = FLAG_ALLRECORD;
                 tv_record_all.setTextColor(Color.parseColor("#E5E5E5"));
                 tv_record_missed_call.setTextColor(Color.parseColor("#030303"));
-                allRcordData = getRecordData(null,null);
+                allRcordData = getRecordData(null, null);
                 mData.clear();
                 mData.addAll(allRcordData);
                 adapter.notifyDataSetChanged();
@@ -259,7 +269,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
                 FLAG = FLAG_MISSEDCALL;
                 tv_record_all.setTextColor(Color.parseColor("#030303"));
                 tv_record_missed_call.setTextColor(Color.parseColor("#E5E5E5"));
-                missedCallRecordData = getRecordData(selection,selectionArgs);
+                missedCallRecordData = getRecordData(selection, selectionArgs);
                 mData.clear();
                 mData.addAll(missedCallRecordData);
                 adapter.notifyDataSetChanged();
@@ -289,32 +299,35 @@ public class RecordFragement extends Fragment implements OnClickListener {
     //获取 READ_CALL_LOG 权限
     public void initData() {
 
-        if (ContextCompat.checkSelfPermission(getContext(),
-                Manifest.permission.READ_CALL_LOG)
-                != PackageManager.PERMISSION_GRANTED)
-        {
 
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.READ_CALL_LOG},
-                    MY_PERMISSIONS_REQUEST_READ_CALL_LOG);
-        } else {
+        //异步加载联系人数据
+        new AsyncTask<Void, Void, ArrayList<RecordListViewItemData>>() {
+            @Override
+            protected ArrayList<RecordListViewItemData> doInBackground(Void... params) {
 
-            //异步加载联系人数据
-            new AsyncTask<Void, Void, ArrayList<RecordListViewItemData>>() {
-                @Override
-                protected ArrayList<RecordListViewItemData> doInBackground(Void... params) {
-                    ArrayList<RecordListViewItemData> datas = getRecordData(null,null);
-                    return datas;
+                ArrayList<RecordListViewItemData> datas = new ArrayList<RecordListViewItemData>();
+                if (ContextCompat.checkSelfPermission(getContext(),
+                        Manifest.permission.READ_CALL_LOG)
+                        != PackageManager.PERMISSION_GRANTED) {
+
+                    ActivityCompat.requestPermissions(getActivity(),
+                            new String[]{Manifest.permission.READ_CALL_LOG},
+                            MY_PERMISSIONS_REQUEST_READ_CALL_LOG);
+                } else {
+
+                    datas = getRecordData(null, null);
+
                 }
+                return datas;
+            }
 
-                @Override
-                protected void onPostExecute(ArrayList<RecordListViewItemData> datas) {
-                    mData.addAll(datas);
-                    adapter.notifyDataSetChanged();
-                }
-            }.execute();
+            @Override
+            protected void onPostExecute(ArrayList<RecordListViewItemData> datas) {
+                mData.addAll(datas);
+                adapter.notifyDataSetChanged();
+            }
+        }.execute();
 
-        }
 
     }
 
@@ -322,43 +335,24 @@ public class RecordFragement extends Fragment implements OnClickListener {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 
-        if (requestCode == MY_PERMISSIONS_REQUEST_READ_CALL_LOG)
-        {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
-            {
-                //异步加载联系人数据
-                new AsyncTask<Void, Void, ArrayList<RecordListViewItemData>>() {
-                    @Override
-                    protected ArrayList<RecordListViewItemData> doInBackground(Void... params) {
-                        ArrayList<RecordListViewItemData> datas = getRecordData(null,null);
-                        return datas;
-                    }
-
-                    @Override
-                    protected void onPostExecute(ArrayList<RecordListViewItemData> datas) {
-                        mData.addAll(datas);
-                        adapter.notifyDataSetChanged();
-                    }
-                }.execute();
-
-            } else
-            {
+        if (requestCode == MY_PERMISSIONS_REQUEST_READ_CALL_LOG) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //提示通话记录数据刷新
+                EventBus.getDefault().post(new DialEvent(true,false));
+            } else {
                 // Permission Denied
                 Toast.makeText(getContext(), "Permission Denied", Toast.LENGTH_SHORT).show();
             }
             return;
         }
 
-        if (requestCode == MY_PERMISSIONS_REQUEST_WRITE_CALL_LOG)
-        {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
-            {
-                mData = getRecordData(null,null);
+        if (requestCode == MY_PERMISSIONS_REQUEST_WRITE_CALL_LOG) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                mData = getRecordData(null, null);
                 allRcordData.addAll(mData);
-                missedCallRecordData = getRecordData(selection,selectionArgs);
+                missedCallRecordData = getRecordData(selection, selectionArgs);
 
-            } else
-            {
+            } else {
                 // Permission Denied
                 Toast.makeText(getContext(), "Permission Denied", Toast.LENGTH_SHORT).show();
             }
@@ -368,7 +362,9 @@ public class RecordFragement extends Fragment implements OnClickListener {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    /**得到手机通话记录**/
+    /**
+     * 得到手机通话记录
+     **/
     private ArrayList<RecordListViewItemData> getRecordData(String selection, String[] selectionArgs) {
 
         ArrayList<RecordListViewItemData> recordInfo = new ArrayList<RecordListViewItemData>();
@@ -404,9 +400,9 @@ public class RecordFragement extends Fragment implements OnClickListener {
                     int _id = callLogCursor.getInt(CALLS_ID_INDEX);
 
                     //判断联系人姓名是否为空
-                    if(cachedName == null){
+                    if (cachedName == null) {
                         ArrayList<String> returnData = updataRecordData(_id, strNumber);//补全通话记录数据表中的空字段
-                        if(returnData != null) {
+                        if (returnData != null) {
                             cachedName = returnData.get(0);
                             numberType = Integer.parseInt(returnData.get(1));
                         }
@@ -428,13 +424,13 @@ public class RecordFragement extends Fragment implements OnClickListener {
                 callLogCursor.close();
             }
 
-        }catch (SecurityException e) {
+        } catch (SecurityException e) {
 
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.READ_CALL_LOG},
                     MY_PERMISSIONS_REQUEST_READ_CALL_LOG);
 
-        }finally {
+        } finally {
 
         }
 
@@ -443,9 +439,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
     }
 
 
-
-    public void callPhone(String telNum)
-    {
+    public void callPhone(String telNum) {
         Intent intent = new Intent(Intent.ACTION_CALL);
         Uri data = Uri.parse("tel:" + telNum);
         intent.setData(data);
@@ -455,9 +449,9 @@ public class RecordFragement extends Fragment implements OnClickListener {
     private void deleteRecord(int id) {
         try {
             getContext().getContentResolver().delete(CallLog.Calls.CONTENT_URI,
-                    CallLog.Calls._ID+"=?", new String[]{id+""});
+                    CallLog.Calls._ID + "=?", new String[]{id + ""});
 
-        }catch (SecurityException e){
+        } catch (SecurityException e) {
 
         }
     }
@@ -468,8 +462,8 @@ public class RecordFragement extends Fragment implements OnClickListener {
         ArrayList<String> retrunData = new ArrayList<String>();
         Cursor phoneCursor = getContext().getContentResolver().query(Phone.CONTENT_URI,
                 new String[]{Phone.DISPLAY_NAME, Phone.NUMBER, Phone.TYPE, Phone.LOOKUP_KEY, Phone.CONTACT_ID},
-                null,null,null);
-        if(phoneCursor!=null) {
+                null, null, null);
+        if (phoneCursor != null) {
             while (phoneCursor.moveToNext()) {
                 String number = phoneCursor.getString(1);
                 PhoneNumberTransformer pntf = new PhoneNumberTransformer();
@@ -477,10 +471,10 @@ public class RecordFragement extends Fragment implements OnClickListener {
                 number = pntf.getStrPhoneNumber();
                 if (number.equals(strNumber)) {
                     String name = phoneCursor.getString(0);
-                    String numbertype = phoneCursor.getInt(2)+"";
+                    String numbertype = phoneCursor.getInt(2) + "";
                     StringBuilder lookup_uri = new StringBuilder();
                     lookup_uri.append("content://com.android.contacts/contacts/lookup/");
-                    lookup_uri.append(phoneCursor.getString(3)+"/");
+                    lookup_uri.append(phoneCursor.getString(3) + "/");
                     lookup_uri.append(phoneCursor.getString(4));
 
                     ContentValues values = new ContentValues();
@@ -491,8 +485,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
                     //动态获取通话记录写入权限
                     if (ContextCompat.checkSelfPermission(getContext(),
                             Manifest.permission.WRITE_CALL_LOG)
-                            != PackageManager.PERMISSION_GRANTED)
-                    {
+                            != PackageManager.PERMISSION_GRANTED) {
 
                         ActivityCompat.requestPermissions(getActivity(),
                                 new String[]{Manifest.permission.WRITE_CALL_LOG},
@@ -500,12 +493,12 @@ public class RecordFragement extends Fragment implements OnClickListener {
                     } else {
 
                         getContext().getContentResolver().update(CallLog.Calls.CONTENT_URI,
-                                values, CallLog.Calls._ID+"=?",new String[]{_id+""});
+                                values, CallLog.Calls._ID + "=?", new String[]{_id + ""});
 
                     }
 
-                    retrunData.add(0,name);
-                    retrunData.add(1,numbertype);
+                    retrunData.add(0, name);
+                    retrunData.add(1, numbertype);
                     return retrunData;//已找到
 
                 }
@@ -520,18 +513,19 @@ public class RecordFragement extends Fragment implements OnClickListener {
     //用于消息处理,更新数据
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onChangeRecordDataDialEvent(DialEvent dialEvent) {
-        if(dialEvent.isDialFlag() && !dialEvent.isAfterDialFlag()){
+        if (dialEvent.isDialFlag() && !dialEvent.isAfterDialFlag()) {//立即数据刷新
             ArrayList<RecordListViewItemData> recordDatas = new ArrayList<RecordListViewItemData>();
-            if(FLAG == FLAG_ALLRECORD){
-                recordDatas = getRecordData(null,null);
-            }else if(FLAG == FLAG_MISSEDCALL){
-                recordDatas = getRecordData(selection,selectionArgs);
+            if (FLAG == FLAG_ALLRECORD) {
+                recordDatas = getRecordData(null, null);
+            } else if (FLAG == FLAG_MISSEDCALL) {
+                recordDatas = getRecordData(selection, selectionArgs);
             }
 
             mData.clear();
             mData.addAll(recordDatas);
             adapter.notifyDataSetChanged();
-        }else if(!dialEvent.isDialFlag() && dialEvent.isAfterDialFlag()) {
+        } else if (!dialEvent.isDialFlag() && dialEvent.isAfterDialFlag()) {
+            //在其他页面拨打电话后提示再进入通话记录页面后数据刷新
             dialFlag = true;
         }
 

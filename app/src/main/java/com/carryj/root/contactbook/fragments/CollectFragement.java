@@ -1,9 +1,11 @@
 package com.carryj.root.contactbook.fragments;
 
 
+import android.Manifest;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -12,7 +14,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
@@ -31,10 +37,15 @@ import com.carryj.root.contactbook.ContactPersonalShowActivity;
 import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.adapter.CollectAdapter;
 import com.carryj.root.contactbook.data.CollectListViewItemData;
+import com.carryj.root.contactbook.data.ContactListViewItemData;
+import com.carryj.root.contactbook.event.CollectEvent;
 import com.carryj.root.contactbook.event.DialEvent;
+import com.carryj.root.contactbook.event.NumberChangeEvent;
 
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
@@ -52,12 +63,13 @@ public class CollectFragement extends Fragment implements OnClickListener {
     public static final String NAME = "NAME";
     public static final String LOOKUP = "LOOKUP";
 
+    private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1001;
+
     private TextView tv_collect_add;
     private ImageView iv_collect_box;
     private CollectAdapter adapter;
     private SwipeMenuListView listView;
 
-    private boolean dialFlag;
 
     /**获取库contact表字段**/
     private static final String[] Collect_PROJECTION = new String[] {
@@ -92,22 +104,44 @@ public class CollectFragement extends Fragment implements OnClickListener {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         initData();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_collect,null);
         initView(view);
         return view;
     }
 
     private void initData() {
-        dialFlag = false;
-        //异步加载联系人数据
+        //异步加载收藏联系人数据
         new AsyncTask<Void, Void, ArrayList<CollectListViewItemData>>() {
             @Override
             protected ArrayList<CollectListViewItemData> doInBackground(Void... params) {
-                ArrayList<CollectListViewItemData> datas = getCollectData();
+
+                ArrayList<CollectListViewItemData> datas = new ArrayList<CollectListViewItemData>();
+                //获取 READ_CONTACTS 权限
+
+                if (ContextCompat.checkSelfPermission(getContext(),
+                        Manifest.permission.READ_CONTACTS)
+                        != PackageManager.PERMISSION_GRANTED) {
+
+                    ActivityCompat.requestPermissions(getActivity(),
+                            new String[]{Manifest.permission.READ_CONTACTS},
+                            MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+                } else {
+
+                    datas = getCollectData();
+
+                }
                 return datas;
             }
+
 
             @Override
             protected void onPostExecute(ArrayList<CollectListViewItemData> datas) {
@@ -115,6 +149,7 @@ public class CollectFragement extends Fragment implements OnClickListener {
                 adapter.notifyDataSetChanged();
             }
         }.execute();
+
     }
 
     private void initView(View view) {
@@ -230,6 +265,23 @@ public class CollectFragement extends Fragment implements OnClickListener {
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+
+        if (requestCode == MY_PERMISSIONS_REQUEST_READ_CONTACTS) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //提示刷新收藏联系人数据
+                EventBus.getDefault().post(new CollectEvent(true));
+
+            } else {
+                // Permission Denied
+                Toast.makeText(getContext(), "Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -237,6 +289,12 @@ public class CollectFragement extends Fragment implements OnClickListener {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
     }
 
     private int dp2px(int dp) {
@@ -260,7 +318,7 @@ public class CollectFragement extends Fragment implements OnClickListener {
         try {
 
             Cursor collectCursor = resolver.query(Phone.CONTENT_URI, Collect_PROJECTION,
-                    Phone.STARRED+"=?", new String[]{"1"},  Phone.RAW_CONTACT_ID+" ASC");
+                    Phone.STARRED+"=?", new String[]{"1"},  Phone.SORT_KEY_PRIMARY+" ASC");
 
             if (collectCursor != null) {
                 while (collectCursor.moveToNext()) {
@@ -310,4 +368,15 @@ public class CollectFragement extends Fragment implements OnClickListener {
         getContext().getContentResolver().update(ContactsContract.RawContacts.CONTENT_URI,
                 values, ContactsContract.RawContacts.CONTACT_ID+"=?",new String[]{contactID});
     }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onCollectChangeEvent(CollectEvent collectEvent) {
+        if (collectEvent.isCollectFlag()) {
+            ArrayList<CollectListViewItemData> collectDatas = getCollectData();
+            mData.clear();
+            mData.addAll(collectDatas);
+            adapter.notifyDataSetChanged();
+        }
+    }
+
 }

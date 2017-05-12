@@ -26,6 +26,10 @@ import android.widget.Toast;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.carryj.root.contactbook.adapter.ContactBookAdapter;
 import com.carryj.root.contactbook.data.ContactListViewItemData;
+import com.carryj.root.contactbook.event.CollectEvent;
+
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
 
 
@@ -144,6 +148,7 @@ public class AddCollectActivity extends SweepBackActivity {
                     @Override
                     public void onClick(View v) {
                         addCollect(mData.get(index).getContactID());
+                        EventBus.getDefault().post(new CollectEvent(true));
                         popupWindow.dismiss();
                     }
                 });
