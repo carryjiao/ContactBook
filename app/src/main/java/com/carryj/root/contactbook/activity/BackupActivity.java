@@ -3,7 +3,6 @@ package com.carryj.root.contactbook.activity;
 import android.content.ContentResolver;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,11 +12,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.SweepBackActivity;
+import com.carryj.root.contactbook.ui.RoundProgressBar;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,12 +28,17 @@ public class BackupActivity extends SweepBackActivity {
 
     private LinearLayout ll_backup_back;
 
-    private ProgressBar progressBar;
+    private RoundProgressBar progressBar;
+
+    private TextView tv_progress_str;
 
     private Button btn_backup_cloud_backup;
     private Button btn_backup_local_backup;
     private Button btn_backup_cloud_recovery;
     private Button btn_backup_local_recovery;
+
+
+    private int total;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,19 +49,27 @@ public class BackupActivity extends SweepBackActivity {
 
     @Override
     protected void initData() {
-
+        total = 0;
     }
 
     @Override
     protected void initView() {
         ll_backup_back = (LinearLayout) findViewById(R.id.ll_backup_back);
-        progressBar = (ProgressBar) findViewById(R.id.backup_progressBar);
+        progressBar = (RoundProgressBar) findViewById(R.id.backup_progressBar);
+        tv_progress_str = (TextView) findViewById(R.id.tv_progress_str);
+
         btn_backup_cloud_backup = (Button) findViewById(R.id.btn_backup_cloud_backup);
         btn_backup_local_backup = (Button) findViewById(R.id.btn_backup_local_backup);
         btn_backup_cloud_recovery = (Button) findViewById(R.id.btn_backup_cloud_recovery);
         btn_backup_local_recovery = (Button) findViewById(R.id.btn_backup_local_recovery);
 
         progressBar.setProgress(0);
+        progressBar.setCricleProgressColor(0xFF1AE642);
+        progressBar.setCricleColor(0xFF111100);
+        progressBar.setTextIsDisplayable(false);
+
+        tv_progress_str.setText("0");
+
     }
 
     @Override
@@ -107,33 +120,28 @@ public class BackupActivity extends SweepBackActivity {
 
                     File file = new File(Environment.getExternalStorageDirectory().getPath(), "/contacts.vcf");
 
-                    Log.d("=========path","=========================================");
-
                     ContentResolver resolver = BackupActivity.this.getContentResolver();
                     Cursor cur = resolver.query(Contacts.CONTENT_URI, null, null, null, null);
                     int index = cur.getColumnIndex(Contacts.LOOKUP_KEY);
+                    total = cur.getCount()-1;
 
-                    Log.d("=========index","========================================="+index);
 
                     FileOutputStream fout = new FileOutputStream(file);
-                    Log.d("=========","FileOutputStream=========================================");
+
                     byte[] data = new byte[1024 * 1];
-                    Log.d("=========","byte=========================================");
+
                     if(cur != null) {
                         while (cur.moveToNext()) {
                             String lookupKey = cur.getString(index);
 
-                            Log.d("=========lookupKey","========================================="+lookupKey);
                             Uri uri = Uri.withAppendedPath(Contacts.CONTENT_VCARD_URI, lookupKey);
 
-                            Log.d("=========uri","========================================="+uri);
                             AssetFileDescriptor fd = resolver.openAssetFileDescriptor(uri, "r");
                             FileInputStream fin = fd.createInputStream();
-
-                            Log.d("=========","FileInputStream=========================================");
                             int len = -1;
                             while ((len = fin.read(data)) != -1) {
                                 fout.write(data, 0, len);
+                                publishProgress(cur.getPosition());
                             }
                             fin.close();
                         }
@@ -155,7 +163,14 @@ public class BackupActivity extends SweepBackActivity {
 
             @Override
             protected void onProgressUpdate(Integer... values) {
+
+                progressBar.setMax(total);
+                Log.d("===============", "progressBar===  total===================================="+total);
                 progressBar.setProgress(values[0]);
+                Log.d("===============", "progressBar======================================="+values[0]);
+                int progress = 100*values[0]/total;
+                tv_progress_str.setText(progress+"");
+
             }
 
             @Override
