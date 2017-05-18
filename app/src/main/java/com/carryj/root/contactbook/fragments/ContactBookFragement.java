@@ -78,27 +78,12 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
     private View view;
 
 
+    /**
+     * 获取库Contacts表字段
+     **/
     private static final String[] CONTACTS_PROJECTION = new String[]{
             Contacts.DISPLAY_NAME, Contacts.LOOKUP_KEY};
 
-    /**
-     * 获取库Phone表字段
-     **/
-    private static final String[] PHONES_PROJECTION = new String[]{
-            Phone.DISPLAY_NAME, Phone.RAW_CONTACT_ID, Phone.CONTACT_ID};
-
-
-    /**
-     * 联系人显示名称
-     **/
-    private static final int PHONES_DISPLAY_NAME_INDEX = 0;
-
-    /**
-     * 联系人的ID
-     **/
-    private static final int PHONES_RAW_CONTACT_ID_INDEX = 1;
-
-    private static final int PHONES_CONTACT_ID_INDEX = 2;
 
 
     private ArrayList<ContactListViewItemData> mData = new ArrayList<ContactListViewItemData>();
@@ -363,6 +348,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             if (s != null && s.length() > 0) {
+                //调用模糊匹配类进行查找
                 searchResultData = new ContactBookSearch().searchContact(getContext(), s);
                 mData.clear();
                 mData.addAll(searchResultData);

@@ -400,25 +400,35 @@ public class AddContactActivity extends SweepBackActivity {
 
 
                 if(insertFlag){
-                    insert(name, company, myNumberData, myEmailData, myImData, remark);
-                    Toast.makeText(this,"添加成功",Toast.LENGTH_SHORT).show();
+                    if(name.equals("") || name == null) {
+                        Toast.makeText(this,"姓名为空",Toast.LENGTH_SHORT).show();
+                    }else {
+                        insert(name, company, myNumberData, myEmailData, myImData, remark);
+                        Toast.makeText(this,"添加成功",Toast.LENGTH_SHORT).show();
+                        EventBus.getDefault().post(new NumberChangeEvent(true));//通知ContactBook刷新数据
+                    }
+
                 }
                 if(updateFlag){
-                    update(name, company, myNumberData, myEmailData, myImData, remark);
-                    Toast.makeText(this,"修改成功",Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent();
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable("NUMBER",myNumberData);
-                    bundle.putSerializable("EMAIL",myEmailData);
-                    bundle.putSerializable("IM",myImData);
-                    intent.putExtras(bundle);
-                    intent.putExtra("NAME",name);
-                    intent.putExtra("COMPANY",company);
-                    intent.putExtra("REMARK",remark);
-                    this.setResult(RESULT_CODE,intent);
-                }
+                    if(name.equals("") || name == null) {
+                        Toast.makeText(this,"姓名为空",Toast.LENGTH_SHORT).show();
+                    }else {
+                        update(name, company, myNumberData, myEmailData, myImData, remark);
+                        Toast.makeText(this, "修改成功", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent();
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("NUMBER", myNumberData);
+                        bundle.putSerializable("EMAIL", myEmailData);
+                        bundle.putSerializable("IM", myImData);
+                        intent.putExtras(bundle);
+                        intent.putExtra("NAME", name);
+                        intent.putExtra("COMPANY", company);
+                        intent.putExtra("REMARK", remark);
+                        this.setResult(RESULT_CODE, intent);
+                        EventBus.getDefault().post(new NumberChangeEvent(true));//通知ContactBook刷新数据
+                    }
 
-                EventBus.getDefault().post(new NumberChangeEvent(true));//通知ContactBook刷新数据
+                }
                 this.finish();
                 break;
             case R.id.ll_add_contact_number_add:

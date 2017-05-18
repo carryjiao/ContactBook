@@ -447,14 +447,14 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                     tv_contact_personal_show_name.setTextColor(Color.parseColor("#030303"));
                 }
                 nameFlag = true;
-                Log.d("onActivityResult", "==============nameFlag = true;");
+
             }else {
                 if(nameFlag) {
                     tv_contact_personal_show_name.setTextColor(Color.parseColor("#A3A3A3"));
                 }
                 name = "(无姓名)";
                 nameFlag = false;
-                Log.d("onActivityResult", "==============nameFlag = false;");
+
             }
             tv_contact_personal_show_name.setText(name);
 
@@ -463,11 +463,11 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                 ll_contact_personal_show_remark_block.setVisibility(View.VISIBLE);
                 tv_contact_personal_show_remark.setText(remark);
                 remarkFlag = true;
-                Log.d("onActivityResult", "==============remarkFlag = true;");
+
             } else {
                 ll_contact_personal_show_remark_block.setVisibility(View.GONE);
                 remarkFlag = false;
-                Log.d("onActivityResult", "==============remarkFlag = false;");
+
             }
 
             company = data.getStringExtra("COMPANY");
@@ -475,11 +475,11 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                 ll_contact_personal_show_company_block.setVisibility(View.VISIBLE);
                 tv_contact_personal_show_company.setText(company);
                 companyFlag = true;
-                Log.d("onActivityResult", "==============companyFlag = true;");
+
             } else {
                 ll_contact_personal_show_company_block.setVisibility(View.GONE);
                 companyFlag = false;
-                Log.d("onActivityResult", "==============companyFlag = false;");
+
             }
 
             ArrayList<PhoneNumberData> resultNumberDatas = (ArrayList<PhoneNumberData>) data.getSerializableExtra("NUMBER");
@@ -487,7 +487,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
             ArrayList<ImData> resultImDatas = (ArrayList<ImData>) data.getSerializableExtra("IM");
 
             //类型数据处理
-            Log.d("resultNumberDatas","size= "+resultNumberDatas.size());
+
             if(resultNumberDatas.size()>0) {
 
                 for (PhoneNumberData resultNumberData:resultNumberDatas) {
@@ -572,7 +572,36 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         Intent orCodeIntent = new Intent(ContactPersonalShowActivity.this.getApplicationContext(),
                 ShowORCodeActivity.class);
         StringBuilder sb = new StringBuilder();
-        sb.append(numberDatas.get(0).getNumber());
+        sb.append("BEGIN:VCARD%0A");
+        /*sb.append("N:"+name+"%0A");
+        if(!company.equals("")) {
+            sb.append("ORG:"+company+"%0A");
+        }
+
+        if(numberDatas.size() > 0) {
+            sb.append("TEL;CELL;VOICE:"+numberDatas.get(0).getNumber()+"%0A");
+        }
+
+        if (emailDatas.size() > 0) {
+            sb.append("EMAIL;PREF;INTERNET:"+emailDatas.get(0)+"%0A");
+        }*/
+
+        for (PhoneNumberData numberData : numberDatas) {
+            if(numberData.getNumberType().equals("手机")) {
+                sb.append("TEL;CELL;VOICE:"+numberData.getNumber()+"%0A");
+            }else if(numberData.getNumberType().equals("住宅")) {
+                sb.append("TEL;HOME;VOICE:"+numberData.getNumber()+"%0A");
+            }else {
+                sb.append("TEL;WORK;VOICE:"+numberData.getNumber()+"%0A");
+            }
+
+        }
+
+        sb.append("END:VCARD ");
+        /*sb.append("姓名: "+name+"%0A");
+        sb.append("电话: "+numberDatas.get(0).getNumber()+"%0A");
+        sb.append("邮箱: "+emailDatas.get(0)+"%0A");
+        sb.append(imDatas.get(0).getImType()+": "+imDatas.get(0).getIm());*/
         orCodeIntent.putExtra("ORCODE", sb.toString());
         startActivity(orCodeIntent);
 

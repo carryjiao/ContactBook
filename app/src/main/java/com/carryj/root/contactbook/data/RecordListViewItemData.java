@@ -80,7 +80,6 @@ public class RecordListViewItemData implements Serializable{
         Date currentDate = new Date(System.currentTimeMillis());
         SimpleDateFormat df = new SimpleDateFormat("HH:mm");
         Long diff = currentDate.getTime() - date.getTime();
-        //System.out.println("+++++++++++++++++++============================= "+diff+" +++++++++++++++++++=============================");
         if(diff <= 120*1000) {
             return "刚刚";
         }else if(diff < 60*60*1000) {
