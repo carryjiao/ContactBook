@@ -1,6 +1,7 @@
 package com.carryj.root.contactbook;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import android.support.design.widget.NavigationView;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.carryj.root.contactbook.activity.BackupActivity;
 import com.carryj.root.contactbook.adapter.MainFragmentPagerAdapter;
 import com.carryj.root.contactbook.event.DialEvent;
 import com.carryj.root.contactbook.fragments.CollectFragement;
@@ -67,6 +69,8 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
                     case R.id.change_password:
                         break;
                     case R.id.data_synchronization:
+                        Intent intent = new Intent(MainActivity.this, BackupActivity.class);
+                        startActivity(intent);
                         break;
                     case R.id.about:
                         break;
