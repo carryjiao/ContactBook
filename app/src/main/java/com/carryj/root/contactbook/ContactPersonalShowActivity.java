@@ -351,9 +351,12 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
             @Override
             public void onClick(int position) {
                 String email = emailDatas.get(position).getEmail();
-                Intent intent = new Intent(ContactPersonalShowActivity.this.getApplicationContext(), ShowORCodeActivity.class);
-                intent.putExtra("ORCODE", email);
+                Uri uri = Uri.parse("mailto:"+email);
+                Intent intent = new Intent(Intent.ACTION_SENDTO, uri);
                 startActivity(intent);
+                /*Intent intent = new Intent(ContactPersonalShowActivity.this.getApplicationContext(), ShowORCodeActivity.class);
+                intent.putExtra("ORCODE", email);
+                startActivity(intent);*/
             }
         });
 
