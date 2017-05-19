@@ -1,12 +1,15 @@
 package com.carryj.root.contactbook.activity;
 
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.ContactsContract.Data;
+import android.provider.ContactsContract.RawContacts;
 import android.provider.ContactsContract.Contacts;
 import android.util.Log;
 import android.view.View;
@@ -100,6 +103,7 @@ public class BackupActivity extends SweepBackActivity {
                 break;
 
             case R.id.btn_backup_local_recovery:
+                localRecovery();
                 break;
 
             default:
@@ -182,5 +186,70 @@ public class BackupActivity extends SweepBackActivity {
                 }
             }
         }.execute();
+    }
+
+
+    private void localRecovery() {
+
+        new AsyncTask<Void, Integer, Boolean>() {
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+
+                try {
+                    ContentResolver resolver = BackupActivity.this.getContentResolver();
+                    Cursor cur = resolver.query(RawContacts.CONTENT_URI, null, null, null, null);
+                    int index = cur.getColumnIndex(RawContacts._ID);
+                    total = cur.getCount()-1;
+
+                    if(cur != null) {
+                        while (cur.moveToNext()) {
+                            String rawContactID = cur.getString(index);
+                            publishProgress(cur.getPosition());
+                            resolver.delete(RawContacts.CONTENT_URI, RawContacts._ID+"=?", new String[]{rawContactID});
+                            resolver.delete(Data.CONTENT_URI, RawContacts._ID+"=?", new String[]{rawContactID});
+                        }
+                        cur.close();
+                        return true;
+                    }else {
+                        Log.d("===============", "cur == null=======================================");
+                        return false;
+                    }
+
+                }catch (Exception e) {
+                    return false;
+                }
+
+            }
+
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                progressBar.setMax(total);
+                Log.d("===============", "progressBar===  total===================================="+total);
+                progressBar.setProgress(values[0]);
+                Log.d("===============", "progressBar======================================="+values[0]);
+                int progress = 100*values[0]/total;
+                tv_progress_str.setText(progress+"");
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                if (aBoolean) {
+                    Toast.makeText(BackupActivity.this, "恢复预处理成功,正在进行联系人恢复", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent();
+                    intent.setPackage("com.android.contacts");
+                    Uri uri = Uri.fromFile(new File(Environment.getExternalStorageDirectory().getPath(), "/contacts.vcf"));
+                    intent.setAction(Intent.ACTION_VIEW);
+                    intent.setDataAndType(uri, "text/x-vcard");
+                    startActivity(intent);
+
+                }else {
+                    Toast.makeText(BackupActivity.this, "恢复预处理失败,联系人恢复中断", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        }.execute();
+
+
     }
 }
