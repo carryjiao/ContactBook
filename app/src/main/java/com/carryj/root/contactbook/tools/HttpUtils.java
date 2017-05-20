@@ -19,9 +19,9 @@ import android.net.NetworkInfo;
  * 
  *@Name: HttpUtils
  * 
- *@Description: �ӷ������˻�ȡ����
+ *@Description: 从服务器端获取数据
  *
- *@author: ���������桢�޼�
+ *@author: 焦消
  *
  */
 public class HttpUtils {
@@ -40,7 +40,7 @@ public class HttpUtils {
 	 * 
 	 *@Name: isNetworkConnected()
 	 *
-	 *@Description: �ж��ֻ��Ƿ�����
+	 *@Description: 判断手机是否联网
 	 *
 	 */
 	public boolean isNetworkConnected() {
@@ -57,7 +57,7 @@ public class HttpUtils {
 	 * 
 	 *@Name: getContent()
 	 *
-	 *@Description: ����http�������ݣ��ӷ���˻�ȡ����
+	 *@Description: 根据http请求内容，从服务端获取数据
 	 *
 	 */
 	public String getContent(String urlPath) throws ConnectException {
@@ -96,7 +96,7 @@ public class HttpUtils {
 	 * 
 	 *@Name: getInputStream()
 	 *
-	 *@Description: ��ȡ������
+	 *@Description: 获取数据流
 	 *
 	 */
 	public static InputStream getInputStream(String urlPath) throws ConnectException {

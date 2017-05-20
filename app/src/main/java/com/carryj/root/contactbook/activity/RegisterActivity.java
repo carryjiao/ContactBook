@@ -37,14 +37,14 @@ import com.carryj.root.contactbook.R;
  * 
  *@Name: RegisterActivity
  * 
- *@Description: ͨ�������û����룬�Ͷ�����֤�룬����ע��
- *								�û�ע��ʱ��������������������������ܸ��ø�Activity
+ *@Description:通过输入用户密码，和短信验证码，进行注册
  *
- *@author: ���������桢�޼�
+ *
+ *@author: 焦消
  *
  */
 public class RegisterActivity extends SweepBackActivity {
-	//ģʽ���ã�ע��ģʽ����������ģʽ
+	//模式设置：注册模式和重置密码模式
 	public static final String REQUEST_MODE = "REQUEST_MODE";
 	public static final int REQUEST_REGISTER = 1;
 	public static final int REQUEST_SET_PSW = 2;
@@ -60,9 +60,9 @@ public class RegisterActivity extends SweepBackActivity {
 	private ToggleButton tg_view_psw;
 	private Logger logger;
 	private String telnum;
-	// ��д�Ӷ���SDKӦ�ú�̨ע��õ���APPKEY
+	// 填写从短信SDK应用后台注册得到的APPKEY
 	private static final String APPKEY = "fd41235f7406";
-	// ��д�Ӷ���SDKӦ�ú�̨ע��õ���APPSECRET
+	// 填写从短信SDK应用后台注册得到的APPSECRET
 	private static final String APPSECRET = "2fe552cfe432b5a4e4a450ea0080158e";
 	private EventHandler smsHandler;
 	private Handler mHandler;
@@ -84,10 +84,10 @@ public class RegisterActivity extends SweepBackActivity {
 		// TODO Auto-generated method stub
 		logger = Logger.getLogger(RegisterActivity.class);
 		Intent intent = getIntent();
-		//��ȡ����һ�����洫�����û���
+		//获取从上一个界面传来的用户名
 		telnum = intent.getStringExtra(LoginRegisterActivity.TELNUM_EXTRA);
 		logger.debug("----------telnum: " + telnum);
-		//��ȡ����һ�����洫��������ģʽ
+		//获取从上一个界面传来的请求模式
 		request_mode = intent.getIntExtra(REQUEST_MODE, REQUEST_REGISTER);
 		logger.debug("----------request_mode: " + request_mode);
 
@@ -103,10 +103,10 @@ public class RegisterActivity extends SweepBackActivity {
 		tv_login = (TextView) findViewById(R.id.tv_register_setpsw);
 		tv_code_operation = (TextView) findViewById(R.id.tv_get_code);
 		tg_view_psw = (ToggleButton) findViewById(R.id.tg_view_psw);
-		//������������Ľ�������
+		//设置重置密码的界面文字
 		if (request_mode == REQUEST_SET_PSW) {
-			tv_title_register_setpsw.setText("���õ�¼" + "����");
-			tv_login.setText("��������");
+			tv_title_register_setpsw.setText("重置登录" + "密码");
+			tv_login.setText("重置密码");
 
 		}
 		timeCount();
@@ -125,15 +125,15 @@ public class RegisterActivity extends SweepBackActivity {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				// TODO Auto-generated method stub
-				if (isChecked) {// ��������
+				if (isChecked) {// 隐藏密码
 					et_password.setTransformationMethod(PasswordTransformationMethod.getInstance());
-				} else {// ��ʾ����
+				} else {//显示密码
 					et_password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
 
 				}
 			}
 		});
-		//������֤
+		//短信验证
 		/*SMSSDK.initSDK(this, APPKEY, APPSECRET, true);
 		smsHandler = new EventHandler() {
 
@@ -162,12 +162,12 @@ public class RegisterActivity extends SweepBackActivity {
 					switch (event) {
 					// �ύ������֤��ɹ�
 					case SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE:
-						logger.debug("-----------�ύ��֤��ɹ�");
+						logger.debug("-----------提交验证码成功");
 
 						break;
 					// ��ȡ��֤��ɹ�
 					case SMSSDK.EVENT_GET_VERIFICATION_CODE:
-						logger.debug("---------��ȡ��֤��ɹ�");
+						logger.debug("---------获取验证码成功");
 						break;
 
 					default:
@@ -190,11 +190,11 @@ public class RegisterActivity extends SweepBackActivity {
 					application.setTelnum(telnum);
 					application.setPsw(psw);
 					application.setLogin(true);
-					Toast.makeText(RegisterActivity.this, "验证成功!", Toast.LENGTH_SHORT).show();
+					Toast.makeText(RegisterActivity.this, "重置密码登录成功！", Toast.LENGTH_SHORT).show();
 					Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
 					startActivity(intent);
 				} else {
-					Toast.makeText(RegisterActivity.this, "该号码已经注册", Toast.LENGTH_SHORT).show();
+					Toast.makeText(RegisterActivity.this, "登录失败！", Toast.LENGTH_SHORT).show();
 				}
 
 			}
@@ -209,7 +209,7 @@ public class RegisterActivity extends SweepBackActivity {
 					application.setTelnum(telnum);
 					application.setPsw(psw);
 					application.setLogin(true);
-					Toast.makeText(RegisterActivity.this, "注册成功!", Toast.LENGTH_SHORT).show();
+					Toast.makeText(RegisterActivity.this, "注册登录成功！", Toast.LENGTH_SHORT).show();
 					Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
 					startActivity(intent);
 					setResult(RESULT_REGISTER_OK);
@@ -236,12 +236,12 @@ public class RegisterActivity extends SweepBackActivity {
 				// TODO Auto-generated method stub
 
 				if (resultCode == HTTPCODES.RESET_PSW_SUCCESS) {
-					progressDialog.show("��������ɹ�����¼��...");
+					progressDialog.show("重置密码成功！登录中...");
 					LoginRegisterManager.getInstance().Login(telnum, psw);
 					setResult(RESULT_SET_PSW_OK);
 				} else {
 					progressDialog.dismiss();
-					Toast.makeText(RegisterActivity.this, "��������ʧ�ܣ�", Toast.LENGTH_SHORT).show();
+					Toast.makeText(RegisterActivity.this, "重置密码失败！", Toast.LENGTH_SHORT).show();
 				}
 
 			}
@@ -254,7 +254,7 @@ public class RegisterActivity extends SweepBackActivity {
 	 * 
 	 *@Name: timeCount()
 	 *
-	 *@Description: ������֤�ط�����ʱ
+	 *@Description:短信验证重发倒计时
 	 *
 	 */
 	private void timeCount() {
@@ -271,7 +271,7 @@ public class RegisterActivity extends SweepBackActivity {
 					tv_code_operation.setText(values[0] + "s");
 				} else {
 					tv_code_operation.setTextColor(Color.BLUE);
-					tv_code_operation.setText("�ط�");
+					tv_code_operation.setText("重发");
 					tv_code_operation.setEnabled(true);
 				}
 
@@ -281,7 +281,7 @@ public class RegisterActivity extends SweepBackActivity {
 			protected Void doInBackground(Void... params) {
 				// TODO Auto-generated method stub
 				timer.schedule(new TimerTask() {
-					int count = 60;  //���¼�ʱ60��
+					int count = 60;  //重新计时60秒
 
 					@Override
 					public void run() {
@@ -313,23 +313,23 @@ public class RegisterActivity extends SweepBackActivity {
 				psw = et_password.getText().toString().trim();
 				if (request_mode == REQUEST_REGISTER) {
 					if (psw != null && !psw.equals("")) {
-						progressDialog.show("ע�������Ե�...");
-						LoginRegisterManager.getInstance().register(telnum, psw);//��������˷����û�ע����Ϣ
+						progressDialog.show("注册中请稍等...");
+						LoginRegisterManager.getInstance().register(telnum, psw);//向服务器端发送用户注册信息
 					} else {
-						Toast.makeText(this, "���������룡", Toast.LENGTH_SHORT).show();
+						Toast.makeText(this, "请输入密码！", Toast.LENGTH_SHORT).show();
 					}
 
 				} else if (request_mode == REQUEST_SET_PSW) {
 					if (psw != null && !psw.equals("")) {
-						progressDialog.show("���������Ե�...");
+						progressDialog.show("重置中请稍等...");
 						logger.debug("------>>resetpsw>>------telnum: "+telnum+";psw: "+psw);
-						LoginRegisterManager.getInstance().resetPsw(telnum, psw);//��������˷�������������Ϣ
+						LoginRegisterManager.getInstance().resetPsw(telnum, psw);//向服务器端发送重置密码信息
 					} else {
-						Toast.makeText(this, "���������룡", Toast.LENGTH_SHORT).show();
+						Toast.makeText(this, "请输入密码！", Toast.LENGTH_SHORT).show();
 					}
 				}
 			} else {
-				Toast.makeText(this, "������д��֤�룡", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, "请先填写验证码！", Toast.LENGTH_SHORT).show();
 			}
 			break;
 		case R.id.tv_get_code:

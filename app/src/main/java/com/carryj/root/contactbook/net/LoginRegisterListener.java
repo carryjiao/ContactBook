@@ -1,11 +1,6 @@
 package com.carryj.root.contactbook.net;
 /**
- * 
- *@Name: LoginRegisterListener
- * 
- *@Description: ��¼��ע��ļ������ӿ�
- *
- *@author: ���������桢�޼�
+ *登录或注册的监听器接口
  *
  */
 public interface LoginRegisterListener {

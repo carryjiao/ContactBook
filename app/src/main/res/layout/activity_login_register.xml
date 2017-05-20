@@ -30,9 +30,15 @@
                 android:textSize="30sp"
                 android:textColor="@color/colorTitleBGGray" />
 
-
-
         </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="登录"
+            android:textSize="20sp"
+            android:textColor="@color/colorTitleBGGray"/>
 
     </RelativeLayout>
 
@@ -55,7 +61,7 @@
 
         <ImageView
             android:layout_width="20dp"
-            android:layout_height="40dp"
+            android:layout_height="35dp"
             android:layout_centerVertical="true"
             android:layout_marginLeft="30dp"
             android:src="@drawable/icon_phone" />

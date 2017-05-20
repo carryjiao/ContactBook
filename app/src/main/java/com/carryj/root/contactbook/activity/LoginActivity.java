@@ -24,10 +24,8 @@ import com.carryj.root.contactbook.R;
  * 
  *@Name: LoginActivity
  * 
- *@Description: λ�ã���¼��ע�ᡪ>��¼
- *								ͨ�������û����룬��¼�˻������Ӧ��
- *
- *@author: ���������桢�޼�
+ *@Description: 位置：登录或注册—>登录
+ *								通过输入用户密码，登录账户后进入应用
  *
  */
 public class LoginActivity extends SweepBackActivity {
@@ -54,7 +52,7 @@ public class LoginActivity extends SweepBackActivity {
 	@Override
 	protected void initData() {
 		// TODO Auto-generated method stub
-		//��ȡ�ӵ�¼��ע�����������û���
+		//获取从登录或注册界面输入的用户名
 		telnum = getIntent().getStringExtra(LoginRegisterActivity.TELNUM_EXTRA);
 		logger.debug("-------telnum: " + telnum);
 	}
@@ -79,7 +77,7 @@ public class LoginActivity extends SweepBackActivity {
 		mListener = new LoginRegisterListener() {
 
 			/**
-			 * ��¼ʱ���û�����������֤
+			 * 登录时，用户名和密码验证
 			 */
 			@Override
 			public void onVerify(int resultCode) {
@@ -90,18 +88,18 @@ public class LoginActivity extends SweepBackActivity {
 					ContactBookApplication application = (ContactBookApplication) getApplication();
 					application.setTelnum(telnum);
 					application.setPsw(psw);
-					application.setLogin(true);//���õ�¼״̬Ϊ���ѵ�¼
+					application.setLogin(true);//设置登录状态为：已登录
 
 					logger.debug("--->>>---->>>telnum: " + telnum + ";psw: " + psw + ";gettelnum():"
 							+ application.getTelnum() + ";getpsw():" + application.getPsw());
 
 					Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-					LoginActivity.this.startActivity(intent);//��¼�ɹ�����ת��������
+					LoginActivity.this.startActivity(intent);//登录成功后，跳转到主界面
 					LoginActivity.this.setResult(RESULT_LOGIN_OK);
 					LoginActivity.this.finish();
 				} else {
-					//�û���Ϣ��֤ʧ�ܺ���ʾ�������
-					Toast.makeText(LoginActivity.this, "�������", Toast.LENGTH_SHORT).show();
+					//用户信息验证失败后，提示密码错误
+					Toast.makeText(LoginActivity.this, "密码错误！", Toast.LENGTH_SHORT).show();
 				}
 			}
 
@@ -138,24 +136,24 @@ public class LoginActivity extends SweepBackActivity {
 		// TODO Auto-generated method stub
 		switch (v.getId()) {
 		case R.id.tv_login:
-			progressDialog.show("��¼��...");//�����¼��ť�󣬵�����ʾ��¼��
+			progressDialog.show("登录中...");//点击登录按钮后，弹窗提示登录中
 			psw = et_password.getText().toString().trim();
 			if (psw != null && !psw.equals("")) {
-				LoginRegisterManager.getInstance().Login(telnum, psw);//��������˷��͵�¼����
+				LoginRegisterManager.getInstance().Login(telnum, psw);//向服务器端发送登录请求
 			} else {
-				//����⵽����Ϊ��ʱ�������û���������
-				Toast.makeText(this, "���������룡", Toast.LENGTH_SHORT).show();
+				//当检测到密码为空时，提醒用户输入密码
+				Toast.makeText(this, "请输入密码！", Toast.LENGTH_SHORT).show();
 			}
 			break;
 		case R.id.ll_login_back:
 			this.finish();
 			break;
-		case R.id.tv_forget_psw://��������
+		case R.id.tv_forget_psw://忘记密码
 			Intent intent = new Intent(this, RegisterActivity.class);
-			intent.putExtra(LoginRegisterActivity.TELNUM_EXTRA, telnum);//�����û�������
-			//���ڽ��渴�ã�����ģʽΪ��������ģʽ
+			intent.putExtra(LoginRegisterActivity.TELNUM_EXTRA, telnum);//传输用户名数据
+			//由于界面复用，设置模式为重置密码模式
 			intent.putExtra(RegisterActivity.REQUEST_MODE, RegisterActivity.REQUEST_SET_PSW);
-			startActivity(intent);//��ת�������������
+			startActivity(intent);//跳转到重置密码界面
 			break;
 
 		default:
@@ -168,7 +166,7 @@ public class LoginActivity extends SweepBackActivity {
 		// TODO Auto-generated method stub
 		super.onActivityResult(requestCode, resultCode, data);
 		if (resultCode == RegisterActivity.RESULT_SET_PSW_OK) {
-			this.finish();//�������óɹ��󣬽�����Activity
+			this.finish();//密码重置成功后，结束本Activity
 		}
 	}
 

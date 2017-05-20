@@ -21,6 +21,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+
+/*登录或注册时，输入用户名(电话号码)界面复用
+ *								通过查询服务器端该用户是否已注册，若已注册则跳转至输入登录时输入密码的界面
+ *								若未注册，则跳转至用户注册时输入密码和短信验证码的界面
+ */
+
+
 public class LoginRegisterActivity extends SweepBackActivity {
 	private LinearLayout ll_login_register_back;
 	private EditText et_phonenum;
@@ -53,7 +60,7 @@ public class LoginRegisterActivity extends SweepBackActivity {
 		et_phonenum = (EditText) findViewById(R.id.et_phonenum);
 		tv_next_step = (TextView) findViewById(R.id.tv_next_step);
 		TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-		telnum = telephonyManager.getLine1Number();//��ȡ��������
+		telnum = telephonyManager.getLine1Number();//获取本机号码
 		logger.debug("-------phoneNum: " + telnum);
 		et_phonenum.setText(telnum);
 		progressDialog = new MyProgressDialog(this);
@@ -88,18 +95,18 @@ public class LoginRegisterActivity extends SweepBackActivity {
 				logger.debug("onDetect resultCode: " + resultCode);
 				progressDialog.dismiss();
 				/**
-				 * �жϴӷ������˷��صĲ�ѯ���
+				 * 判断从服务器端返回的查询结果
 				 */
-				if (resultCode == HTTPCODES.DETECT_REGISTERED) {//��ע��
+				if (resultCode == HTTPCODES.DETECT_REGISTERED) {//已注册
 					Intent intent = new Intent(LoginRegisterActivity.this, LoginActivity.class);
 					intent.putExtra(TELNUM_EXTRA, telnum);
-					startActivityForResult(intent, 0);//��ת����¼����
+					startActivityForResult(intent, 0);//跳转至登录界面
 
-				} else {//δע��
+				} else {//未注册
 					Intent intent = new Intent(LoginRegisterActivity.this, RegisterActivity.class);
 					intent.putExtra(TELNUM_EXTRA, telnum);
 					intent.putExtra(RegisterActivity.REQUEST_MODE, RegisterActivity.REQUEST_REGISTER);
-					startActivityForResult(intent, 0);//��ת��ע�����
+					startActivityForResult(intent, 0);//跳转至注册界面
 				}
 
 			}
@@ -123,23 +130,23 @@ public class LoginRegisterActivity extends SweepBackActivity {
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
 		switch (v.getId()) {
-		case R.id.tv_in: //��ίδ����ʱ�����
+		case R.id.tv_in:
 			Intent intent = new Intent(this, MainActivity.class);
 			this.startActivity(intent);
 			this.finish();
 			break;
-		case R.id.tv_next_step: //��һ��
+		case R.id.tv_next_step:
 			telnum = et_phonenum.getText().toString().trim();
 			if (telnum != null && !telnum.equals("")) {
 				if (telnum.length() == 11) {
-					progressDialog.show("ʶ����...");
-					LoginRegisterManager.getInstance().detect(telnum);//��������˲�ѯ���û��Ƿ���ע��
+					progressDialog.show("识别中...");
+					LoginRegisterManager.getInstance().detect(telnum);//向服务器端查询该用户是否已注册
 
 				} else {
-					Toast.makeText(this, "�ֻ�����д����", Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, "手机号填写有误！", Toast.LENGTH_SHORT).show();
 				}
 			} else {
-				Toast.makeText(this, "������д�ֻ��ţ�", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, "请先填写手机号！", Toast.LENGTH_SHORT).show();
 			}
 			break;
 		case R.id.ll_login_register_back:
@@ -156,7 +163,7 @@ public class LoginRegisterActivity extends SweepBackActivity {
 		// TODO Auto-generated method stub
 		super.onActivityResult(requestCode, resultCode, data);
 		if (resultCode == LoginActivity.RESULT_LOGIN_OK || resultCode == RegisterActivity.RESULT_REGISTER_OK) {
-			this.finish();//�ɹ���¼��ע��󣬽���Activity
+			this.finish();//成功登录或注册后，结束Activity
 		}
 	}
 

@@ -15,11 +15,8 @@ import android.os.AsyncTask;
 /**
  * 
  *@Name: LoginRegisterManager
- * 
- *@Description: ���ڶԡ���¼���͡�ע�ᡱ����ģ��
- *								�ͷ�����������ݽ������й���
- *
- *@author: ���������桢�޼�
+ *用于对“登录”和“注册”两个模块
+ *和服务器间的数据交互进行管理
  *
  */
 public class LoginRegisterManager {
@@ -87,7 +84,7 @@ public class LoginRegisterManager {
 	 * 
 	 *@Name:  Login()
 	 *
-	 *@Description: ��¼
+	 *@Description: 登录
 	 *
 	 */
 	public void Login(String telnum, String psw) {
@@ -133,7 +130,7 @@ public class LoginRegisterManager {
 	 * 
 	 *@Name: register()
 	 *
-	 *@Description: ע��
+	 *@Description: 注册
 	 *
 	 */
 	public void register(String telnum, String psw) {
@@ -179,7 +176,7 @@ public class LoginRegisterManager {
 	 * 
 	 *@Name: logout()
 	 *
-	 *@Description: �˳���¼
+	 *@Description: 注销
 	 *
 	 */
 	public void logout(String telnum, String psw) {
@@ -226,7 +223,7 @@ public class LoginRegisterManager {
 	 * 
 	 *@Name: resetPsw()
 	 *
-	 *@Description: ��������
+	 *@Description: 重置密码
 	 *
 	 */
 	public void resetPsw(String telnum, String newpsw) {

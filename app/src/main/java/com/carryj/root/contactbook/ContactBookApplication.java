@@ -12,8 +12,8 @@ import de.mindpipe.android.logging.log4j.LogConfigurator;
  * 
  *@Name: RedAlarmApplication
  * 
- *@Description: �������
- *								�洢���������ݣ����û��������룬��¼״̬��
+ *@Description: 通讯录
+ *								存储轻量级数据，如用户名，密码，登录状态等
  *
  *@author: ���������桢�޼�
  *
@@ -33,13 +33,10 @@ public class ContactBookApplication extends Application {
 		super.onCreate();
 		appContext = this;
 		preferences = getSharedPreferences("data", 0);
-		/*edior = preferences.edit();
+		edior = preferences.edit();
 		telnum = preferences.getString(UserTable.TELNUM, null);
 		psw = preferences.getString(UserTable.PSW, null);
-		isLogin = preferences.getBoolean(IS_LOGIN, false);*/
-		telnum = "13251356557";
-		psw = "1234";
-		isLogin = true;
+		isLogin = preferences.getBoolean(IS_LOGIN, false);
 		initLog4J();
 	}
 
