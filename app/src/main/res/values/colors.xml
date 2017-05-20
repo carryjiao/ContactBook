@@ -16,4 +16,22 @@
     <color name="colorCharBlue">#1E90FF</color>
     <color name="colorTabbarTextBlue">#1E90FF</color>
     <color name="colorTitleBGGray">#EDEDED</color>
+
+    <color name="red_bg">#E93939</color>
+    <color name="white_grey_bg">#F0F0F0</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="grey_line">#C9C9C9</color>
+    <color name="light_black">#363636</color>
+    <color name="tabbar_highlight_text">#F14A4D</color>
+    <color name="tabbar_normal_text">#797979</color>
+    <color name="white_menu_item">#FFFFFF</color>
+    <color name="light_grey_menu_item">#F0F0F0</color>
+    <color name="grey_menu_item">#E4E4E4</color>
+    <color name="popwindow_listtext_normal">@color/black</color>
+    <color name="powpwindow_listtext_highlight">#F14A4D</color>
+    <color name="alarm_ring_btn_highlight">#7CAF9A</color>
+    <color name="rules_detail_text">@color/light_black</color>
+    <color name="withdraw_btn_norm">#FF9900</color>
+
 </resources>

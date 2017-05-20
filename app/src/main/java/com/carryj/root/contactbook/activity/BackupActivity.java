@@ -20,7 +20,10 @@ import android.widget.Toast;
 
 import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.SweepBackActivity;
+import com.carryj.root.contactbook.event.NumberChangeEvent;
 import com.carryj.root.contactbook.ui.RoundProgressBar;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,7 +43,7 @@ public class BackupActivity extends SweepBackActivity {
     private Button btn_backup_cloud_recovery;
     private Button btn_backup_local_recovery;
 
-
+    private boolean localRecoveryFlag;
     private int total;
 
     @Override
@@ -53,6 +56,7 @@ public class BackupActivity extends SweepBackActivity {
     @Override
     protected void initData() {
         total = 0;
+        localRecoveryFlag = false;
     }
 
     @Override
@@ -110,6 +114,15 @@ public class BackupActivity extends SweepBackActivity {
                 break;
         }
 
+    }
+
+
+    @Override
+    public void finish() {
+        if(localRecoveryFlag) {
+            EventBus.getDefault().post(new NumberChangeEvent(true));
+        }
+        super.finish();
     }
 
     private void localBackup() {
@@ -242,6 +255,7 @@ public class BackupActivity extends SweepBackActivity {
                     intent.setAction(Intent.ACTION_VIEW);
                     intent.setDataAndType(uri, "text/x-vcard");
                     startActivity(intent);
+                    localRecoveryFlag = true;
 
                 }else {
                     Toast.makeText(BackupActivity.this, "恢复预处理失败,联系人恢复中断", Toast.LENGTH_SHORT).show();

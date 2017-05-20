@@ -16,12 +16,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.carryj.root.contactbook.activity.BackupActivity;
+import com.carryj.root.contactbook.activity.LoginRegisterActivity;
+import com.carryj.root.contactbook.activity.RegisterActivity;
 import com.carryj.root.contactbook.adapter.MainFragmentPagerAdapter;
 import com.carryj.root.contactbook.event.DialEvent;
 import com.carryj.root.contactbook.fragments.CollectFragement;
 import com.carryj.root.contactbook.fragments.ContactBookFragement;
 import com.carryj.root.contactbook.fragments.DialFragement;
 import com.carryj.root.contactbook.fragments.RecordFragement;
+import com.carryj.root.contactbook.net.LoginRegisterManager;
 
 
 import org.greenrobot.eventbus.EventBus;
@@ -45,6 +48,8 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
     private NavigationView navigationView;
     private DrawerLayout drawer;
 
+    private String telnum;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,18 +70,27 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
                     case R.id.header_bar:
                         break;
                     case R.id.login:
+                        Intent loginRegisterIntent = new Intent(MainActivity.this, LoginRegisterActivity.class);
+                        startActivity(loginRegisterIntent);
                         break;
                     case R.id.change_password:
+                        Intent cIntent = new Intent(MainActivity.this, RegisterActivity.class);
+                        cIntent.putExtra(LoginRegisterActivity.TELNUM_EXTRA, telnum);
+                        cIntent.putExtra(RegisterActivity.REQUEST_MODE, RegisterActivity.REQUEST_SET_PSW);
+                        startActivity(cIntent);
                         break;
                     case R.id.data_synchronization:
-                        Intent intent = new Intent(MainActivity.this, BackupActivity.class);
-                        startActivity(intent);
+                        Intent backupIntent = new Intent(MainActivity.this, BackupActivity.class);
+                        startActivity(backupIntent);
                         break;
                     case R.id.about:
                         break;
                     case R.id.logout:
+                        ContactBookApplication application = (ContactBookApplication) getApplication();
+                        LoginRegisterManager.getInstance().logout(telnum, application.getPsw());
                         break;
                     case R.id.exit:
+                        finish();
                         break;
                     default:
                         break;
@@ -92,6 +106,9 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
 
     @Override
     protected void initData() {
+
+        ContactBookApplication application = (ContactBookApplication) getApplication();
+        telnum = application.getTelnum();
 
         fragments = new ArrayList<Fragment>();
         if(collectFragment == null) {

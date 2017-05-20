@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white_grey_bg" >
+
+    <RelativeLayout
+        android:id="@+id/rl_login_register_title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/toolbar_height"
+        android:gravity="center_vertical"
+        android:background="@color/colorTitleBlue"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true">
+
+        <LinearLayout
+            android:id="@+id/ll_login_register_back"
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="10dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="&lt;"
+                android:textSize="30sp"
+                android:textColor="@color/colorTitleBGGray" />
+
+
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/split_line1"
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:layout_below="@id/rl_login_register_title_bar"
+        android:layout_marginTop="18dp"
+        android:background="@color/grey_line" />
+
+    <RelativeLayout
+        android:id="@+id/rl_phonenum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/split_line1"
+        android:background="@color/white"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp" >
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="30dp"
+            android:src="@drawable/icon_phone" />
+
+        <EditText
+            android:id="@+id/et_phonenum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text=""
+            android:background="@null"
+            android:hint="请输入手机号"
+            android:inputType="number"
+            android:textSize="16sp" />
+
+        
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/split_line2"
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:layout_below="@+id/rl_phonenum"
+        android:background="@color/grey_line" />
+
+    <TextView
+        android:id="@+id/tv_next_step"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/split_line2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="36dp"
+        android:background="@drawable/backup_btn_shape"
+        android:gravity="center"
+        android:paddingBottom="15dp"
+        android:paddingLeft="100dp"
+        android:paddingRight="100dp"
+        android:paddingTop="15dp"
+        android:text="下一步"
+        android:textColor="@color/white"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/tv_in"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_next_step"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="168dp"
+        android:text="tips:请先确保手机已经联网，推荐注册用户后登录。如不想注册用户，可用 账号：13251356557 密码：1234 登录" 
+        android:textColor="@color/tabbar_normal_text"/>
+
+</RelativeLayout>
