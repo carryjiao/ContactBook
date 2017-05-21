@@ -15,8 +15,10 @@ import com.carryj.root.contactbook.R;
  */
 
 public class ServletPaths {																
-	public static final String ServerServletAddress = "http://123.207.119.208:8080/RedAlarm_Server/servlet/";//��Ѷ��
-	//public static final String ServerServletAddress = "http://121.42.201.50:8080/RedAlarm_Server/servlet/";//������
+	//public static final String ServerServletAddress = "http://123.207.119.208:8080/ConatctBook_Server/servlet/";
+	public static final String ServerServletAddress = "http://123.207.119.208:8080/RedAlarm_Server/servlet/";
+	//public static final String ServerServletAddress = "http://113.251.173.15:8080/ConatctBook_Server/servlet/";
+
 	public static final String LoginRegisterServlet = "LoginRegisterServlet";
 	public static final String JoinSignServlet = "JoinSignServlet";
 	public static final String GetBillsServlet = "GetBillsServlet";

@@ -2,6 +2,7 @@ package com.carryj.root.contactbook.activity;
 
 import org.apache.log4j.Logger;
 
+import com.carryj.root.contactbook.ContactBookApplication;
 import com.carryj.root.contactbook.MainActivity;
 import com.carryj.root.contactbook.SweepBackActivity;
 import com.carryj.root.contactbook.constant_values.HTTPCODES;
@@ -34,7 +35,7 @@ public class LoginRegisterActivity extends SweepBackActivity {
 	private TextView tv_next_step;
 	private Logger logger;
 	public static final String TELNUM_EXTRA = "TELNUM_EXTRA";
-	private boolean isRegister = true;
+
 	private LoginRegisterListener mListener;
 	private MyProgressDialog progressDialog;
 	private String telnum;
@@ -51,6 +52,9 @@ public class LoginRegisterActivity extends SweepBackActivity {
 	@Override
 	protected void initData() {
 		// TODO Auto-generated method stub
+		ContactBookApplication application = (ContactBookApplication) getApplication();
+		telnum = application.getTelnum();
+
 	}
 
 	@Override
@@ -59,8 +63,8 @@ public class LoginRegisterActivity extends SweepBackActivity {
 		ll_login_register_back = (LinearLayout) findViewById(R.id.ll_login_register_back);
 		et_phonenum = (EditText) findViewById(R.id.et_phonenum);
 		tv_next_step = (TextView) findViewById(R.id.tv_next_step);
-		TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-		telnum = telephonyManager.getLine1Number();//获取本机号码
+		/*TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+		telnum = telephonyManager.getLine1Number();//获取本机号码*/
 		logger.debug("-------phoneNum: " + telnum);
 		et_phonenum.setText(telnum);
 		progressDialog = new MyProgressDialog(this);

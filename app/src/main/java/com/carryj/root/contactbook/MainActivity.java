@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.carryj.root.contactbook.activity.BackupActivity;
 import com.carryj.root.contactbook.activity.LoginRegisterActivity;
@@ -48,7 +49,6 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
     private NavigationView navigationView;
     private DrawerLayout drawer;
 
-    private String telnum;
 
 
     @Override
@@ -70,14 +70,29 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
                     case R.id.header_bar:
                         break;
                     case R.id.login:
-                        Intent loginRegisterIntent = new Intent(MainActivity.this, LoginRegisterActivity.class);
-                        startActivity(loginRegisterIntent);
+                        ContactBookApplication applicationLogin = (ContactBookApplication) getApplication();
+                        boolean isLogin_Login = applicationLogin.isLogin();
+                        if(!isLogin_Login) {
+                            Intent loginRegisterIntent = new Intent(MainActivity.this, LoginRegisterActivity.class);
+                            startActivity(loginRegisterIntent);
+                        }else {
+                            Toast.makeText(MainActivity.this, "您已经登录了",Toast.LENGTH_SHORT).show();
+                        }
+
                         break;
                     case R.id.change_password:
-                        Intent cIntent = new Intent(MainActivity.this, RegisterActivity.class);
-                        cIntent.putExtra(LoginRegisterActivity.TELNUM_EXTRA, telnum);
-                        cIntent.putExtra(RegisterActivity.REQUEST_MODE, RegisterActivity.REQUEST_SET_PSW);
-                        startActivity(cIntent);
+                        ContactBookApplication applicationCPW = (ContactBookApplication) getApplication();
+                        String telnum = applicationCPW.getTelnum();
+                        Boolean isLoginCPW = applicationCPW.isLogin();
+                        if(isLoginCPW) {
+                            Intent cIntent = new Intent(MainActivity.this, RegisterActivity.class);
+                            cIntent.putExtra(LoginRegisterActivity.TELNUM_EXTRA, telnum);
+                            cIntent.putExtra(RegisterActivity.REQUEST_MODE, RegisterActivity.REQUEST_SET_PSW);
+                            startActivity(cIntent);
+                        }else {
+                            Toast.makeText(MainActivity.this, "您还未登录呢",Toast.LENGTH_SHORT).show();
+                        }
+
                         break;
                     case R.id.data_synchronization:
                         Intent backupIntent = new Intent(MainActivity.this, BackupActivity.class);
@@ -86,8 +101,18 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
                     case R.id.about:
                         break;
                     case R.id.logout:
-                        ContactBookApplication application = (ContactBookApplication) getApplication();
-                        LoginRegisterManager.getInstance().logout(telnum, application.getPsw());
+                        ContactBookApplication applicationLogout = (ContactBookApplication) getApplication();
+                        telnum = applicationLogout.getTelnum();
+                        String psw = applicationLogout.getPsw();
+                        boolean isLogin_out = applicationLogout.isLogin();
+                        if (isLogin_out) {
+                            LoginRegisterManager.getInstance().logout(telnum, psw);
+                            applicationLogout.setLogin(false);
+                            Toast.makeText(MainActivity.this, "退出登录成功",Toast.LENGTH_SHORT).show();
+                        }else {
+                            Toast.makeText(MainActivity.this, "您还未登录呢",Toast.LENGTH_SHORT).show();
+                        }
+
                         break;
                     case R.id.exit:
                         finish();
@@ -107,8 +132,7 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
     @Override
     protected void initData() {
 
-        ContactBookApplication application = (ContactBookApplication) getApplication();
-        telnum = application.getTelnum();
+
 
         fragments = new ArrayList<Fragment>();
         if(collectFragment == null) {

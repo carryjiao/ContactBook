@@ -70,6 +70,7 @@ public class RegisterActivity extends SweepBackActivity {
 	private MyProgressDialog progressDialog;
 	private String psw;
 
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
