@@ -18,15 +18,22 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.carryj.root.contactbook.ContactBookApplication;
 import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.SweepBackActivity;
+import com.carryj.root.contactbook.constant_values.HTTPCODES;
+import com.carryj.root.contactbook.constant_values.ServletPaths;
 import com.carryj.root.contactbook.event.NumberChangeEvent;
 import com.carryj.root.contactbook.ui.RoundProgressBar;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -45,6 +52,7 @@ public class BackupActivity extends SweepBackActivity {
 
     private boolean localRecoveryFlag;
     private int total;
+    private String telnum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +65,8 @@ public class BackupActivity extends SweepBackActivity {
     protected void initData() {
         total = 0;
         localRecoveryFlag = false;
+        ContactBookApplication applicationLogin = (ContactBookApplication) getApplication();
+        telnum = applicationLogin.getTelnum();
     }
 
     @Override
@@ -97,6 +107,7 @@ public class BackupActivity extends SweepBackActivity {
                 break;
 
             case R.id.btn_backup_cloud_backup:
+                uploadFile();
                 break;
 
             case R.id.btn_backup_local_backup:
@@ -266,4 +277,66 @@ public class BackupActivity extends SweepBackActivity {
 
 
     }
+
+
+
+    public void uploadFile()
+    {
+
+        String url = ServletPaths.ServerServletAddress+ServletPaths.UploadFileServlet;
+
+        String filePath = Environment.getExternalStorageDirectory().getPath()
+                + "/contacts.vcf";
+
+        AsyncHttpClient httpClient = new AsyncHttpClient();
+
+        RequestParams param = new RequestParams();
+        try
+        {
+            param.put("telnum", telnum);
+            param.put("file", new File(filePath));
+
+            httpClient.post(url, param, new AsyncHttpResponseHandler()
+            {
+                @Override
+                public void onStart()
+                {
+                    super.onStart();
+
+                    Toast.makeText(BackupActivity.this, "正在上传...", Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void onSuccess(String arg0)
+                {
+                    super.onSuccess(arg0);
+
+                    Log.i("ck", "success>" + arg0);
+
+                    if(arg0.equals("success"))
+                    {
+                        Toast.makeText(BackupActivity.this, "上传成功!", Toast.LENGTH_SHORT).show();
+                    }else {
+                        Toast.makeText(BackupActivity.this, "服务器写入数据错误", Toast.LENGTH_SHORT).show();
+                    }
+
+
+                }
+
+                @Override
+                public void onFailure(Throwable arg0, String arg1)
+                {
+                    super.onFailure(arg0, arg1);
+
+                    Toast.makeText(BackupActivity.this, "上传失败", Toast.LENGTH_LONG).show();
+                }
+            });
+
+        } catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+            Toast.makeText(BackupActivity.this, "上传文件不存在！", Toast.LENGTH_LONG).show();
+        }
+    }
+
 }

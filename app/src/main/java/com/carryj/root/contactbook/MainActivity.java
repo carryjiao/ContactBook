@@ -95,8 +95,15 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
 
                         break;
                     case R.id.data_synchronization:
-                        Intent backupIntent = new Intent(MainActivity.this, BackupActivity.class);
-                        startActivity(backupIntent);
+                        ContactBookApplication applicationSynchronization = (ContactBookApplication) getApplication();
+                        boolean isLogin_Synchronization = applicationSynchronization.isLogin();
+                        if(isLogin_Synchronization) {
+                            Intent backupIntent = new Intent(MainActivity.this, BackupActivity.class);
+                            startActivity(backupIntent);
+                        }else {
+                            Toast.makeText(MainActivity.this, "您还未登录呢",Toast.LENGTH_SHORT).show();
+                        }
+
                         break;
                     case R.id.about:
                         break;

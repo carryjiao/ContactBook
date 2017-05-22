@@ -20,7 +20,9 @@ public class ServletPaths {
 	//public static final String ServerServletAddress = "http://113.251.173.15:8080/ConatctBook_Server/servlet/";
 
 	public static final String LoginRegisterServlet = "LoginRegisterServlet";
+	public static final String UploadFileServlet = "UploadFileServlet";
 	public static final String JoinSignServlet = "JoinSignServlet";
 	public static final String GetBillsServlet = "GetBillsServlet";
 	public static final String GetJoinRecordsServlet = "GetJoinRecordsServlet";
+
 }
