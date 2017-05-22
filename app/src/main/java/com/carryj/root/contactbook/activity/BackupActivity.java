@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 import android.provider.ContactsContract.Contacts;
@@ -21,13 +22,13 @@ import android.widget.Toast;
 import com.carryj.root.contactbook.ContactBookApplication;
 import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.SweepBackActivity;
-import com.carryj.root.contactbook.constant_values.HTTPCODES;
 import com.carryj.root.contactbook.constant_values.ServletPaths;
 import com.carryj.root.contactbook.event.NumberChangeEvent;
 import com.carryj.root.contactbook.ui.RoundProgressBar;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import cz.msebera.android.httpclient.Header;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -298,37 +299,35 @@ public class BackupActivity extends SweepBackActivity {
 
             httpClient.post(url, param, new AsyncHttpResponseHandler()
             {
-                @Override
-                public void onStart()
-                {
-                    super.onStart();
-
-                    Toast.makeText(BackupActivity.this, "正在上传...", Toast.LENGTH_LONG).show();
-                }
+                
 
                 @Override
-                public void onSuccess(String arg0)
-                {
-                    super.onSuccess(arg0);
-
-                    Log.i("ck", "success>" + arg0);
-
-                    if(arg0.equals("success"))
+                public void onSuccess(int i, Header[] headers, byte[] bytes) {
+                    String result = new String(bytes);
+                    if(result.equals("success"))
                     {
                         Toast.makeText(BackupActivity.this, "上传成功!", Toast.LENGTH_SHORT).show();
                     }else {
                         Toast.makeText(BackupActivity.this, "服务器写入数据错误", Toast.LENGTH_SHORT).show();
                     }
+                }
 
 
+                @Override
+                public void onFailure(int i, Header[] headers, byte[] bytes, Throwable throwable) {
+                    Toast.makeText(BackupActivity.this, "上传失败", Toast.LENGTH_LONG).show();
                 }
 
                 @Override
-                public void onFailure(Throwable arg0, String arg1)
-                {
-                    super.onFailure(arg0, arg1);
+                public void onProgress(long bytesWritten, long totalSize) {
+                    super.onProgress(bytesWritten, totalSize);
+                    int total = (int)totalSize;
+                    int written = (int)bytesWritten;
+                    progressBar.setProgress(written);
+                    progressBar.setMax(total);
+                    int progress = 100;
 
-                    Toast.makeText(BackupActivity.this, "上传失败", Toast.LENGTH_LONG).show();
+                    tv_progress_str.setText(progress+"");
                 }
             });
 
