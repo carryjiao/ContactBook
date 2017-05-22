@@ -106,6 +106,8 @@ public class LoginRegisterActivity extends SweepBackActivity {
 					intent.putExtra(TELNUM_EXTRA, telnum);
 					startActivityForResult(intent, 0);//跳转至登录界面
 
+				} else if(resultCode == 104) {
+					Toast.makeText(LoginRegisterActivity.this, "服务器数据库连接错误",Toast.LENGTH_LONG).show();
 				} else {//未注册
 					Intent intent = new Intent(LoginRegisterActivity.this, RegisterActivity.class);
 					intent.putExtra(TELNUM_EXTRA, telnum);
