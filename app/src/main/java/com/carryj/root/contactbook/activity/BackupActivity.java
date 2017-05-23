@@ -24,19 +24,23 @@ import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.SweepBackActivity;
 import com.carryj.root.contactbook.constant_values.ServletPaths;
 import com.carryj.root.contactbook.event.NumberChangeEvent;
+import com.carryj.root.contactbook.tools.FileUtils;
 import com.carryj.root.contactbook.ui.RoundProgressBar;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.BinaryHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import cz.msebera.android.httpclient.Header;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class BackupActivity extends SweepBackActivity {
 
@@ -116,6 +120,7 @@ public class BackupActivity extends SweepBackActivity {
                 break;
 
             case R.id.btn_backup_cloud_recovery:
+                downloadFile();
                 break;
 
             case R.id.btn_backup_local_recovery:
@@ -299,7 +304,7 @@ public class BackupActivity extends SweepBackActivity {
 
             httpClient.post(url, param, new AsyncHttpResponseHandler()
             {
-                
+
 
                 @Override
                 public void onSuccess(int i, Header[] headers, byte[] bytes) {
@@ -328,6 +333,7 @@ public class BackupActivity extends SweepBackActivity {
                     int progress = 100;
 
                     tv_progress_str.setText(progress+"");
+
                 }
             });
 
@@ -336,6 +342,69 @@ public class BackupActivity extends SweepBackActivity {
             e.printStackTrace();
             Toast.makeText(BackupActivity.this, "上传文件不存在！", Toast.LENGTH_LONG).show();
         }
+    }
+
+
+    public void downloadFile() {
+
+        String url = ServletPaths.DownloadFilePath + telnum + "/contacts.vcf";
+
+        AsyncHttpClient client = new AsyncHttpClient();
+
+        // 指定文件类型
+        String[] allowedContentTypes = new String[] { ".*" };
+
+        client.get(url, new BinaryHttpResponseHandler(allowedContentTypes) {
+            @Override
+            public void onSuccess(int i, Header[] headers, byte[] bytes) {
+
+                // 文件夹地址
+                String tempPath = "ContactBook/"+telnum;
+
+                String filePath = tempPath + "/contacts.vcf";
+
+                FileUtils fileutils = new FileUtils();
+
+                // 判断sd卡上的文件夹是否存在
+                if (!fileutils.isFileExist(tempPath)) {
+                    fileutils.createSDDir(tempPath);
+                }
+
+                // 删除已下载的文件
+                if (fileutils.isFileExist(filePath)) {
+                    fileutils.deleteFile(filePath);
+                }
+
+
+                InputStream inputstream = new ByteArrayInputStream(bytes);
+                if (inputstream != null) {
+                    fileutils.write2SDFromInput(filePath, inputstream);
+                    try {
+                        inputstream.close();
+                        Toast.makeText(BackupActivity.this, "文件写入SD卡成功", Toast.LENGTH_SHORT).show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(int i, Header[] headers, byte[] bytes, Throwable throwable) {
+                Toast.makeText(BackupActivity.this, "文件写入SD卡失败", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onProgress(long bytesWritten, long totalSize) {
+                super.onProgress(bytesWritten, totalSize);
+                int total = (int)totalSize;
+                int written = (int)bytesWritten;
+                progressBar.setProgress(written);
+                progressBar.setMax(total);
+                int progress = (int) ((bytesWritten * 1.0 / totalSize) * 100);
+
+                tv_progress_str.setText(progress+"");
+            }
+        });
     }
 
 }

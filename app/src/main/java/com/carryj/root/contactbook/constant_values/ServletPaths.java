@@ -25,4 +25,6 @@ public class ServletPaths {
 	public static final String GetBillsServlet = "GetBillsServlet";
 	public static final String GetJoinRecordsServlet = "GetJoinRecordsServlet";
 
+	public static final String DownloadFilePath = "http://123.207.119.208:8080/ContactBook/";
+
 }
