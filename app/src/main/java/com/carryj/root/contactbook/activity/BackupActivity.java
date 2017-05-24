@@ -150,9 +150,24 @@ public class BackupActivity extends SweepBackActivity {
 
                 try {
 
-                    //String path = Environment.getExternalStorageDirectory().getPath() + "/contacts.vcf";
+                    // 文件夹地址
+                    String tempPath = "ContactBook/"+telnum;
 
-                    File file = new File(Environment.getExternalStorageDirectory().getPath(), "/contacts.vcf");
+                    String filePath = tempPath + "/contacts.vcf";
+
+                    FileUtils fileutils = new FileUtils();
+
+                    // 判断sd卡上的文件夹是否存在
+                    if (!fileutils.isFileExist(tempPath)) {
+                        fileutils.createSDDir(tempPath);
+                    }
+
+                    // 删除已导出的文件
+                    if (fileutils.isFileExist(filePath)) {
+                        fileutils.deleteFile(filePath);
+                    }
+
+                    File file = new File(Environment.getExternalStorageDirectory().getPath()+"/", filePath);
 
                     ContentResolver resolver = BackupActivity.this.getContentResolver();
                     Cursor cur = resolver.query(Contacts.CONTENT_URI, null, null, null, null);
@@ -266,9 +281,23 @@ public class BackupActivity extends SweepBackActivity {
             protected void onPostExecute(Boolean aBoolean) {
                 if (aBoolean) {
                     Toast.makeText(BackupActivity.this, "恢复预处理成功,正在进行联系人恢复", Toast.LENGTH_SHORT).show();
+
+                    // 文件夹地址
+                    String tempPath = "ContactBook/"+telnum;
+
+                    String filePath = tempPath + "/contacts.vcf";
+
+                    FileUtils fileutils = new FileUtils();
+
+                    // 判断sd卡上的文件夹是否存在
+                    if (!fileutils.isFileExist(tempPath)) {
+                        fileutils.createSDDir(tempPath);
+                    }
+
+
                     Intent intent = new Intent();
                     intent.setPackage("com.android.contacts");
-                    Uri uri = Uri.fromFile(new File(Environment.getExternalStorageDirectory().getPath(), "/contacts.vcf"));
+                    Uri uri = Uri.fromFile(new File(Environment.getExternalStorageDirectory().getPath()+"/", filePath));
                     intent.setAction(Intent.ACTION_VIEW);
                     intent.setDataAndType(uri, "text/x-vcard");
                     startActivity(intent);
@@ -291,8 +320,17 @@ public class BackupActivity extends SweepBackActivity {
 
         String url = ServletPaths.ServerServletAddress+ServletPaths.UploadFileServlet;
 
-        String filePath = Environment.getExternalStorageDirectory().getPath()
-                + "/contacts.vcf";
+        // 文件夹地址
+        String tempPath = "ContactBook/"+telnum;
+
+        String filePath = tempPath + "/contacts.vcf";
+
+        FileUtils fileutils = new FileUtils();
+
+        // 判断sd卡上的文件夹是否存在
+        if (!fileutils.isFileExist(tempPath)) {
+            fileutils.createSDDir(tempPath);
+        }
 
         AsyncHttpClient httpClient = new AsyncHttpClient();
 
@@ -300,7 +338,7 @@ public class BackupActivity extends SweepBackActivity {
         try
         {
             param.put("telnum", telnum);
-            param.put("file", new File(filePath));
+            param.put("file", new File(Environment.getExternalStorageDirectory().getPath()+"/", filePath));
 
             httpClient.post(url, param, new AsyncHttpResponseHandler()
             {

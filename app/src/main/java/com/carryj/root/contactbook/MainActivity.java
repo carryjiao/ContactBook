@@ -2,18 +2,25 @@ package com.carryj.root.contactbook;
 
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.carryj.root.contactbook.activity.BackupActivity;
@@ -26,10 +33,16 @@ import com.carryj.root.contactbook.fragments.ContactBookFragement;
 import com.carryj.root.contactbook.fragments.DialFragement;
 import com.carryj.root.contactbook.fragments.RecordFragement;
 import com.carryj.root.contactbook.net.LoginRegisterManager;
+import com.carryj.root.contactbook.tools.FileUtils;
+import com.makeramen.roundedimageview.RoundedImageView;
 
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +61,11 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
     private List<Fragment> fragments;
     private NavigationView navigationView;
     private DrawerLayout drawer;
+    private RoundedImageView head_photo;
+    private TextView tv_user_name;
+    private TextView tv_head_tel;
+    private String telnum;
+    private Bitmap bitmap;
 
 
 
@@ -61,6 +79,20 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
         //navigationView.setItemIconTintList(null);
+
+        View headview=navigationView.inflateHeaderView(R.layout.nav_header_main);
+        head_photo = (RoundedImageView) headview.findViewById(R.id.head_photo);
+        tv_user_name = (TextView) headview.findViewById(R.id.tv_user_name);
+        tv_head_tel = (TextView) headview.findViewById(R.id.tv_head_tel);
+
+        if(bitmap != null) {
+            head_photo.setImageBitmap(bitmap);
+        }
+
+        tv_head_tel.setText(telnum);
+        head_photo.setOnClickListener(this);
+        tv_user_name.setOnClickListener(this);
+
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener(){
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
@@ -133,13 +165,14 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
             }
         });
 
+
     }
 
 
     @Override
     protected void initData() {
-
-
+        ContactBookApplication applicationCPW = (ContactBookApplication) getApplication();
+        telnum = applicationCPW.getTelnum();
 
         fragments = new ArrayList<Fragment>();
         if(collectFragment == null) {
@@ -159,6 +192,21 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
             fragments.add(dialFragement);
         }
 
+        // 文件夹地址
+        String tempPath = "ContactBook/"+telnum;
+
+        String filePath = tempPath + "/head.jpg";
+
+        FileUtils fileutils = new FileUtils();
+
+        // 判断sd卡上的文件夹是否存在
+        if (!fileutils.isFileExist(tempPath)) {
+            fileutils.createSDDir(tempPath);
+        }
+
+        bitmap = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory().getPath()
+                + "/" + filePath);// 从SD卡中找头像，转换成Bitmap
+
     }
 
     @Override
@@ -169,6 +217,7 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
         ll_record = (LinearLayout)findViewById(R.id.ll_record);
         ll_contact = (LinearLayout)findViewById(R.id.ll_contact);
         ll_dial = (LinearLayout)findViewById(R.id.ll_dial);
+
 
         main_pagerAdapter = new MainFragmentPagerAdapter(getSupportFragmentManager(),fragments);
         main_viewpager.setOffscreenPageLimit(4);
@@ -185,6 +234,7 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
         ll_record.setOnClickListener(this);
         ll_contact.setOnClickListener(this);
         ll_dial.setOnClickListener(this);
+
     }
 
     @Override
@@ -207,6 +257,11 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
                 break;
             case R.id.ll_dial:
                 setCurrentPage(3);
+                break;
+            case R.id.head_photo:
+                getHeadPhoto();
+                break;
+            case R.id.tv_user_name:
                 break;
             default:
                 break;
@@ -277,6 +332,115 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
         return super.onOptionsItemSelected(item);
     }*/
 
+    private void getHeadPhoto() {
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final AlertDialog dialog = builder.create();
+        View view = View.inflate(this, R.layout.dialog_select_photo, null);
+        TextView tv_select_gallery = (TextView) view.findViewById(R.id.tv_select_gallery);
+        TextView tv_select_camera = (TextView) view.findViewById(R.id.tv_select_camera);
+
+        tv_select_gallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent1 = new Intent(Intent.ACTION_PICK, null);
+                intent1.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+                startActivityForResult(intent1, 1);
+                dialog.dismiss();
+            }
+        });
+
+        tv_select_camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent2 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                intent2.putExtra(MediaStore.EXTRA_OUTPUT,
+                        Uri.fromFile(new File(Environment.getExternalStorageDirectory().getPath(),
+                                "/ContactBook/"+telnum+"/head.jpg")));
+                startActivityForResult(intent2, 2);// 采用ForResult打开
+                dialog.dismiss();
+            }
+        });
+
+        dialog.setView(view);
+        dialog.show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case 1:
+                if (resultCode == RESULT_OK) {
+                    cropPhoto(data.getData());// 裁剪图片
+                }
+                break;
+            case 2:
+                if (resultCode == RESULT_OK) {
+                    File temp = new File(Environment.getExternalStorageDirectory().getPath(),
+                            "/ContactBook/"+telnum+"/head.jpg");
+                    cropPhoto(Uri.fromFile(temp));// 裁剪图片
+                }
+                break;
+            case 3:
+                if (data != null) {
+                    Bundle extras = data.getExtras();
+                    bitmap = extras.getParcelable("data");
+                    if (bitmap != null) {
+                        setPicToView(bitmap);// 保存在SD卡中
+                        head_photo.setImageBitmap(bitmap);// 用RoundedImageView显示出来
+                    }
+                }
+                break;
+            default:
+                break;
+
+        }
+
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    /**
+     * 调用系统的裁剪功能
+     *
+     * @param uri
+     */
+    private void cropPhoto(Uri uri) {
+        Intent intent = new Intent("com.android.camera.action.CROP");
+        intent.setDataAndType(uri, "image/*");
+        intent.putExtra("crop", "true");
+// aspectX aspectY 是宽高的比例
+        intent.putExtra("aspectX", 1);
+        intent.putExtra("aspectY", 1);
+// outputX outputY 是裁剪图片宽高
+        intent.putExtra("outputX", 150);
+        intent.putExtra("outputY", 150);
+        intent.putExtra("return-data", true);
+        startActivityForResult(intent, 3);
+    }
+
+    private void setPicToView(Bitmap mBitmap) {
+        String sdStatus = Environment.getExternalStorageState();
+        if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) { // 检测sd是否可用
+            return;
+        }
+        FileOutputStream b = null;
+        String fileName = Environment.getExternalStorageDirectory().getPath()+
+                "/ContactBook/"+telnum+"/head.jpg";// 图片名字
+        try {
+            b = new FileOutputStream(fileName);
+            mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, b);// 把数据写入文件
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+// 关闭流
+                b.flush();
+                b.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 }
