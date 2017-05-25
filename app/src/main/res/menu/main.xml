@@ -4,37 +4,38 @@
 
     <item
         android:id="@+id/login"
-        android:icon="@android:drawable/ic_menu_edit"
+        android:icon="@drawable/ic_login"
         android:title="登录"/>
 
     <item
         android:id="@+id/change_password"
-        android:icon="@android:drawable/ic_menu_manage"
+        android:icon="@drawable/ic_settings"
         android:title="修改密码"/>
 
 
     <item
         android:id="@+id/data_synchronization"
-        android:icon="@android:drawable/ic_popup_sync"
+        android:icon="@drawable/ic_cloud_refresh"
         android:title="数据同步"/>
 
     <item
         android:id="@+id/about"
-        android:icon="@android:drawable/ic_menu_info_details"
+        android:icon="@drawable/ic_info"
         android:title="关于"/>
 
     <item
         android:id="@+id/help"
-        android:icon="@android:drawable/ic_menu_help"
+        android:icon="@drawable/ic_help"
         android:title="帮助"/>
 
     <item
         android:id="@+id/logout"
-        android:icon="@android:drawable/ic_menu_rotate"
+        android:icon="@drawable/ic_logout"
         android:title="注销"/>
 
     <item
         android:id="@+id/exit"
-        android:icon="@android:drawable/ic_lock_power_off"
+        android:icon="@drawable/ic_power_off"
         android:title="退出"/>
+
 </menu>

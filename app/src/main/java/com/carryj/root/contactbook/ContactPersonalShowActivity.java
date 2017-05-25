@@ -6,6 +6,8 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,7 +23,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,11 +42,11 @@ import com.carryj.root.contactbook.tools.GetStrImType;
 import com.carryj.root.contactbook.tools.GetStrPhoneType;
 import com.carryj.root.contactbook.tools.PhoneNumberTransformer;
 import com.carryj.root.contactbook.ui.DividerItemDecoration;
+import com.makeramen.roundedimageview.RoundedImageView;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class ContactPersonalShowActivity extends SweepBackActivity {
@@ -68,10 +69,14 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     private String name;
     private String remark;
     private String company;
+    private Bitmap photo;
 
     private boolean nameFlag;
     private boolean remarkFlag;
     private boolean companyFlag;
+    private boolean photoFlag;
+
+    private boolean isPhotoChange = false;
 
     private String backStr;
 
@@ -90,7 +95,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     private TextView tv_contact_personal_show_remark;
     private TextView tv_contact_personal_show_company;
 
-    private ImageView im_contact_personal_show_icon;
+    private RoundedImageView im_contact_personal_show_icon;
 
     private RecyclerView rv_contact_personal_show_number;
     private RecyclerView rv_contact_personal_show_emial;
@@ -194,6 +199,15 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
 
         }
 
+
+        //获取图像
+        photo = getContactPhoto(lookUp, resolver);
+        if(photo != null) {
+            photoFlag = true;
+        }else {
+            photoFlag = false;
+        }
+
     }
 
     @Override
@@ -202,7 +216,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         ll_contact_personal_show_back = (LinearLayout) findViewById(R.id.ll_contact_personal_show_back);
         tv_back_str = (TextView) findViewById(R.id.tv_back_str);
         tv_contact_personal_show_edit = (TextView) findViewById(R.id.tv_contact_personal_show_edit);
-        im_contact_personal_show_icon = (ImageView) findViewById(R.id.im_contact_personal_show_icon);
+        im_contact_personal_show_icon = (RoundedImageView) findViewById(R.id.im_contact_personal_show_icon);
         tv_contact_personal_show_name = (TextView) findViewById(R.id.tv_contact_personal_show_name);
         ll_contact_personal_show_number_block = (LinearLayout) findViewById(R.id.ll_contact_personal_show_number_block);
         rv_contact_personal_show_number = (RecyclerView) findViewById(R.id.rv_contact_personal_show_number);
@@ -227,6 +241,11 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
             tv_contact_personal_show_name.setTextColor(Color.parseColor("#A3A3A3"));
         }
         tv_contact_personal_show_name.setText(name);
+
+        if(photoFlag) {
+            im_contact_personal_show_icon.setImageBitmap(photo);
+        }
+
 
 
         numberAdapter = new ContactPersonalShowNumberAdapter(this,numberDatas);
@@ -397,13 +416,14 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                 Intent intent = new Intent(ContactPersonalShowActivity.this.getApplicationContext(),
                         AddContactActivity.class);
                 intent.putExtra(SELECTOR, FROM_CONTACT_PERSONAL_SHOW_ACTIVITY_EDIT);
-                intent.putExtra("NAME",name);
-                intent.putExtra("NAMEFLAG",nameFlag);
-                intent.putExtra("COMPANY",company);
-                intent.putExtra("COMPANYFLAG",companyFlag);
-                intent.putExtra("REMARK",remark);
-                intent.putExtra("REMARKFLAG",remarkFlag);
-                intent.putExtra("LOOKUP",lookUp);
+                intent.putExtra("NAME", name);
+                intent.putExtra("NAMEFLAG", nameFlag);
+                intent.putExtra("COMPANY", company);
+                intent.putExtra("COMPANYFLAG", companyFlag);
+                intent.putExtra("REMARK", remark);
+                intent.putExtra("REMARKFLAG", remarkFlag);
+                intent.putExtra("PHOTOFLAG", photoFlag);
+                intent.putExtra("LOOKUP", lookUp);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("NUMBERDATA", numberDatas);
                 bundle.putSerializable("EMAILDATA", emailDatas);
@@ -444,6 +464,13 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
 
         if(requestCode == REQUEST_CODE && resultCode == RESULT_CODE) {
             //更新数据
+            isPhotoChange = data.getBooleanExtra("ISPHOTOCHANGE",false);
+            if(isPhotoChange) {
+                ContentResolver resolver = getContentResolver();
+                photo = getContactPhoto(lookUp, resolver);
+                im_contact_personal_show_icon.setImageBitmap(photo);
+            }
+
             name = data.getStringExtra("NAME");
             if(name != null && name.length()>0) {
                 if(!nameFlag) {//之前是无姓名,颜色为灰色,现在有姓名,需将颜色设为黑色
@@ -758,6 +785,34 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
             imCursor.close();
         }
         return datas;
+    }
+
+    /**
+     * 获取联系人高清头像
+     * @param lookUp 联系人ID
+     * @param cr 调用容器
+     * @return 联系人的高清头像
+     */
+    public Bitmap getContactPhoto(String lookUp, ContentResolver cr) {
+        String contactID = null;
+        //查询需要修改的联系人的ContactId
+        Cursor cursor = getContentResolver().query(Phone.CONTENT_URI,
+                new String[]{Phone.CONTACT_ID},
+                Phone.LOOKUP_KEY+"=?", new String[]{lookUp}, null);
+        if(cursor!=null) {
+            while (cursor.moveToNext()) {
+                contactID = cursor.getString(0);
+            }
+            cursor.close();
+        }
+
+
+        Uri uri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, Long.parseLong(contactID));
+        InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(cr, uri, true);
+        if (input == null) {
+            return null;
+        }
+        return BitmapFactory.decodeStream(input);
     }
 
 }

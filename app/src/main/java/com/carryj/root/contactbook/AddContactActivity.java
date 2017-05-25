@@ -1,11 +1,16 @@
 package com.carryj.root.contactbook;
 
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.CommonDataKinds.Organization;
@@ -13,6 +18,7 @@ import android.provider.ContactsContract.CommonDataKinds.Note;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Im;
+import android.provider.ContactsContract.CommonDataKinds.Photo;
 import android.provider.ContactsContract.Data;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -32,11 +38,17 @@ import com.carryj.root.contactbook.adapter.AddContactNumberAdapter;
 import com.carryj.root.contactbook.data.EmailData;
 import com.carryj.root.contactbook.data.ImData;
 import com.carryj.root.contactbook.data.PhoneNumberData;
+import com.carryj.root.contactbook.event.HeadPhotoChangeEvent;
 import com.carryj.root.contactbook.event.NumberChangeEvent;
+import com.carryj.root.contactbook.tools.UserHeadPhotoManager;
 import com.carryj.root.contactbook.ui.DividerItemDecoration;
+import com.makeramen.roundedimageview.RoundedImageView;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 
@@ -62,7 +74,7 @@ public class AddContactActivity extends SweepBackActivity {
     private TextView tv_add_contact_done;
     private TextView tv_add_contact_back_str;
 
-    private ImageView im_add_contact_icon;
+    private RoundedImageView im_add_contact_icon;
 
     private EditText et_add_contact_surname;
     private EditText et_add_contact_given_name;
@@ -91,8 +103,15 @@ public class AddContactActivity extends SweepBackActivity {
     private boolean nameFlag;
     private boolean remarkFlag;
     private boolean companyFlag;
+    private boolean photoFlag;
+
+    private boolean isPhotoChange = false;
 
     private ContentValues values;
+
+    private UserHeadPhotoManager userHeadPhotoManager;
+    private Bitmap bitmap;
+    private String telnum;
 
 
 
@@ -136,6 +155,7 @@ public class AddContactActivity extends SweepBackActivity {
             remark = getIntent().getStringExtra("REMARK");
             remarkFlag = getIntent().getBooleanExtra("REMARKFLAG", false);
 
+            photoFlag = getIntent().getBooleanExtra("PHOTOFLAG", false);
             lookUp = getIntent().getStringExtra("LOOKUP");
             myNumberData = (ArrayList<PhoneNumberData>) getIntent().getSerializableExtra("NUMBERDATA");
             myEmailData = (ArrayList<EmailData>) getIntent().getSerializableExtra("EMAILDATA");
@@ -143,8 +163,14 @@ public class AddContactActivity extends SweepBackActivity {
         }
 
         values = new ContentValues();
+        ContactBookApplication application = ContactBookApplication.getInstance();
+        telnum = application.getTelnum();
+        userHeadPhotoManager = new UserHeadPhotoManager(telnum);
 
-
+        if(photoFlag){
+            ContentResolver resolver = getContentResolver();
+            bitmap = getContactPhoto(lookUp, resolver);
+        }
 
     }
 
@@ -156,7 +182,7 @@ public class AddContactActivity extends SweepBackActivity {
         ll_add_contact_back = (LinearLayout) findViewById(R.id.ll_add_contact_back);
         tv_add_contact_back_str = (TextView) findViewById(R.id.tv_add_contact_back_str);
         tv_add_contact_done = (TextView) findViewById(R.id.tv_add_contact_done);
-        im_add_contact_icon = (ImageView) findViewById(R.id.im_add_contact_icon);
+        im_add_contact_icon = (RoundedImageView) findViewById(R.id.im_add_contact_icon);
         et_add_contact_surname = (EditText) findViewById(R.id.et_add_contact_surname);
         et_add_contact_given_name = (EditText) findViewById(R.id.et_add_contact_given_name);
         et_add_contact_company = (EditText) findViewById(R.id.et_add_contact_company);
@@ -180,6 +206,10 @@ public class AddContactActivity extends SweepBackActivity {
 
         /*个人信息模块*/
         if(updateFlag) {
+
+            if(photoFlag) {
+                im_add_contact_icon.setImageBitmap(bitmap);//显示头像
+            }
             if(nameFlag) {
                 et_add_contact_surname.setText(name);
 
@@ -223,6 +253,7 @@ public class AddContactActivity extends SweepBackActivity {
         ll_add_contact_number_add.setOnClickListener(this);
         ll_add_contact_email_add.setOnClickListener(this);
         ll_add_contact_im_add.setOnClickListener(this);
+        im_add_contact_icon.setOnClickListener(this);
 
 
         /*电话号码模块*/
@@ -385,6 +416,9 @@ public class AddContactActivity extends SweepBackActivity {
             case R.id.ll_add_contact_back:
                 this.finish();
                 break;
+            case R.id.im_add_contact_icon:
+                userHeadPhotoManager.getHeadPhoto(this, 301, 302);
+                break;
             case R.id.tv_add_contact_done:
                 //获取名字
                 StringBuilder sb = new StringBuilder();
@@ -403,7 +437,7 @@ public class AddContactActivity extends SweepBackActivity {
                     if(name.equals("") || name == null) {
                         Toast.makeText(this,"姓名为空",Toast.LENGTH_SHORT).show();
                     }else {
-                        insert(name, company, myNumberData, myEmailData, myImData, remark);
+                        insert(name, company, myNumberData, myEmailData, myImData, remark, bitmap);
                         Toast.makeText(this,"添加成功",Toast.LENGTH_SHORT).show();
                         EventBus.getDefault().post(new NumberChangeEvent(true));//通知ContactBook刷新数据
                     }
@@ -413,7 +447,7 @@ public class AddContactActivity extends SweepBackActivity {
                     if(name.equals("") || name == null) {
                         Toast.makeText(this,"姓名为空",Toast.LENGTH_SHORT).show();
                     }else {
-                        update(name, company, myNumberData, myEmailData, myImData, remark);
+                        update(name, company, myNumberData, myEmailData, myImData, remark, bitmap);
                         Toast.makeText(this, "修改成功", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent();
                         Bundle bundle = new Bundle();
@@ -424,6 +458,7 @@ public class AddContactActivity extends SweepBackActivity {
                         intent.putExtra("NAME", name);
                         intent.putExtra("COMPANY", company);
                         intent.putExtra("REMARK", remark);
+                        intent.putExtra("ISPHOTOCHANGE",isPhotoChange);
                         this.setResult(RESULT_CODE, intent);
                         EventBus.getDefault().post(new NumberChangeEvent(true));//通知ContactBook刷新数据
                     }
@@ -447,7 +482,7 @@ public class AddContactActivity extends SweepBackActivity {
     }
 
     private boolean insert(String name, String company, ArrayList<PhoneNumberData> numberDatas,
-                           ArrayList<EmailData> emailDatas, ArrayList<ImData> imDatas, String remark) {
+                           ArrayList<EmailData> emailDatas, ArrayList<ImData> imDatas, String remark, Bitmap bitmap) {
 
         try
         {
@@ -488,6 +523,11 @@ public class AddContactActivity extends SweepBackActivity {
                 insertNote(remark);
             }
 
+            //向data表中插入头像数据
+            if(bitmap != null) {
+                insertPhoto(bitmap);
+            }
+
         }
 
         catch (Exception e)
@@ -499,7 +539,7 @@ public class AddContactActivity extends SweepBackActivity {
 
     private boolean update(String name, String company, ArrayList<PhoneNumberData> numberDatas,
                            ArrayList<EmailData> emailDatas,
-                           ArrayList<ImData> imDatas, String remark) {
+                           ArrayList<ImData> imDatas, String remark, Bitmap bitmap) {
 
         try {
 
@@ -634,6 +674,25 @@ public class AddContactActivity extends SweepBackActivity {
 
             }
 
+            //在data表中更新头像数据
+            if(bitmap != null) {
+
+                if(photoFlag) {
+                    final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    // 将Bitmap压缩成PNG编码，质量为100%存储
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                    byte[] avatar = outputStream.toByteArray();
+                    ContentValues values = new ContentValues();
+                    values.put(Photo.PHOTO, avatar);
+                    getContentResolver().update(Data.CONTENT_URI, values,
+                            Data.RAW_CONTACT_ID+"=? AND "+Data.MIMETYPE+"=?",
+                            new String[]{rawContactId+"", Photo.CONTENT_ITEM_TYPE});
+                }else {
+                    insertPhoto(bitmap);
+                }
+
+            }
+
         }catch (Exception e){
             return false;
         }
@@ -691,5 +750,78 @@ public class AddContactActivity extends SweepBackActivity {
         getContentResolver().insert(Data.CONTENT_URI, values);
     }
 
+    private void insertPhoto(Bitmap photo) {
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        // 将Bitmap压缩成PNG编码，质量为100%存储
+        photo.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+        byte[] avatar = outputStream.toByteArray();
+        ContentValues values = new ContentValues();
+        values.put(Data.RAW_CONTACT_ID, rawContactId);
+        values.put(Data.MIMETYPE, Photo.CONTENT_ITEM_TYPE);
+        values.put(Photo.PHOTO, avatar);
+        getContentResolver().insert(Data.CONTENT_URI, values);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case 301:
+                if (resultCode == RESULT_OK) {
+                    userHeadPhotoManager.cropPhoto(data.getData(), AddContactActivity.this, 303);// 裁剪图片
+                }
+                break;
+            case 302:
+                if (resultCode == RESULT_OK) {
+                    File temp = new File(Environment.getExternalStorageDirectory().getPath(),
+                            "/ContactBook/"+telnum+"/temphead.jpg");
+                    userHeadPhotoManager.cropPhoto(Uri.fromFile(temp), AddContactActivity.this, 303);// 裁剪图片
+                }
+                break;
+            case 303:
+                if (data != null) {
+                    Bundle extras = data.getExtras();
+                    bitmap = extras.getParcelable("data");
+                    if (bitmap != null) {
+                        im_add_contact_icon.setImageBitmap(bitmap);// 用RoundedImageView显示出来
+                        isPhotoChange = true;//头像已改变
+                    }
+                }
+                break;
+            default:
+                break;
+
+        }
+
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    /**
+     * 获取联系人高清头像
+     * @param lookUp 联系人ID
+     * @param cr 调用容器
+     * @return 联系人的高清头像
+     */
+    public Bitmap getContactPhoto(String lookUp, ContentResolver cr) {
+        String contactID = null;
+        //查询需要修改的联系人的ContactId
+        Cursor cursor = getContentResolver().query(Phone.CONTENT_URI,
+                new String[]{Phone.CONTACT_ID},
+                Phone.LOOKUP_KEY+"=?", new String[]{lookUp}, null);
+        if(cursor!=null) {
+            while (cursor.moveToNext()) {
+                contactID = cursor.getString(0);
+            }
+            cursor.close();
+        }
+
+
+        Uri uri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, Long.parseLong(contactID));
+        InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(cr, uri, true);
+        if (input == null) {
+            return null;
+        }
+        return BitmapFactory.decodeStream(input);
+    }
 
 }

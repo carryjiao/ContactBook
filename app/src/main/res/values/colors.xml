@@ -34,4 +34,5 @@
     <color name="rules_detail_text">@color/light_black</color>
     <color name="withdraw_btn_norm">#FF9900</color>
 
+    <color name="icon_purple">#69589a</color>
 </resources>
