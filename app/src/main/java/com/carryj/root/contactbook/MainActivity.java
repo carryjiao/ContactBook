@@ -7,13 +7,11 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,7 +23,9 @@ import com.carryj.root.contactbook.activity.BackupActivity;
 import com.carryj.root.contactbook.activity.LoginRegisterActivity;
 import com.carryj.root.contactbook.activity.RegisterActivity;
 import com.carryj.root.contactbook.adapter.MainFragmentPagerAdapter;
+import com.carryj.root.contactbook.event.CallNavigationViewEvent;
 import com.carryj.root.contactbook.event.DialEvent;
+import com.carryj.root.contactbook.event.HeadPhotoChangeEvent;
 import com.carryj.root.contactbook.fragments.CollectFragement;
 import com.carryj.root.contactbook.fragments.ContactBookFragement;
 import com.carryj.root.contactbook.fragments.DialFragement;
@@ -36,11 +36,10 @@ import com.makeramen.roundedimageview.RoundedImageView;
 
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -172,6 +171,8 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
     protected void initData() {
         ContactBookApplication applicationCPW = (ContactBookApplication) getApplication();
         telnum = applicationCPW.getTelnum();
+
+        EventBus.getDefault().register(this);
 
         fragments = new ArrayList<Fragment>();
         if(collectFragment == null) {
@@ -305,39 +306,10 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
     }
 
 
-
-    private void getHeadPhoto() {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        final AlertDialog dialog = builder.create();
-        View view = View.inflate(this, R.layout.dialog_select_photo, null);
-        TextView tv_select_gallery = (TextView) view.findViewById(R.id.tv_select_gallery);
-        TextView tv_select_camera = (TextView) view.findViewById(R.id.tv_select_camera);
-
-        tv_select_gallery.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent1 = new Intent(Intent.ACTION_PICK, null);
-                intent1.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-                startActivityForResult(intent1, 1);
-                dialog.dismiss();
-            }
-        });
-
-        tv_select_camera.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent2 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                intent2.putExtra(MediaStore.EXTRA_OUTPUT,
-                        Uri.fromFile(new File(Environment.getExternalStorageDirectory().getPath(),
-                                "/ContactBook/"+telnum+"/head.jpg")));
-                startActivityForResult(intent2, 2);// 采用ForResult打开
-                dialog.dismiss();
-            }
-        });
-
-        dialog.setView(view);
-        dialog.show();
+    @Override
+    protected void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
     }
 
     @Override
@@ -362,6 +334,7 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
                     if (bitmap != null) {
                         userHeadPhotoManager.setPicToSDCard(bitmap);// 保存在SD卡中
                         head_photo.setImageBitmap(bitmap);// 用RoundedImageView显示出来
+                        EventBus.getDefault().post(new HeadPhotoChangeEvent(true));//通知fragment刷新用户头像
                     }
                 }
                 break;
@@ -372,6 +345,14 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
 
 
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    //处理数据更新事件
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onCallNavigationViewEvent(CallNavigationViewEvent callNavigationViewEvent) {
+        if (callNavigationViewEvent.isCallNavigationViewFlag()) {
+            drawer.openDrawer(GravityCompat.START);
+        }
     }
 
 

@@ -38,7 +38,9 @@ import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.RecordItemInDetailActivity;
 import com.carryj.root.contactbook.adapter.RecordAdapter;
 import com.carryj.root.contactbook.data.RecordListViewItemData;
+import com.carryj.root.contactbook.event.CallNavigationViewEvent;
 import com.carryj.root.contactbook.event.DialEvent;
+import com.carryj.root.contactbook.event.HeadPhotoChangeEvent;
 import com.carryj.root.contactbook.tools.PhoneNumberTransformer;
 import com.carryj.root.contactbook.tools.UserHeadPhotoManager;
 import com.makeramen.roundedimageview.RoundedImageView;
@@ -286,6 +288,9 @@ public class RecordFragement extends Fragment implements OnClickListener {
                 mData.clear();
                 mData.addAll(missedCallRecordData);
                 adapter.notifyDataSetChanged();
+                break;
+            case R.id.head_photo:
+                EventBus.getDefault().post(new CallNavigationViewEvent(true));
                 break;
             default:
                 break;
@@ -547,6 +552,13 @@ public class RecordFragement extends Fragment implements OnClickListener {
             dialFlag = true;
         }
 
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onHeadPhotoChangeEvent(HeadPhotoChangeEvent headPhotoChangeEvent) {
+        if (headPhotoChangeEvent.isHeadPhotoChangeFlag()) {
+            userHeadPhotoManager.refreshHeadPhoto(head_photo);
+        }
     }
 
 }

@@ -43,6 +43,8 @@ import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.adapter.ContactBookAdapter;
 import com.carryj.root.contactbook.data.ContactListViewItemData;
 import com.carryj.root.contactbook.data.PhoneNumberData;
+import com.carryj.root.contactbook.event.CallNavigationViewEvent;
+import com.carryj.root.contactbook.event.HeadPhotoChangeEvent;
 import com.carryj.root.contactbook.event.NumberChangeEvent;
 import com.carryj.root.contactbook.tools.ContactBookSearch;
 import com.carryj.root.contactbook.tools.GetStrPhoneType;
@@ -270,7 +272,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
                 break;
             case R.id.head_photo:
-
+                EventBus.getDefault().post(new CallNavigationViewEvent(true));
                 break;
             default:
                 break;
@@ -397,6 +399,13 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
             mData.clear();
             mData.addAll(contactDatas);
             adapter.notifyDataSetChanged();
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onHeadPhotoChangeEvent(HeadPhotoChangeEvent headPhotoChangeEvent) {
+        if (headPhotoChangeEvent.isHeadPhotoChangeFlag()) {
+            userHeadPhotoManager.refreshHeadPhoto(head_photo);
         }
     }
 }

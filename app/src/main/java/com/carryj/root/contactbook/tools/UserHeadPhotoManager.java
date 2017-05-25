@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.carryj.root.contactbook.R;
+import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -139,5 +140,11 @@ public class UserHeadPhotoManager {
                 e.printStackTrace();
             }
         }
+    }
+
+
+    public void refreshHeadPhoto(RoundedImageView headPhoto) {
+        Bitmap bitmap = getBitmap();
+        headPhoto.setImageBitmap(bitmap);
     }
 }

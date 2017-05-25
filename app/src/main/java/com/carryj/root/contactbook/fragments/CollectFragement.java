@@ -41,8 +41,10 @@ import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.adapter.CollectAdapter;
 import com.carryj.root.contactbook.data.CollectListViewItemData;
 import com.carryj.root.contactbook.data.ContactListViewItemData;
+import com.carryj.root.contactbook.event.CallNavigationViewEvent;
 import com.carryj.root.contactbook.event.CollectEvent;
 import com.carryj.root.contactbook.event.DialEvent;
+import com.carryj.root.contactbook.event.HeadPhotoChangeEvent;
 import com.carryj.root.contactbook.event.NumberChangeEvent;
 import com.carryj.root.contactbook.tools.UserHeadPhotoManager;
 import com.makeramen.roundedimageview.RoundedImageView;
@@ -277,6 +279,9 @@ public class CollectFragement extends Fragment implements OnClickListener {
                 Intent intent = new Intent(this.getContext(), AddCollectActivity.class);
                 startActivity(intent);
                 break;
+            case R.id.head_photo:
+                EventBus.getDefault().post(new CallNavigationViewEvent(true));
+                break;
             default:
                 break;
         }
@@ -395,6 +400,14 @@ public class CollectFragement extends Fragment implements OnClickListener {
             mData.clear();
             mData.addAll(collectDatas);
             adapter.notifyDataSetChanged();
+        }
+    }
+
+    //处理数据更新事件
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onHeadPhotoChangeEvent(HeadPhotoChangeEvent headPhotoChangeEvent) {
+        if (headPhotoChangeEvent.isHeadPhotoChangeFlag()) {
+            userHeadPhotoManager.refreshHeadPhoto(head_photo);
         }
     }
 
