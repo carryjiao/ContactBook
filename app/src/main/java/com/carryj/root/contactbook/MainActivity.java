@@ -3,7 +3,6 @@ package com.carryj.root.contactbook;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -18,7 +17,6 @@ import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,7 +31,7 @@ import com.carryj.root.contactbook.fragments.ContactBookFragement;
 import com.carryj.root.contactbook.fragments.DialFragement;
 import com.carryj.root.contactbook.fragments.RecordFragement;
 import com.carryj.root.contactbook.net.LoginRegisterManager;
-import com.carryj.root.contactbook.tools.FileUtils;
+import com.carryj.root.contactbook.tools.UserHeadPhotoManager;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 
@@ -66,6 +64,7 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
     private TextView tv_head_tel;
     private String telnum;
     private Bitmap bitmap;
+    private UserHeadPhotoManager userHeadPhotoManager;
 
 
 
@@ -192,20 +191,8 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
             fragments.add(dialFragement);
         }
 
-        // 文件夹地址
-        String tempPath = "ContactBook/"+telnum;
-
-        String filePath = tempPath + "/head.jpg";
-
-        FileUtils fileutils = new FileUtils();
-
-        // 判断sd卡上的文件夹是否存在
-        if (!fileutils.isFileExist(tempPath)) {
-            fileutils.createSDDir(tempPath);
-        }
-
-        bitmap = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory().getPath()
-                + "/" + filePath);// 从SD卡中找头像，转换成Bitmap
+        userHeadPhotoManager = new UserHeadPhotoManager(telnum);
+        bitmap = userHeadPhotoManager.getBitmap();// 从SD卡中找头像，转换成Bitmap
 
     }
 
@@ -259,7 +246,7 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
                 setCurrentPage(3);
                 break;
             case R.id.head_photo:
-                getHeadPhoto();
+                userHeadPhotoManager.getHeadPhoto(this, 1, 2);
                 break;
             case R.id.tv_user_name:
                 break;
@@ -317,20 +304,7 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
         return true;
     }
 
-    /*@Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }*/
 
     private void getHeadPhoto() {
 
@@ -371,14 +345,14 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
         switch (requestCode) {
             case 1:
                 if (resultCode == RESULT_OK) {
-                    cropPhoto(data.getData());// 裁剪图片
+                    userHeadPhotoManager.cropPhoto(data.getData(), MainActivity.this, 3);// 裁剪图片
                 }
                 break;
             case 2:
                 if (resultCode == RESULT_OK) {
                     File temp = new File(Environment.getExternalStorageDirectory().getPath(),
                             "/ContactBook/"+telnum+"/head.jpg");
-                    cropPhoto(Uri.fromFile(temp));// 裁剪图片
+                    userHeadPhotoManager.cropPhoto(Uri.fromFile(temp), MainActivity.this, 3);// 裁剪图片
                 }
                 break;
             case 3:
@@ -386,7 +360,7 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
                     Bundle extras = data.getExtras();
                     bitmap = extras.getParcelable("data");
                     if (bitmap != null) {
-                        setPicToView(bitmap);// 保存在SD卡中
+                        userHeadPhotoManager.setPicToSDCard(bitmap);// 保存在SD卡中
                         head_photo.setImageBitmap(bitmap);// 用RoundedImageView显示出来
                     }
                 }
@@ -400,47 +374,6 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    /**
-     * 调用系统的裁剪功能
-     *
-     * @param uri
-     */
-    private void cropPhoto(Uri uri) {
-        Intent intent = new Intent("com.android.camera.action.CROP");
-        intent.setDataAndType(uri, "image/*");
-        intent.putExtra("crop", "true");
-// aspectX aspectY 是宽高的比例
-        intent.putExtra("aspectX", 1);
-        intent.putExtra("aspectY", 1);
-// outputX outputY 是裁剪图片宽高
-        intent.putExtra("outputX", 150);
-        intent.putExtra("outputY", 150);
-        intent.putExtra("return-data", true);
-        startActivityForResult(intent, 3);
-    }
 
-    private void setPicToView(Bitmap mBitmap) {
-        String sdStatus = Environment.getExternalStorageState();
-        if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) { // 检测sd是否可用
-            return;
-        }
-        FileOutputStream b = null;
-        String fileName = Environment.getExternalStorageDirectory().getPath()+
-                "/ContactBook/"+telnum+"/head.jpg";// 图片名字
-        try {
-            b = new FileOutputStream(fileName);
-            mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, b);// 把数据写入文件
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-// 关闭流
-                b.flush();
-                b.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
 }

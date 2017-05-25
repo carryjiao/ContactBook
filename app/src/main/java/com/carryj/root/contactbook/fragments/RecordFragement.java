@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -32,12 +33,15 @@ import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.carryj.root.contactbook.ContactBookApplication;
 import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.RecordItemInDetailActivity;
 import com.carryj.root.contactbook.adapter.RecordAdapter;
 import com.carryj.root.contactbook.data.RecordListViewItemData;
 import com.carryj.root.contactbook.event.DialEvent;
 import com.carryj.root.contactbook.tools.PhoneNumberTransformer;
+import com.carryj.root.contactbook.tools.UserHeadPhotoManager;
+import com.makeramen.roundedimageview.RoundedImageView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -111,13 +115,16 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
     private TextView tv_record_all;
     private TextView tv_record_missed_call;
-    private ImageView iv_record_box;
+    private RoundedImageView head_photo;
     private SwipeMenuListView recordListView;
     private RecordAdapter adapter;
 
     private ArrayList<RecordListViewItemData> mData = new ArrayList<RecordListViewItemData>();
     private ArrayList<RecordListViewItemData> allRcordData = new ArrayList<RecordListViewItemData>();
     private ArrayList<RecordListViewItemData> missedCallRecordData = new ArrayList<RecordListViewItemData>();
+
+    private UserHeadPhotoManager userHeadPhotoManager;
+    private Bitmap bitmap;
 
 
     public RecordFragement() {
@@ -145,9 +152,15 @@ public class RecordFragement extends Fragment implements OnClickListener {
     private void initView(View view) {
         tv_record_all = (TextView) view.findViewById(R.id.tv_record_all);
         tv_record_missed_call = (TextView) view.findViewById(R.id.tv_record_missed_call);
-        iv_record_box = (ImageView) view.findViewById(R.id.iv_record_box);
+        head_photo = (RoundedImageView) view.findViewById(R.id.head_photo);
 
         recordListView = (SwipeMenuListView) view.findViewById(R.id.record_listview);
+
+        if(bitmap != null) {
+            head_photo.setImageBitmap(bitmap);
+        }else {
+            Log.d("ContactBookFragment","===========================bitmap = null");
+        }
         adapter = new RecordAdapter(getContext(), mData);
         recordListView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
@@ -241,7 +254,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
         tv_record_all.setOnClickListener(this);
         tv_record_missed_call.setOnClickListener(this);
-        iv_record_box.setOnClickListener(this);
+        head_photo.setOnClickListener(this);
 
 
     }
@@ -328,6 +341,11 @@ public class RecordFragement extends Fragment implements OnClickListener {
             }
         }.execute();
 
+        ContactBookApplication application = ContactBookApplication.getInstance();
+        String telnum = application.getTelnum();
+        Log.d("RecordFragment","===========================telnum = "+telnum);
+        userHeadPhotoManager = new UserHeadPhotoManager(telnum);
+        bitmap = userHeadPhotoManager.getBitmap();
 
     }
 

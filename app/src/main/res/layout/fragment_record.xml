@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <RelativeLayout
         android:id="@+id/record_title_bar"
@@ -13,14 +13,18 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true">
 
-        <ImageView
-            android:id="@+id/iv_record_box"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/head_photo"
             android:layout_marginLeft="10dp"
-            android:src="@android:drawable/ic_menu_sort_by_size"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:src="@drawable/user_head_photo"
             android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true" />
+            android:layout_alignParentLeft="true"
+            app:riv_border_color="#333333"
+            app:riv_border_width="1dp"
+            app:riv_oval="true" />
+
 
         <LinearLayout
             android:layout_width="wrap_content"

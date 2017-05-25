@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -18,6 +19,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +35,7 @@ import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.carryj.root.contactbook.AddCollectActivity;
+import com.carryj.root.contactbook.ContactBookApplication;
 import com.carryj.root.contactbook.ContactPersonalShowActivity;
 import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.adapter.CollectAdapter;
@@ -41,6 +44,8 @@ import com.carryj.root.contactbook.data.ContactListViewItemData;
 import com.carryj.root.contactbook.event.CollectEvent;
 import com.carryj.root.contactbook.event.DialEvent;
 import com.carryj.root.contactbook.event.NumberChangeEvent;
+import com.carryj.root.contactbook.tools.UserHeadPhotoManager;
+import com.makeramen.roundedimageview.RoundedImageView;
 
 
 import org.greenrobot.eventbus.EventBus;
@@ -66,7 +71,7 @@ public class CollectFragement extends Fragment implements OnClickListener {
     private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1001;
 
     private TextView tv_collect_add;
-    private ImageView iv_collect_box;
+    private RoundedImageView head_photo;
     private CollectAdapter adapter;
     private SwipeMenuListView listView;
 
@@ -97,6 +102,9 @@ public class CollectFragement extends Fragment implements OnClickListener {
 
     private ArrayList<CollectListViewItemData> mData = new ArrayList<CollectListViewItemData>();
     private ArrayList<CollectListViewItemData> collectData = new ArrayList<CollectListViewItemData>();
+
+    private UserHeadPhotoManager userHeadPhotoManager;
+    private Bitmap bitmap;
 
 
     public CollectFragement() {
@@ -149,13 +157,24 @@ public class CollectFragement extends Fragment implements OnClickListener {
                 adapter.notifyDataSetChanged();
             }
         }.execute();
+        ContactBookApplication application = ContactBookApplication.getInstance();
+        String telnum = application.getTelnum();
+        Log.d("CollectFragment","===========================telnum = "+telnum);
+        userHeadPhotoManager = new UserHeadPhotoManager(telnum);
+        bitmap = userHeadPhotoManager.getBitmap();
 
     }
 
     private void initView(View view) {
         tv_collect_add = (TextView) view.findViewById(R.id.tv_collect_add);
-        iv_collect_box = (ImageView) view.findViewById(R.id.iv_collect_box);
+        head_photo = (RoundedImageView) view.findViewById(R.id.head_photo);
         listView = (SwipeMenuListView) view.findViewById(R.id.collect_listview);
+
+        if(bitmap != null) {
+            head_photo.setImageBitmap(bitmap);
+        }else {
+            Log.d("ContactBookFragment","===========================bitmap = null");
+        }
         adapter = new CollectAdapter(getContext(), mData);
         listView.setAdapter(adapter);
 
@@ -245,7 +264,7 @@ public class CollectFragement extends Fragment implements OnClickListener {
 
     private void initEvent(){
         tv_collect_add.setOnClickListener(this);
-        iv_collect_box.setOnClickListener(this);
+        head_photo.setOnClickListener(this);
 
     }
 

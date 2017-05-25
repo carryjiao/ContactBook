@@ -27,6 +27,8 @@ import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.carryj.root.contactbook.adapter.ContactBookAdapter;
 import com.carryj.root.contactbook.data.ContactListViewItemData;
 import com.carryj.root.contactbook.event.CollectEvent;
+import com.carryj.root.contactbook.tools.UserHeadPhotoManager;
+import com.makeramen.roundedimageview.RoundedImageView;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -40,9 +42,10 @@ public class AddCollectActivity extends SweepBackActivity {
     private RelativeLayout contact_book_view;
     private RelativeLayout contact_book_title_bar;
     private TextView tv_contact_book_add;
-    private ImageView iv_contact_book_box;
+    private RoundedImageView head_photo;
     private ContactBookAdapter adapter;
     private SwipeMenuListView listView;
+
 
     private Button cancel;
     private Button confirm;
@@ -88,6 +91,7 @@ public class AddCollectActivity extends SweepBackActivity {
             }
         }.execute();
 
+
     }
 
     @Override
@@ -96,8 +100,9 @@ public class AddCollectActivity extends SweepBackActivity {
         contact_book_view = (RelativeLayout) findViewById(R.id.contact_book_view);
         contact_book_title_bar = (RelativeLayout) findViewById(R.id.contact_book_title_bar);
         tv_contact_book_add = (TextView) findViewById(R.id.tv_contact_book_add);
-        iv_contact_book_box = (ImageView) findViewById(R.id.iv_contact_book_box);
+        head_photo = (RoundedImageView) findViewById(R.id.head_photo);
         listView = (SwipeMenuListView) findViewById(R.id.contact_book_listview);
+
 
         tv_contact_book_add.setText("取消");
         tv_contact_book_add.setTextSize(20);
@@ -164,7 +169,7 @@ public class AddCollectActivity extends SweepBackActivity {
     @Override
     protected void initEvents() {
         tv_contact_book_add.setOnClickListener(this);
-        iv_contact_book_box.setOnClickListener(this);
+        head_photo.setOnClickListener(this);
     }
 
     @Override

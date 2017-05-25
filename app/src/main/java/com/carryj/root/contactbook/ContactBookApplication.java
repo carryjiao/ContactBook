@@ -22,10 +22,17 @@ public class ContactBookApplication extends Application {
 	public static Context appContext;
 	private String telnum;
 	private String psw;
+	private String nickName;
 	private boolean isLogin;
 	private static final String IS_LOGIN = "IS_LOGIN";
 	private SharedPreferences preferences;
 	private SharedPreferences.Editor edior;
+	private static ContactBookApplication application;
+
+	public static ContactBookApplication getInstance()
+	{
+		return application;
+	}
 
 	@Override
 	public void onCreate() {
@@ -38,6 +45,7 @@ public class ContactBookApplication extends Application {
 		psw = preferences.getString(UserTable.PSW, null);
 		isLogin = preferences.getBoolean(IS_LOGIN, false);
 		initLog4J();
+		application = this;
 	}
 
 	private void initLog4J() {
@@ -74,4 +82,12 @@ public class ContactBookApplication extends Application {
 		edior.putBoolean(IS_LOGIN, isLogin).commit();
 	}
 
+	public String getNickName() {
+		return nickName;
+	}
+
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+		edior.putString(UserTable.PSW, psw).commit();
+	}
 }

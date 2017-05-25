@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
@@ -18,6 +19,7 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,6 +37,7 @@ import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.carryj.root.contactbook.AddContactActivity;
+import com.carryj.root.contactbook.ContactBookApplication;
 import com.carryj.root.contactbook.ContactPersonalShowActivity;
 import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.adapter.ContactBookAdapter;
@@ -44,6 +47,8 @@ import com.carryj.root.contactbook.event.NumberChangeEvent;
 import com.carryj.root.contactbook.tools.ContactBookSearch;
 import com.carryj.root.contactbook.tools.GetStrPhoneType;
 import com.carryj.root.contactbook.tools.PhoneNumberTransformer;
+import com.carryj.root.contactbook.tools.UserHeadPhotoManager;
+import com.makeramen.roundedimageview.RoundedImageView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -72,10 +77,12 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
     private EditText et_contact_book_search;
     private TextView tv_contact_book_search;
     private ImageView iv_contact_book_search;
-    private ImageView iv_contact_book_box;
+    private RoundedImageView head_photo;
     private ContactBookAdapter adapter;
     private SwipeMenuListView listView;
     private View view;
+    private UserHeadPhotoManager userHeadPhotoManager;
+    private Bitmap bitmap;
 
 
     /**
@@ -141,6 +148,11 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
                 adapter.notifyDataSetChanged();
             }
         }.execute();
+        ContactBookApplication application = ContactBookApplication.getInstance();
+        String telnum = application.getTelnum();
+        Log.d("ContactBookFragment","===========================telnum = "+telnum);
+        userHeadPhotoManager = new UserHeadPhotoManager(telnum);
+        bitmap = userHeadPhotoManager.getBitmap();
     }
 
     private void initView(View view) {
@@ -149,8 +161,15 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
         et_contact_book_search = (EditText) view.findViewById(R.id.et_contact_book_search);
         tv_contact_book_search = (TextView) view.findViewById(R.id.tv_contact_book_search);
         iv_contact_book_search = (ImageView) view.findViewById(R.id.iv_contact_book_search);
-        iv_contact_book_box = (ImageView) view.findViewById(R.id.iv_contact_book_box);
+        head_photo = (RoundedImageView) view.findViewById(R.id.head_photo);
         listView = (SwipeMenuListView) view.findViewById(R.id.contact_book_listview);
+
+        if(bitmap != null) {
+            head_photo.setImageBitmap(bitmap);
+        }else {
+            Log.d("ContactBookFragment","===========================bitmap = null");
+        }
+
         adapter = new ContactBookAdapter(getContext(), mData);
         listView.setAdapter(adapter);
 
@@ -234,7 +253,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
 
         tv_contact_book_add.setOnClickListener(this);
-        iv_contact_book_box.setOnClickListener(this);
+        head_photo.setOnClickListener(this);
         et_contact_book_search.addTextChangedListener(new MyTextWatcher());
 
     }
@@ -250,7 +269,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
                 startActivity(intent);
 
                 break;
-            case R.id.iv_contact_book_box:
+            case R.id.head_photo:
 
                 break;
             default:
