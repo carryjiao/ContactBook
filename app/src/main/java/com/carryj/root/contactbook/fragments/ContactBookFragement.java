@@ -392,6 +392,15 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
     }
 
     //处理数据更新事件
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onHeadPhotoChangeEvent(HeadPhotoChangeEvent headPhotoChangeEvent) {
+        if (headPhotoChangeEvent.isHeadPhotoChangeFlag()) {
+            userHeadPhotoManager.refreshHeadPhoto(head_photo);
+        }
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDealNumberChangeEvent(NumberChangeEvent numberChangeEvent) {
         if (numberChangeEvent.isNumberChangeFlag()) {
@@ -399,13 +408,6 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
             mData.clear();
             mData.addAll(contactDatas);
             adapter.notifyDataSetChanged();
-        }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onHeadPhotoChangeEvent(HeadPhotoChangeEvent headPhotoChangeEvent) {
-        if (headPhotoChangeEvent.isHeadPhotoChangeFlag()) {
-            userHeadPhotoManager.refreshHeadPhoto(head_photo);
         }
     }
 }
