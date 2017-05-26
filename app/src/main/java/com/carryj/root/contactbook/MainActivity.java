@@ -334,7 +334,7 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
                     if (bitmap != null) {
                         userHeadPhotoManager.setPicToSDCard(bitmap);// 保存在SD卡中
                         head_photo.setImageBitmap(bitmap);// 用RoundedImageView显示出来
-                        EventBus.getDefault().post(new HeadPhotoChangeEvent(true));//通知fragment刷新用户头像
+                        EventBus.getDefault().post(new HeadPhotoChangeEvent("change"));//通知fragment刷新用户头像
                     }
                 }
                 break;

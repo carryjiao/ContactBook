@@ -2,19 +2,29 @@ package com.carryj.root.contactbook;
 
 
 
+import android.content.ContentUris;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.CallLog;
+import android.provider.ContactsContract.Contacts;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.carryj.root.contactbook.data.RecordListViewItemData;
-import com.carryj.root.contactbook.fragments.DialFragement;
 import com.carryj.root.contactbook.fragments.RecordFragement;
+import com.carryj.root.contactbook.tools.UserHeadPhotoManager;
+import com.makeramen.roundedimageview.RoundedImageView;
+
+import java.io.InputStream;
 
 public class RecordItemInDetailActivity extends SweepBackActivity {
 
@@ -27,7 +37,7 @@ public class RecordItemInDetailActivity extends SweepBackActivity {
     private LinearLayout ll_record_item_in_detail_contact_add;
     private LinearLayout ll_record_item_in_detail_contact_delete;
 
-    private ImageView im_record_item_in_detail_icon;
+    private RoundedImageView im_record_item_in_detail_icon;
     private ImageView im_record_item_in_detail_call_icon;
 
     private TextView tv_record_item_in_detail_name;
@@ -39,6 +49,8 @@ public class RecordItemInDetailActivity extends SweepBackActivity {
     private TextView tv_record_item_in_detail_number;
 
     private RecordListViewItemData data;
+    private UserHeadPhotoManager userHeadPhotoManager;
+    Bitmap bitmap;
 
 
     @Override
@@ -53,6 +65,38 @@ public class RecordItemInDetailActivity extends SweepBackActivity {
 
         data = (RecordListViewItemData) getIntent().getSerializableExtra(RecordFragement.RECORD_IN_DETAIL);
 
+        new AsyncTask<Void, Void, Bitmap>(){//异步加载联系人头像
+            @Override
+            protected Bitmap doInBackground(Void... params) {
+                String contactID = data.getContactID();
+                if(contactID == null) {//根据姓名查询contactID
+                    String name = data.getStrCachedName();
+                    Cursor cursor = getContentResolver().query(Contacts.CONTENT_URI, new String[]{Contacts._ID},
+                            Contacts.DISPLAY_NAME + "=?", new String[]{name}, null);
+                    if (cursor != null) {
+                        while (cursor.moveToNext()) {
+                            contactID = cursor.getString(0);
+                        }
+                    }
+                }
+
+                //获取头像
+                Uri uri = ContentUris.withAppendedId(Contacts.CONTENT_URI, Long.parseLong(contactID));
+                InputStream input = Contacts.openContactPhotoInputStream(getContentResolver(), uri, true);
+                if (input != null) {
+                    bitmap = BitmapFactory.decodeStream(input);
+                }
+                return bitmap;
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                im_record_item_in_detail_icon.setImageBitmap(bitmap);
+                super.onPostExecute(bitmap);
+            }
+        }.execute();
+
+
     }
 
     @Override
@@ -61,7 +105,7 @@ public class RecordItemInDetailActivity extends SweepBackActivity {
         ll_record_item_in_detail_contact_add = (LinearLayout) findViewById(R.id.ll_record_item_in_detail_contact_add);
         ll_record_item_in_detail_contact_delete = (LinearLayout) findViewById(R.id.ll_record_item_in_detail_contact_delete);
 
-        im_record_item_in_detail_icon = (ImageView) findViewById(R.id.im_record_item_in_detail_icon);
+        im_record_item_in_detail_icon = (RoundedImageView) findViewById(R.id.im_record_item_in_detail_icon);
         im_record_item_in_detail_call_icon = (ImageView) findViewById(R.id.im_record_item_in_detail_call_icon);
 
         tv_record_item_in_detail_name = (TextView) findViewById(R.id.tv_record_item_in_detail_name);

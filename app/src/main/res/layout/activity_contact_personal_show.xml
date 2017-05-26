@@ -90,8 +90,8 @@
 
                 <com.makeramen.roundedimageview.RoundedImageView
                     android:id="@+id/im_contact_personal_show_icon"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="@dimen/head_photo_size"
+                    android:layout_height="@dimen/head_photo_size"
                     android:src="@drawable/user_head_photo"
                     android:layout_centerVertical="true"
                     android:layout_alignParentLeft="true"

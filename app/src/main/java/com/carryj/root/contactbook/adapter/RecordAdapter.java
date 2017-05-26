@@ -71,13 +71,16 @@ public class RecordAdapter extends BaseAdapter{
 
             switch (itemData.getcontactType()) {
                 case CallLog.Calls.INCOMING_TYPE:
-                    viewHolder.im_record_contact_type.setImageResource(sym_call_incoming);
+                    viewHolder.im_record_contact_type.setImageResource(R.drawable.ic_call_in);
+                    viewHolder.im_record_contact_type.setColorFilter(0xFF1E90FF);
                     break;
                 case CallLog.Calls.OUTGOING_TYPE:
-                    viewHolder.im_record_contact_type.setImageResource(sym_call_outgoing);
+                    viewHolder.im_record_contact_type.setImageResource(R.drawable.ic_call_out);
+                    viewHolder.im_record_contact_type.setColorFilter(0xFF32CD32);
                     break;
                 case CallLog.Calls.MISSED_TYPE:
-                    viewHolder.im_record_contact_type.setImageResource(sym_call_missed);
+                    viewHolder.im_record_contact_type.setImageResource(R.drawable.ic_call_miss);
+                    viewHolder.im_record_contact_type.setColorFilter(0xFFE93939);
                     break;
                 default:
                     break;

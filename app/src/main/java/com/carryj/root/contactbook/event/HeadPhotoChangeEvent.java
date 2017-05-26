@@ -8,15 +8,28 @@ public class HeadPhotoChangeEvent {
 
     private boolean headPhotoChangeFlag;
 
-    public HeadPhotoChangeEvent(boolean headPhotoChangeFlag) {
-        this.headPhotoChangeFlag = headPhotoChangeFlag;
-    }
+    private String headPhotoChange;
 
+    /*public HeadPhotoChangeEvent(boolean headPhotoChangeFlag) {
+        this.headPhotoChangeFlag = headPhotoChangeFlag;
+    }*/
+
+    public HeadPhotoChangeEvent(String headPhotoChange) {
+        this.headPhotoChange = headPhotoChange;
+    }
     public boolean isHeadPhotoChangeFlag() {
         return headPhotoChangeFlag;
     }
 
     public void setHeadPhotoChangeFlag(boolean headPhotoChangeFlag) {
         this.headPhotoChangeFlag = headPhotoChangeFlag;
+    }
+
+    public String getHeadPhotoChange() {
+        return headPhotoChange;
+    }
+
+    public void setHeadPhotoChange(String headPhotoChange) {
+        this.headPhotoChange = headPhotoChange;
     }
 }

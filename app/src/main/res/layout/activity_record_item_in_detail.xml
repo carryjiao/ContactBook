@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -75,11 +76,16 @@
         android:gravity="center_vertical"
         android:layout_marginLeft="@dimen/record_item_in_detail_margin_left">
 
-        <ImageView
+
+
+        <com.makeramen.roundedimageview.RoundedImageView
             android:id="@+id/im_record_item_in_detail_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/im_icon"/>
+            android:layout_width="@dimen/head_photo_size"
+            android:layout_height="@dimen/head_photo_size"
+            android:src="@drawable/user_head_photo"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            app:riv_oval="true" />
 
         <TextView
             android:id="@+id/tv_record_item_in_detail_name"

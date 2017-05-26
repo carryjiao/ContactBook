@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.CallLog;
+import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -284,6 +285,20 @@ public class RecordFragement extends Fragment implements OnClickListener {
                 FLAG = FLAG_MISSEDCALL;
                 tv_record_all.setTextColor(Color.parseColor("#030303"));
                 tv_record_missed_call.setTextColor(Color.parseColor("#E5E5E5"));
+
+
+                /*ContentValues values = new ContentValues();
+                values.put(CallLog.Calls.TYPE, CallLog.Calls.INCOMING_TYPE);
+                try {
+                    getActivity().getContentResolver().update(CallLog.Calls.CONTENT_URI, values,
+                            CallLog.Calls._ID+"=?", new String[]{17+""});
+
+                    Log.d("============","数据已更新++++++++++++++++++++++++++++++++++++++++");
+                }catch (SecurityException e) {
+                    Log.d("============","更新失败+++++++++++++++");
+                }*/
+
+
                 missedCallRecordData = getRecordData(selection, selectionArgs);
                 mData.clear();
                 mData.addAll(missedCallRecordData);
@@ -348,7 +363,6 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
         ContactBookApplication application = ContactBookApplication.getInstance();
         String telnum = application.getTelnum();
-        Log.d("RecordFragment","===========================telnum = "+telnum);
         userHeadPhotoManager = new UserHeadPhotoManager(telnum);
         bitmap = userHeadPhotoManager.getBitmap();
 
@@ -422,12 +436,15 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
                     int _id = callLogCursor.getInt(CALLS_ID_INDEX);
 
+                    String contactID = null;
+
                     //判断联系人姓名是否为空
                     if (cachedName == null) {
                         ArrayList<String> returnData = updataRecordData(_id, strNumber);//补全通话记录数据表中的空字段
                         if (returnData != null) {
                             cachedName = returnData.get(0);
                             numberType = Integer.parseInt(returnData.get(1));
+                            contactID = returnData.get(2);
                         }
                     }
 
@@ -439,7 +456,7 @@ public class RecordFragement extends Fragment implements OnClickListener {
                     itemData.setDuration(duration);
                     itemData.setPhoneType(numberType);
                     itemData.set_id(_id);
-
+                    itemData.setContactID(contactID);
                     recordInfo.add(itemData);
 
                 }
@@ -495,10 +512,11 @@ public class RecordFragement extends Fragment implements OnClickListener {
                 if (number.equals(strNumber)) {
                     String name = phoneCursor.getString(0);
                     String numbertype = phoneCursor.getInt(2) + "";
+                    String contactID = phoneCursor.getString(4);
                     StringBuilder lookup_uri = new StringBuilder();
                     lookup_uri.append("content://com.android.contacts/contacts/lookup/");
                     lookup_uri.append(phoneCursor.getString(3) + "/");
-                    lookup_uri.append(phoneCursor.getString(4));
+                    lookup_uri.append(contactID);
 
                     ContentValues values = new ContentValues();
                     values.put(CallLog.Calls.CACHED_NAME, name);
@@ -516,12 +534,13 @@ public class RecordFragement extends Fragment implements OnClickListener {
                     } else {
 
                         getContext().getContentResolver().update(CallLog.Calls.CONTENT_URI,
-                                values, CallLog.Calls._ID + "=?", new String[]{_id + ""});
+                                values, CallLog.Calls._ID + "=?", new String[]{_id + ""});//写入姓名等空字段
 
                     }
 
                     retrunData.add(0, name);
                     retrunData.add(1, numbertype);
+                    retrunData.add(2, contactID);
                     return retrunData;//已找到
 
                 }
@@ -532,6 +551,15 @@ public class RecordFragement extends Fragment implements OnClickListener {
 
     }
 
+
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onHeadPhotoChangeEvent(HeadPhotoChangeEvent headPhotoChangeEvent) {
+        if (headPhotoChangeEvent.getHeadPhotoChange().equals("change")) {
+            userHeadPhotoManager.refreshHeadPhoto(head_photo);
+        }
+    }
 
     //用于消息处理,更新数据
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -552,13 +580,6 @@ public class RecordFragement extends Fragment implements OnClickListener {
             dialFlag = true;
         }
 
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onHeadPhotoChangeEvent(HeadPhotoChangeEvent headPhotoChangeEvent) {
-        if (headPhotoChangeEvent.isHeadPhotoChangeFlag()) {
-            userHeadPhotoManager.refreshHeadPhoto(head_photo);
-        }
     }
 
 }

@@ -42,4 +42,7 @@
     <dimen name="show_orcode_im_height">250dp</dimen>
 
 
+    <dimen name="head_photo_size">60dp</dimen>
+
+
 </resources>

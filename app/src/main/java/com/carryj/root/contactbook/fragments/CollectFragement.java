@@ -411,7 +411,7 @@ public class CollectFragement extends Fragment implements OnClickListener {
     //处理数据更新事件
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onHeadPhotoChangeEvent(HeadPhotoChangeEvent headPhotoChangeEvent) {
-        if (headPhotoChangeEvent.isHeadPhotoChangeFlag()) {
+        if (headPhotoChangeEvent.getHeadPhotoChange().equals("change")) {
             userHeadPhotoManager.refreshHeadPhoto(head_photo);
         }
     }

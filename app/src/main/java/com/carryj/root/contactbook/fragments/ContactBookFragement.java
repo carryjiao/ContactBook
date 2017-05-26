@@ -396,7 +396,7 @@ public class ContactBookFragement extends Fragment implements OnClickListener {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onHeadPhotoChangeEvent(HeadPhotoChangeEvent headPhotoChangeEvent) {
-        if (headPhotoChangeEvent.isHeadPhotoChangeFlag()) {
+        if (headPhotoChangeEvent.getHeadPhotoChange().equals("change")) {
             userHeadPhotoManager.refreshHeadPhoto(head_photo);
         }
     }

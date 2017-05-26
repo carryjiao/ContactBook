@@ -23,6 +23,7 @@ public class RecordListViewItemData implements Serializable{
     private Date date;
     private Long duration;
     private int _id;
+    private String contactID;
 
 
     public RecordListViewItemData() {
@@ -156,5 +157,13 @@ public class RecordListViewItemData implements Serializable{
 
     public void set_id(int _id) {
         this._id = _id;
+    }
+
+    public String getContactID() {
+        return contactID;
+    }
+
+    public void setContactID(String contactID) {
+        this.contactID = contactID;
     }
 }
