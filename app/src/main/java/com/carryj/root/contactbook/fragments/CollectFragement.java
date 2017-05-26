@@ -3,11 +3,13 @@ package com.carryj.root.contactbook.fragments;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -26,7 +28,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,12 +41,10 @@ import com.carryj.root.contactbook.ContactPersonalShowActivity;
 import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.adapter.CollectAdapter;
 import com.carryj.root.contactbook.data.CollectListViewItemData;
-import com.carryj.root.contactbook.data.ContactListViewItemData;
 import com.carryj.root.contactbook.event.CallNavigationViewEvent;
 import com.carryj.root.contactbook.event.CollectEvent;
 import com.carryj.root.contactbook.event.DialEvent;
 import com.carryj.root.contactbook.event.HeadPhotoChangeEvent;
-import com.carryj.root.contactbook.event.NumberChangeEvent;
 import com.carryj.root.contactbook.tools.UserHeadPhotoManager;
 import com.makeramen.roundedimageview.RoundedImageView;
 
@@ -54,6 +53,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 
 
@@ -360,6 +360,15 @@ public class CollectFragement extends Fragment implements OnClickListener {
                     int contactID = collectCursor.getInt(COLLECT_CONTACT_ID_INDEX);
 
                     String number = collectCursor.getString(COLLECT_NUMBER_ID_INDEX);
+                    Bitmap photo = null;
+
+
+                    //获取头像
+                    Uri uri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactID);
+                    InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(resolver, uri, true);
+                    if (input != null) {
+                        photo = BitmapFactory.decodeStream(input);
+                    }
 
                     CollectListViewItemData itemData = new CollectListViewItemData();
                     itemData.setLookUp(lookUp);
@@ -368,6 +377,10 @@ public class CollectFragement extends Fragment implements OnClickListener {
                     itemData.setRawContactID(rawContactID);
                     itemData.setContactID(contactID);
                     itemData.setStrPhoneNumber(number);
+
+                    if(photo != null) {
+                        itemData.setBitmap(photo);//设置头像
+                    }
 
                     collectInfo.add(itemData);
 
@@ -393,6 +406,15 @@ public class CollectFragement extends Fragment implements OnClickListener {
                 values, ContactsContract.RawContacts.CONTACT_ID+"=?",new String[]{contactID});
     }
 
+
+
+    //处理数据更新事件
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onHeadPhotoChangeEvent(HeadPhotoChangeEvent headPhotoChangeEvent) {
+        if (headPhotoChangeEvent.isHeadPhotoChangeFlag()) {
+            userHeadPhotoManager.refreshHeadPhoto(head_photo);
+        }
+    }
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onCollectChangeEvent(CollectEvent collectEvent) {
         if (collectEvent.isCollectFlag()) {
@@ -403,12 +425,5 @@ public class CollectFragement extends Fragment implements OnClickListener {
         }
     }
 
-    //处理数据更新事件
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onHeadPhotoChangeEvent(HeadPhotoChangeEvent headPhotoChangeEvent) {
-        if (headPhotoChangeEvent.isHeadPhotoChangeFlag()) {
-            userHeadPhotoManager.refreshHeadPhoto(head_photo);
-        }
-    }
 
 }

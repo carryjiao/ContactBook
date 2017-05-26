@@ -35,6 +35,7 @@ import com.carryj.root.contactbook.data.ContactListViewItemData;
 import com.carryj.root.contactbook.data.EmailData;
 import com.carryj.root.contactbook.data.ImData;
 import com.carryj.root.contactbook.data.PhoneNumberData;
+import com.carryj.root.contactbook.event.CollectEvent;
 import com.carryj.root.contactbook.event.DialEvent;
 import com.carryj.root.contactbook.event.NumberChangeEvent;
 import com.carryj.root.contactbook.tools.GetStrEmailType;
@@ -116,7 +117,6 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_personal_show);
-        //EventBus.getDefault().register(this);
     }
 
     @Override
@@ -469,6 +469,9 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                 ContentResolver resolver = getContentResolver();
                 photo = getContactPhoto(lookUp, resolver);
                 im_contact_personal_show_icon.setImageBitmap(photo);
+
+                EventBus.getDefault().post(new CollectEvent(true));//通知收藏列表刷新数据
+
             }
 
             name = data.getStringExtra("NAME");
@@ -593,7 +596,6 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
 
     @Override
     protected void onDestroy() {
-        //EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
 
@@ -637,73 +639,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
 
     }
 
-    /*@Subscribe(threadMode = ThreadMode.MAIN)
-    public void onDealDataEditChange(NumberChangeEvent numberChangeEvent){
-        if(numberChangeEvent.isNumberChangeFlag()) {
-            ArrayList<PhoneNumberData> resultNumberDatas = getNumberData();
-            ArrayList<EmailData> resultEmailDatas = getEmailData();
-            ArrayList<ImData> resultImDatas = getImData();
-            //类型数据处理
-            Log.d("resultNumberDatas","size= "+resultNumberDatas.size());
-            if(resultNumberDatas.size()>0) {
 
-                if(numberDatas.size()>0) {//原本有数据
-                    numberDatas.clear();
-                    numberDatas.addAll(resultNumberDatas);
-                    numberAdapter.notifyDataSetChanged();
-                }else {//原本没有数据
-                    ll_contact_personal_show_number_block.setVisibility(View.VISIBLE);
-                    for (PhoneNumberData resultNumberData:resultNumberDatas) {
-                        numberDatas.add(resultNumberData);
-                        numberAdapter.notifyItemInserted(0);
-                    }
-                }
-            }else {
-                ll_contact_personal_show_number_block.setVisibility(View.GONE);
-                //numberDatas.clear();
-            }
-
-            Log.d("resultEmailDatas","size= "+resultEmailDatas.size());
-            if(resultEmailDatas.size()>0) {
-
-                if(emailDatas.size()>0) {
-                    emailDatas.clear();
-                    emailDatas.addAll(resultEmailDatas);
-                    emailAdapter.notifyDataSetChanged();
-                }else {
-                    ll_contact_personal_show_email_block.setVisibility(View.VISIBLE);
-                    for (EmailData resultEmailData:resultEmailDatas) {
-                        emailDatas.add(resultEmailData);
-                        emailAdapter.notifyItemInserted(0);
-                    }
-                }
-            }else {
-                ll_contact_personal_show_email_block.setVisibility(View.GONE);
-                //emailDatas.clear();
-            }
-
-            Log.d("resultImDatas","size= "+resultImDatas.size());
-            if (resultImDatas.size()>0) {
-
-                if(imDatas.size()>0) {
-                    imDatas.clear();
-                    imDatas.addAll(resultImDatas);
-                    imAdapter.notifyDataSetChanged();
-                }else {
-                    ll_contact_personal_show_im_block.setVisibility(View.VISIBLE);
-                    for (ImData resultImData:resultImDatas) {
-                        imDatas.add(resultImData);
-                        imAdapter.notifyItemInserted(0);
-                    }
-                }
-            }else {
-                ll_contact_personal_show_im_block.setVisibility(View.GONE);
-                //imDatas.clear();
-            }
-
-        }
-
-    }*/
 
     private ArrayList<PhoneNumberData> getNumberData() {
         ArrayList<PhoneNumberData> datas = new ArrayList<PhoneNumberData>();

@@ -1,5 +1,7 @@
 package com.carryj.root.contactbook.data;
 
+import android.graphics.Bitmap;
+
 import com.carryj.root.contactbook.tools.GetStrPhoneType;
 
 import java.io.Serializable;
@@ -16,6 +18,7 @@ public class CollectListViewItemData implements Serializable {
     private int rawContactID;
     private int contactID;
     private int phoneType;
+    private Bitmap bitmap;
 
 
     public CollectListViewItemData() {
@@ -73,5 +76,13 @@ public class CollectListViewItemData implements Serializable {
 
     public void setLookUp(String lookUp) {
         this.lookUp = lookUp;
+    }
+
+    public Bitmap getBitmap() {
+        return bitmap;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
     }
 }

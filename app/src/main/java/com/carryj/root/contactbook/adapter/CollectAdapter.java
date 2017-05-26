@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.data.CollectListViewItemData;
 import com.carryj.root.contactbook.data.RecordListViewItemData;
+import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.ArrayList;
 
@@ -56,7 +57,7 @@ public class CollectAdapter extends BaseAdapter{
             LayoutInflater mInflater = LayoutInflater.from(mContext);
             convertView = mInflater.inflate(R.layout.collect_list_item, null);
 
-            viewHolder.im_collect_icon = (ImageView) convertView.findViewById(R.id.im_collect_icon);
+            viewHolder.im_collect_icon = (RoundedImageView) convertView.findViewById(R.id.im_collect_icon);
             viewHolder.tv_collect_display_name = (TextView) convertView.findViewById(R.id.tv_collect_display_name);
             viewHolder.tv_collect_number_type = (TextView) convertView.findViewById(R.id.tv_collect_number_type);
 
@@ -69,14 +70,15 @@ public class CollectAdapter extends BaseAdapter{
         CollectListViewItemData itemData = getItem(position);
         if (itemData != null) {
 
-
+            if(itemData.getBitmap() != null) {//获取收藏联系人的头像
+                viewHolder.im_collect_icon.setImageBitmap(itemData.getBitmap());
+            }
 
             if (itemData.getName() != null) { //没存名字就显示电话号码
                 viewHolder.tv_collect_display_name.setText(itemData.getName());
             } else {
                 viewHolder.tv_collect_display_name.setText(itemData.getStrPhoneNumber());
             }
-
 
             viewHolder.tv_collect_number_type.setText(itemData.getPhoneType());
 
@@ -88,7 +90,7 @@ public class CollectAdapter extends BaseAdapter{
 
     private static class ViewHolder {
 
-        ImageView im_collect_icon;
+        RoundedImageView im_collect_icon;
         TextView tv_collect_display_name;
         TextView tv_collect_number_type;
 
