@@ -3,17 +3,19 @@ package com.carryj.root.contactbook;
 import android.content.ClipboardManager;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Data;
-import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.CommonDataKinds.Organization;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.CommonDataKinds.Email;
@@ -22,8 +24,13 @@ import android.provider.ContactsContract.CommonDataKinds.Note;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -78,6 +85,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     private boolean photoFlag;
 
     private boolean isPhotoChange = false;
+    private boolean isCollected = false;//判断该联系人是否已被收藏
 
     private String backStr;
 
@@ -88,6 +96,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
     private LinearLayout ll_contact_personal_show_remark_block;
     private LinearLayout ll_contact_personal_show_company_block;
     private LinearLayout ll_contact_personal_show_orcode;
+    private LinearLayout ll_contact_personal_show_collect;
     private LinearLayout ll_contact_personal_show_delete;
 
     private TextView tv_back_str;
@@ -131,21 +140,26 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
 
         lookUp = getIntent().getStringExtra(LOOKUP);
 
+        String starred = null;
         ContentResolver resolver = getContentResolver();
 
-        //查询联系人姓名
-        Cursor nameCursor = resolver.query(Data.CONTENT_URI, new String[]{Data.DISPLAY_NAME},
-                Phone.LOOKUP_KEY+"=? AND " + Data.MIMETYPE + " = ?",
-                new String[]{lookUp, StructuredName.CONTENT_ITEM_TYPE},null);
+        //查询联系人姓名和收藏状态
+        Cursor nameCursor = resolver.query(Contacts.CONTENT_URI, new String[]{Contacts.DISPLAY_NAME, Contacts.STARRED},
+                Contacts.LOOKUP_KEY+"=?", new String[]{lookUp},null);
         if (nameCursor != null) {
             while (nameCursor.moveToNext()) {
                 name = nameCursor.getString(0);
+                starred = nameCursor.getString(1);
             }
         }
         if(name != null && name.length()>0) {
             nameFlag = true;
         }else {
             nameFlag = false;
+        }
+
+        if (starred.equals("1")) { //已收藏
+            isCollected = true;
         }
 
         //查询联系人电话号码
@@ -221,6 +235,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         ll_contact_personal_show_number_block = (LinearLayout) findViewById(R.id.ll_contact_personal_show_number_block);
         rv_contact_personal_show_number = (RecyclerView) findViewById(R.id.rv_contact_personal_show_number);
         ll_contact_personal_show_orcode = (LinearLayout) findViewById(R.id.ll_contact_personal_show_orcode);
+        ll_contact_personal_show_collect = (LinearLayout) findViewById(R.id.ll_contact_personal_show_collect);
         ll_contact_personal_show_delete = (LinearLayout) findViewById(R.id.ll_contact_personal_show_delete);
 
         ll_contact_personal_show_email_block = (LinearLayout) findViewById(R.id.ll_contact_personal_show_email_block);
@@ -307,6 +322,9 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         else
             ll_contact_personal_show_company_block.setVisibility(View.GONE);
 
+        if(isCollected)
+            ll_contact_personal_show_collect.setVisibility(View.GONE);
+
 
     }
 
@@ -315,6 +333,7 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
         ll_contact_personal_show_back.setOnClickListener(this);
         tv_contact_personal_show_edit.setOnClickListener(this);
         ll_contact_personal_show_orcode.setOnClickListener(this);
+        ll_contact_personal_show_collect.setOnClickListener(this);
         ll_contact_personal_show_delete.setOnClickListener(this);
 
         //拨号
@@ -433,6 +452,52 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
                 break;
             case R.id.ll_contact_personal_show_orcode:
                 turnToORCode();
+                break;
+            case R.id.ll_contact_personal_show_collect:
+
+                View popupWindowView = getLayoutInflater().inflate(R.layout.add_collect_popupwindow, null);
+                View parent = getLayoutInflater().inflate(R.layout.activity_contact_personal_show, null);
+                Button cancel = (Button) popupWindowView.findViewById(R.id.btn_add_collect_popupwindow_cancel);
+                Button confirm = (Button) popupWindowView.findViewById(R.id.btn_add_collect_popupwindow_confirm);
+
+                final PopupWindow popupWindow = new PopupWindow(popupWindowView,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                //设置背景透明
+                WindowManager.LayoutParams lp = getWindow().getAttributes();
+                lp.alpha = 0.7f; //0.0-1.0
+                getWindow().setAttributes(lp);
+
+                popupWindow.setAnimationStyle(R.style.popup_window_anim);
+                popupWindow.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#F8F8F8")));
+                popupWindow.setFocusable(true);
+                popupWindow.setOutsideTouchable(true);
+                popupWindow.update();
+                popupWindow.showAtLocation(parent, Gravity.CENTER, 0, 0);
+
+                popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+                    @Override
+                    public void onDismiss() {
+                        WindowManager.LayoutParams lp = getWindow().getAttributes();
+                        lp.alpha = 1f; //0.0-1.0
+                        getWindow().setAttributes(lp);
+                    }
+                });
+                cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        popupWindow.dismiss();
+                    }
+                });
+
+                confirm.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        addCollect(lookUp);
+                        EventBus.getDefault().post(new CollectEvent(true));
+                        popupWindow.dismiss();
+                    }
+                });
+
                 break;
             case R.id.ll_contact_personal_show_delete:
                 Cursor cursor = getContentResolver().query(Phone.CONTENT_URI,
@@ -749,6 +814,17 @@ public class ContactPersonalShowActivity extends SweepBackActivity {
             return null;
         }
         return BitmapFactory.decodeStream(input);
+    }
+
+    private void addCollect(String lookUp) {
+
+        ContentValues values = new ContentValues();
+        values.put(Contacts.STARRED,1);
+        getContentResolver().update(Contacts.CONTENT_URI,
+                values, Contacts.LOOKUP_KEY+"=?",new String[]{lookUp});
+
+        Toast.makeText(this, "收藏成功", Toast.LENGTH_SHORT).show();
+
     }
 
 }

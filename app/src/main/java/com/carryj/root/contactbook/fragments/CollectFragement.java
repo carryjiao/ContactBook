@@ -161,7 +161,6 @@ public class CollectFragement extends Fragment implements OnClickListener {
         }.execute();
         ContactBookApplication application = ContactBookApplication.getInstance();
         String telnum = application.getTelnum();
-        Log.d("CollectFragment","===========================telnum = "+telnum);
         userHeadPhotoManager = new UserHeadPhotoManager(telnum);
         bitmap = userHeadPhotoManager.getBitmap();
 
@@ -368,6 +367,8 @@ public class CollectFragement extends Fragment implements OnClickListener {
                     InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(resolver, uri, true);
                     if (input != null) {
                         photo = BitmapFactory.decodeStream(input);
+                    }else {
+                        photo = null;
                     }
 
                     CollectListViewItemData itemData = new CollectListViewItemData();

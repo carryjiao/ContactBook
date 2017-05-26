@@ -104,6 +104,7 @@ public class AddCollectActivity extends SweepBackActivity {
         listView = (SwipeMenuListView) findViewById(R.id.contact_book_listview);
 
 
+        head_photo.setVisibility(View.GONE);
         tv_contact_book_add.setText("取消");
         tv_contact_book_add.setTextSize(20);
 

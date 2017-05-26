@@ -71,27 +71,35 @@ public class RecordItemInDetailActivity extends SweepBackActivity {
                 String contactID = data.getContactID();
                 if(contactID == null) {//根据姓名查询contactID
                     String name = data.getStrCachedName();
-                    Cursor cursor = getContentResolver().query(Contacts.CONTENT_URI, new String[]{Contacts._ID},
-                            Contacts.DISPLAY_NAME + "=?", new String[]{name}, null);
-                    if (cursor != null) {
-                        while (cursor.moveToNext()) {
-                            contactID = cursor.getString(0);
+                    if(name != null) {//不是未知联系人
+                        Cursor cursor = getContentResolver().query(Contacts.CONTENT_URI, new String[]{Contacts._ID},
+                                Contacts.DISPLAY_NAME + "=?", new String[]{name}, null);
+                        if (cursor != null) {
+                            while (cursor.moveToNext()) {
+                                contactID = cursor.getString(0);
+                            }
                         }
                     }
+
                 }
 
-                //获取头像
-                Uri uri = ContentUris.withAppendedId(Contacts.CONTENT_URI, Long.parseLong(contactID));
-                InputStream input = Contacts.openContactPhotoInputStream(getContentResolver(), uri, true);
-                if (input != null) {
-                    bitmap = BitmapFactory.decodeStream(input);
+                if(contactID != null) {
+                    //获取头像
+                    Uri uri = ContentUris.withAppendedId(Contacts.CONTENT_URI, Long.parseLong(contactID));
+                    InputStream input = Contacts.openContactPhotoInputStream(getContentResolver(), uri, true);
+                    if (input != null) {
+                        bitmap = BitmapFactory.decodeStream(input);
+                    }
                 }
                 return bitmap;
             }
 
             @Override
             protected void onPostExecute(Bitmap bitmap) {
-                im_record_item_in_detail_icon.setImageBitmap(bitmap);
+                if(bitmap != null) {
+                    im_record_item_in_detail_icon.setImageBitmap(bitmap);
+                }
+
                 super.onPostExecute(bitmap);
             }
         }.execute();
