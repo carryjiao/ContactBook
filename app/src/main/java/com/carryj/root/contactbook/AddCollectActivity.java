@@ -1,5 +1,6 @@
 package com.carryj.root.contactbook;
 
+import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -158,6 +159,7 @@ public class AddCollectActivity extends SweepBackActivity {
                         popupWindow.dismiss();
                     }
                 });
+
 
             }
         });

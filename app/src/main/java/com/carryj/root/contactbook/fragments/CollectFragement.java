@@ -378,10 +378,7 @@ public class CollectFragement extends Fragment implements OnClickListener {
                     itemData.setRawContactID(rawContactID);
                     itemData.setContactID(contactID);
                     itemData.setStrPhoneNumber(number);
-
-                    if(photo != null) {
-                        itemData.setBitmap(photo);//设置头像
-                    }
+                    itemData.setBitmap(photo);//设置头像
 
                     collectInfo.add(itemData);
 

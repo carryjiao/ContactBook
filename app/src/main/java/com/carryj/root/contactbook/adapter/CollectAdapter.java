@@ -1,7 +1,10 @@
 package com.carryj.root.contactbook.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.provider.CallLog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +12,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.carryj.root.contactbook.MainActivity;
 import com.carryj.root.contactbook.R;
 import com.carryj.root.contactbook.data.CollectListViewItemData;
 import com.carryj.root.contactbook.data.RecordListViewItemData;
@@ -72,6 +76,9 @@ public class CollectAdapter extends BaseAdapter{
 
             if(itemData.getBitmap() != null) {//获取收藏联系人的头像
                 viewHolder.im_collect_icon.setImageBitmap(itemData.getBitmap());
+            }else {//设置默认头像
+                Bitmap bitmap = BitmapFactory.decodeResource(convertView.getResources(), R.drawable.user_head_photo);
+                viewHolder.im_collect_icon.setImageBitmap(bitmap);
             }
 
             if (itemData.getName() != null) { //没存名字就显示电话号码
